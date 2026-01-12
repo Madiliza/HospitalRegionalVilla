@@ -351,6 +351,19 @@ function deletarExame(id) {
 function openModalMedicamento() {
     document.getElementById('modalMedicamento').classList.remove('modal-hidden');
     limparFormularioMedicamento();
+    preencherSelectPacientes();
+}
+
+function preencherSelectPacientes() {
+    const select = document.getElementById('medicamentoPacienteId');
+    select.innerHTML = '<option value="">Selecione um paciente</option>';
+    
+    pacientes.forEach(paciente => {
+        const option = document.createElement('option');
+        option.value = paciente.id;
+        option.textContent = paciente.nome;
+        select.appendChild(option);
+    });
 }
 
 function closeModalMedicamento() {
@@ -363,7 +376,7 @@ function limparFormularioMedicamento() {
 
 async function adicionarMedicamento() {
     const nome = document.getElementById('medicamentoNome').value;
-    const quantidade = document.getElementById('medicamentoQtd').value;
+    const quantidade = parseInt(document.getElementById('medicamentoQtd').value);
     const pacienteId = document.getElementById('medicamentoPacienteId').value;
     const data = document.getElementById('medicamentoData').value;
 
@@ -373,16 +386,52 @@ async function adicionarMedicamento() {
     }
 
     // Verificar se paciente existe
-    if (!pacientes.find(p => p.id === pacienteId)) {
+    const paciente = pacientes.find(p => p.id === pacienteId);
+    if (!paciente) {
         alert('Paciente não encontrado!');
+        return;
+    }
+
+    // Definir limites máximos por medicamento
+    const limites = {
+        'Kits': 5,
+        'Ataduras': 10,
+        'Analgésicos': 10
+    };
+
+    const limiteMaximo = limites[nome];
+
+    // Comparar datas de forma segura (sem problemas de timezone)
+    // data vem do input no formato YYYY-MM-DD
+    const dataSelecionada = data; // Mantém no formato YYYY-MM-DD
+
+    // Verificar registros do mesmo paciente, mesmo medicamento, na mesma data
+    const medicamentosHoje = medicamentos.filter(m => {
+        // m.data também deve estar no formato YYYY-MM-DD
+        return m.pacienteId === pacienteId && m.nome === nome && m.data === dataSelecionada;
+    });
+
+    const totalHoje = medicamentosHoje.reduce((acc, m) => acc + m.quantidade, 0);
+
+    // Verificar se já atingiu o limite do dia
+    if (totalHoje >= limiteMaximo) {
+        mostrarNotificacao(`❌ Limite diário atingido! O paciente ${paciente.nome} já recebeu ${totalHoje} ${nome} hoje. Limite: ${limiteMaximo}`, 'error');
+        return;
+    }
+
+    // Verificar se a nova quantidade não ultrapassa o limite
+    if (totalHoje + quantidade > limiteMaximo) {
+        const disponivel = limiteMaximo - totalHoje;
+        alert(`O paciente ${paciente.nome} já recebeu ${totalHoje} ${nome} hoje. Você pode adicionar no máximo ${disponivel} mais.`);
         return;
     }
 
     const novoMedicamento = {
         id: `MED-${Date.now()}`,
         nome,
-        quantidade: parseInt(quantidade),
+        quantidade,
         pacienteId,
+        pacienteNome: paciente.nome,
         data,
         dataCriacao: new Date().toLocaleDateString('pt-BR')
     };
@@ -400,7 +449,7 @@ async function adicionarMedicamento() {
     atualizarListaMedicamentos();
     atualizarDashboard();
 
-    mostrarNotificacao('Medicamento registrado com sucesso!', 'success');
+    mostrarNotificacao('✅ Medicamento registrado com sucesso!', 'success');
 }
 
 function atualizarListaMedicamentos() {
