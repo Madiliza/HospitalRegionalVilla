@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Regional Villa - Sistema de Gestão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .modal-hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-modern {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <!-- Navbar -->
+        <nav class="bg-white shadow-lg sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-hospital text-blue-600 text-2xl"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">Hospital Regional Villa</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="userBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-user-circle mr-2"></i>Meu Perfil
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar + Main Content -->
+        <div class="flex max-w-7xl mx-auto gap-6 p-6">
+            <!-- Sidebar -->
+            <aside class="w-64 bg-white rounded-xl shadow-lg p-6 sticky top-20 h-fit">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">Menu Principal</h2>
+                <nav class="space-y-3">
+                    <button onclick="showSection('dashboard')" class="w-full text-left px-4 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition flex items-center space-x-3">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="showSection('pacientes')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
+                        <i class="fas fa-users"></i>
+                        <span>Pacientes</span>
+                    </button>
+                    <button onclick="showSection('consultas')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Consultas</span>
+                    </button>
+                    <button onclick="showSection('exames')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
+                        <i class="fas fa-flask"></i>
+                        <span>Exames</span>
+                    </button>
+                    <button onclick="showSection('farmacia')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
+                        <i class="fas fa-pills"></i>
+                        <span>Farmácia</span>
+                    </button>
+                    <button onclick="showSection('calculadora')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
+                        <i class="fas fa-calculator"></i>
+                        <span>Calculadora</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-8">Bem-vindo ao Sistema</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Card Pacientes -->
+                            <div class="card-hover bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="showSection('pacientes')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-2">Pacientes</h3>
+                                        <p id="totalPacientes" class="text-3xl font-bold">0</p>
+                                    </div>
+                                    <i class="fas fa-users text-4xl opacity-30"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card Consultas -->
+                            <div class="card-hover bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="showSection('consultas')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-2">Consultas</h3>
+                                        <p id="totalConsultas" class="text-3xl font-bold">0</p>
+                                    </div>
+                                    <i class="fas fa-calendar-check text-4xl opacity-30"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card Exames -->
+                            <div class="card-hover bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="showSection('exames')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-2">Exames</h3>
+                                        <p id="totalExames" class="text-3xl font-bold">0</p>
+                                    </div>
+                                    <i class="fas fa-flask text-4xl opacity-30"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card Farmácia -->
+                            <div class="card-hover bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="showSection('farmacia')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-2">Farmácia</h3>
+                                        <p id="totalMedicamentos" class="text-3xl font-bold">0</p>
+                                    </div>
+                                    <i class="fas fa-pills text-4xl opacity-30"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card Calculadora -->
+                            <div class="card-hover bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="showSection('calculadora')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-semibold mb-2">Calculadora</h3>
+                                        <p class="text-sm opacity-80">Medicamentos</p>
+                                    </div>
+                                    <i class="fas fa-calculator text-4xl opacity-30"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pacientes Section -->
+                <section id="pacientes" class="space-y-6 modal-hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-gray-800">Gerenciar Pacientes</h2>
+                            <button onclick="openModalPaciente()" class="btn-modern px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                                <i class="fas fa-plus"></i>
+                                <span>Novo Paciente</span>
+                            </button>
+                        </div>
+
+                        <div id="pacientesList" class="space-y-4">
+                            <p class="text-gray-500 text-center py-8">Nenhum paciente cadastrado ainda</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Consultas Section -->
+                <section id="consultas" class="space-y-6 modal-hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-gray-800">Marcar Consulta</h2>
+                            <button onclick="openModalConsulta()" class="btn-modern px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center space-x-2">
+                                <i class="fas fa-plus"></i>
+                                <span>Nova Consulta</span>
+                            </button>
+                        </div>
+
+                        <div id="consultasList" class="space-y-4">
+                            <p class="text-gray-500 text-center py-8">Nenhuma consulta agendada</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Exames Section -->
+                <section id="exames" class="space-y-6 modal-hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-gray-800">Marcar Exame</h2>
+                            <button onclick="openModalExame()" class="btn-modern px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center space-x-2">
+                                <i class="fas fa-plus"></i>
+                                <span>Novo Exame</span>
+                            </button>
+                        </div>
+
+                        <div id="examesList" class="space-y-4">
+                            <p class="text-gray-500 text-center py-8">Nenhum exame agendado</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Farmácia Section -->
+                <section id="farmacia" class="space-y-6 modal-hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-gray-800">Controle de Farmácia</h2>
+                            <button onclick="openModalMedicamento()" class="btn-modern px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center space-x-2">
+                                <i class="fas fa-plus"></i>
+                                <span>Registrar Medicamento</span>
+                            </button>
+                        </div>
+
+                        <div id="farmaciaList" class="space-y-4">
+                            <p class="text-gray-500 text-center py-8">Nenhum medicamento registrado</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Calculadora Section -->
+                <section id="calculadora" class="space-y-6 modal-hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-8">Calculadora de Medicamentos</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                                <p class="text-gray-600 text-center py-8">
+                                    <i class="fas fa-wrench text-3xl text-gray-400"></i>
+                                </p>
+                                <p class="text-gray-500 text-center">Espaço reservado para a calculadora de medicamentos</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Paciente -->
+    <div id="modalPaciente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Novo Paciente</h3>
+                <button onclick="closeModalPaciente()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="formPaciente" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">ID do Paciente</label>
+                    <input type="text" id="pacienteId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="ID único" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Nome</label>
+                    <input type="text" id="pacienteNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nome completo" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Idade</label>
+                    <input type="number" id="pacienteIdade" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Idade" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Observação</label>
+                    <textarea id="pacienteObservacao" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Observações adicionais" rows="4"></textarea>
+                </div>
+
+                <button type="submit" class="btn-modern w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
+                    Salvar Paciente
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Consulta -->
+    <div id="modalConsulta" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Marcar Consulta</h3>
+                <button onclick="closeModalConsulta()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="formConsulta" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">ID do Paciente</label>
+                    <input type="text" id="consultaPacienteId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ID do paciente" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Especialidade</label>
+                    <input type="text" id="consultaEspecialidade" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Ex: Cardiologia" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Data</label>
+                    <input type="date" id="consultaData" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Hora</label>
+                    <input type="time" id="consultaHora" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+
+                <button type="submit" class="btn-modern w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition">
+                    Agendar Consulta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Exame -->
+    <div id="modalExame" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Marcar Exame</h3>
+                <button onclick="closeModalExame()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="formExame" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">ID do Paciente</label>
+                    <input type="text" id="examePacienteId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="ID do paciente" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Tipo de Exame</label>
+                    <input type="text" id="exameTipo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ex: Ressonância Magnética" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Data</label>
+                    <input type="date" id="exameData" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Hora</label>
+                    <input type="time" id="exameHora" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                </div>
+
+                <button type="submit" class="btn-modern w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition">
+                    Agendar Exame
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Medicamento -->
+    <div id="modalMedicamento" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Registrar Medicamento</h3>
+                <button onclick="closeModalMedicamento()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="formMedicamento" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Nome do Medicamento</label>
+                    <input type="text" id="medicamentoNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Nome" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Quantidade</label>
+                    <input type="number" id="medicamentoQtd" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">ID do Paciente</label>
+                    <input type="text" id="medicamentoPacienteId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="ID do paciente" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Data de Entrega</label>
+                    <input type="date" id="medicamentoData" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                </div>
+
+                <button type="submit" class="btn-modern w-full bg-orange-600 text-white font-bold py-3 rounded-lg hover:bg-orange-700 transition">
+                    Registrar Medicamento
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="../src/index.js"></script>
+</body>
+</html>

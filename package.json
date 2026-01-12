@@ -1,0 +1,26 @@
+{
+  "name": "firebase-js-project",
+  "version": "1.0.0",
+  "description": "Projeto básico de JavaScript com Firebase",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite"
+  },
+  "keywords": [
+    "javascript",
+    "firebase"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "firebase": "^10.14.1",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "dotenv": "^16.6.1"
+  }
+}
