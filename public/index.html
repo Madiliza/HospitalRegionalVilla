@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Regional Villa - Sistema de Gestão</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -239,7 +239,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-8">
                         <div class="flex justify-between items-center mb-8">
                             <h2 class="text-3xl font-bold text-gray-800">Controle de Farmácia</h2>
-                            <button onclick="openModalMedicamento()" class="btn-modern px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center space-x-2">
+                            <button onclick="openModalMedicamento()" class=" px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center space-x-2">
                                 <i class="fas fa-plus"></i>
                                 <span>Registrar Medicamento</span>
                             </button>
@@ -379,100 +379,40 @@
 
     <!-- Modal Medicamento -->
     <div id="modalMedicamento" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full mx-4 fade-in max-h-96 overflow-y-auto">
-            <div class="flex justify-between items-center mb-6 sticky top-0 bg-white pb-4">
-                <h3 class="text-2xl font-bold text-gray-800">Registrar Medicamentos</h3>
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Registrar Medicamento</h3>
                 <button onclick="closeModalMedicamento()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
             </div>
 
-            <form id="formMedicamento" class="space-y-6">
-                <!-- Busca de Paciente -->
+            <form id="formMedicamento" class="space-y-4">
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Buscar Paciente por ID</label>
-                    <div class="relative">
-                        <input type="text" id="buscaPacienteId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Digite o ID do paciente..." onkeyup="buscarPacientes()" autocomplete="off">
-                        
-                        <!-- Dropdown de Sugestões -->
-                        <div id="sugestoesPacientes" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto hidden z-10">
-                            <div id="listaSugestoes" class="py-2"></div>
-                        </div>
-                    </div>
-                    <!-- Campo hidden para armazenar ID -->
-                    <input type="hidden" id="medicamentoPacienteId">
+                    <label class="block text-gray-700 font-semibold mb-2">Nome do Medicamento</label>
+                    <input type="text" id="medicamentoNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Nome" required>
                 </div>
 
-                <!-- Status de Seleção -->
-                <div id="statusSelecao" class="p-3 bg-yellow-50 rounded-lg border border-yellow-200 hidden">
-                    <p class="text-sm text-gray-600">Nenhum paciente selecionado</p>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Quantidade</label>
+                    <input type="number" id="medicamentoQtd" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade" required>
                 </div>
 
-                <!-- Dados do Paciente (Exibição) -->
-                <div id="dadosPacienteDiv" class="p-4 bg-blue-50 rounded-lg hidden border border-blue-200">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-700"><strong>ID:</strong> <span id="idPacienteExibicao"></span></p>
-                            <p class="text-gray-700"><strong>Nome:</strong> <span id="nomePacienteExibicao"></span></p>
-                            <p class="text-gray-700"><strong>Idade:</strong> <span id="idadePacienteExibicao"></span> anos</p>
-                        </div>
-                        <button type="button" onclick="limparSelecaoPaciente()" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
-                            <i class="fas fa-times"></i> Limpar
-                        </button>
-                    </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">ID do Paciente</label>
+                    <input type="text" id="medicamentoPacienteId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="ID do paciente" required>
                 </div>
 
-                <!-- Medicamentos -->
-                <div class="space-y-4 border-t pt-4">
-                    <h4 class="font-semibold text-gray-700">Medicamentos</h4>
-                    
-                    <!-- Kits -->
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="font-semibold text-gray-700">Kits</label>
-                            <span id="kitsDiaInfo" class="text-sm text-orange-600">Limite: 5</span>
-                        </div>
-                        <input type="number" id="qtdKits" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade de Kits" min="0" value="0" onchange="atualizarTotal()">
-                        <p id="avisoKits" class="text-xs text-orange-600 mt-1 hidden"></p>
-                    </div>
-
-                    <!-- Ataduras -->
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="font-semibold text-gray-700">Ataduras</label>
-                            <span id="atadurasDiaInfo" class="text-sm text-orange-600">Limite: 10</span>
-                        </div>
-                        <input type="number" id="qtdAtaduras" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade de Ataduras" min="0" value="0" onchange="atualizarTotal()">
-                        <p id="avisoAtaduras" class="text-xs text-orange-600 mt-1 hidden"></p>
-                    </div>
-
-                    <!-- Analgésicos -->
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="font-semibold text-gray-700">Analgésicos</label>
-                            <span id="analgesicoDiaInfo" class="text-sm text-orange-600">Limite: 10</span>
-                        </div>
-                        <input type="number" id="qtdAnalgesicos" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade de Analgésicos" min="0" value="0" onchange="atualizarTotal()">
-                        <p id="avisoAnalgesicos" class="text-xs text-orange-600 mt-1 hidden"></p>
-                    </div>
-                </div>
-
-                <!-- Resumo Total -->
-                <div class="border-t pt-4 bg-blue-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-3">Resumo do Registro</h4>
-                    <div id="resumoMedicamentos" class="space-y-2 text-sm">
-                        <p class="text-gray-600">Selecione medicamentos acima</p>
-                    </div>
-                    <div class="border-t mt-3 pt-3">
-                        <p class="text-lg font-bold text-gray-800">Total de Itens: <span id="totalItens">0</span></p>
-                    </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Data de Entrega</label>
+                    <input type="date" id="medicamentoData" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
                 </div>
 
                 <button type="submit" class="btn-modern w-full bg-orange-600 text-white font-bold py-3 rounded-lg hover:bg-orange-700 transition">
-                    Registrar Medicamentos
+                    Registrar Medicamento
                 </button>
             </form>
         </div>
     </div>
 
-    <script type="module" src="./src/index.js"></script>
+    <script type="module" src="../src/index.js"></script>
 </body>
 </html>
