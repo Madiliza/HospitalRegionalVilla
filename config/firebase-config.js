@@ -44,6 +44,16 @@ export async function lerDados(caminho) {
   }
 }
 
+// Função para deletar dados do Realtime Database
+export async function deletarDados(caminho) {
+  try {
+    await set(ref(database, caminho), null);
+    console.log("Dados deletados com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao deletar dados:", erro);
+  }
+}
+
 // Função para criar usuário
 export async function criarUsuario(email, senha) {
   try {

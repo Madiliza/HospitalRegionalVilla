@@ -1,4 +1,4 @@
-import { salvarDados, lerDados } from '../config/firebase-config.js';
+import { salvarDados, lerDados, deletarDados } from '../config/firebase-config.js';
 
 // ============================================
 // VARIÁVEIS GLOBAIS
@@ -11,8 +11,11 @@ let medicamentos = [];
 // ============================================
 // INICIALIZAÇÃO
 // ============================================
+let appReady = false;
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM carregado');
+    appReady = true;
     carregarDados();
     configurarEventos();
 });
@@ -56,14 +59,14 @@ function showSection(sectionId) {
 
     // Atualizar botão ativo na sidebar
     document.querySelectorAll('aside button').forEach(btn => {
-        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.remove('bg-red-600', 'text-white');
         btn.classList.add('hover:bg-gray-100', 'text-gray-700');
     });
 
     const activeBtn = event.target.closest('button');
     if (activeBtn) {
         activeBtn.classList.remove('hover:bg-gray-100', 'text-gray-700');
-        activeBtn.classList.add('bg-blue-600', 'text-white');
+        activeBtn.classList.add('bg-red-600', 'text-white');
     }
 }
 
@@ -90,7 +93,7 @@ async function adicionarPaciente() {
     const observacao = document.getElementById('pacienteObservacao').value;
 
     if (!id || !nome || !idade) {
-        alert('Preencha todos os campos obrigatórios!');
+        mostrarErro('Campos Obrigatórios', 'Preencha todos os campos obrigatórios!');
         return;
     }
 
@@ -127,7 +130,7 @@ function atualizarListaPacientes() {
     }
 
     lista.innerHTML = pacientes.map(paciente => `
-        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border-l-4 border-blue-600">
+        <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-lg border-l-4 border-red-600">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-lg font-bold text-gray-800">${paciente.nome}</h3>
@@ -145,12 +148,24 @@ function atualizarListaPacientes() {
 }
 
 function deletarPaciente(id) {
-    if (confirm('Tem certeza que deseja deletar este paciente?')) {
-        pacientes = pacientes.filter(p => p.id !== id);
-        atualizarListaPacientes();
-        atualizarDashboard();
-        mostrarNotificacao('Paciente removido!', 'info');
-    }
+    mostrarConfirmacao(
+        'Deletar Paciente',
+        'Tem certeza que deseja deletar este paciente?',
+        async () => {
+            pacientes = pacientes.filter(p => p.id !== id);
+            
+            // Deletar do Firebase
+            try {
+                await deletarDados(`pacientes/${id}`);
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaPacientes();
+            atualizarDashboard();
+            mostrarNotificacao('Paciente removido!', 'info');
+        }
+    );
 }
 
 // ============================================
@@ -167,6 +182,60 @@ function closeModalConsulta() {
 
 function limparFormularioConsulta() {
     document.getElementById('formConsulta').reset();
+    document.getElementById('buscaPacienteConsulta').value = '';
+    document.getElementById('consultaPacienteId').value = '';
+    document.getElementById('dadosPacienteConsultaDiv').classList.add('hidden');
+    document.getElementById('sugestoesPacientesConsulta').classList.add('hidden');
+}
+
+// Funções de busca de paciente para Consulta
+function buscarPacientesConsulta() {
+    const termo = document.getElementById('buscaPacienteConsulta').value.toLowerCase().trim();
+    const sugestoes = document.getElementById('sugestoesPacientesConsulta');
+    const listaSugestoes = document.getElementById('listaSugestoesConsulta');
+
+    if (termo.length === 0) {
+        sugestoes.classList.add('hidden');
+        return;
+    }
+
+    // Filtrar pacientes pelo ID ou nome
+    const pacientesFiltrados = pacientes.filter(p => 
+        p.id.toLowerCase().includes(termo) || 
+        p.nome.toLowerCase().includes(termo)
+    );
+
+    if (pacientesFiltrados.length === 0) {
+        listaSugestoes.innerHTML = '<div class="px-4 py-2 text-gray-500 text-sm">Nenhum paciente encontrado</div>';
+        sugestoes.classList.remove('hidden');
+        return;
+    }
+
+    listaSugestoes.innerHTML = pacientesFiltrados.map(p => `
+        <div onclick="selecionarPacienteConsulta('${p.id}', '${p.nome}', '${p.idade}')" class="px-4 py-2 hover:bg-green-100 cursor-pointer border-b border-gray-200 last:border-b-0">
+            <div class="font-semibold text-gray-800">${p.id}</div>
+            <div class="text-sm text-gray-600">${p.nome} - ${p.idade} anos</div>
+        </div>
+    `).join('');
+
+    sugestoes.classList.remove('hidden');
+}
+
+function selecionarPacienteConsulta(id, nome, idade) {
+    document.getElementById('buscaPacienteConsulta').value = id;
+    document.getElementById('consultaPacienteId').value = id;
+    document.getElementById('idPacienteConsultaExibicao').textContent = id;
+    document.getElementById('nomePacienteConsultaExibicao').textContent = nome;
+    document.getElementById('idadePacienteConsultaExibicao').textContent = idade;
+    document.getElementById('dadosPacienteConsultaDiv').classList.remove('hidden');
+    document.getElementById('sugestoesPacientesConsulta').classList.add('hidden');
+}
+
+function limparSelecaoPacienteConsulta() {
+    document.getElementById('buscaPacienteConsulta').value = '';
+    document.getElementById('consultaPacienteId').value = '';
+    document.getElementById('dadosPacienteConsultaDiv').classList.add('hidden');
+    document.getElementById('sugestoesPacientesConsulta').classList.add('hidden');
 }
 
 async function adicionarConsulta() {
@@ -176,13 +245,13 @@ async function adicionarConsulta() {
     const hora = document.getElementById('consultaHora').value;
 
     if (!pacienteId || !especialidade || !data || !hora) {
-        alert('Preencha todos os campos!');
+        mostrarErro('Campos Obrigatórios', 'Preencha todos os campos!');
         return;
     }
 
     // Verificar se paciente existe
     if (!pacientes.find(p => p.id === pacienteId)) {
-        alert('Paciente não encontrado!');
+        mostrarErro('Paciente Não Encontrado', 'Paciente não encontrado!');
         return;
     }
 
@@ -241,12 +310,24 @@ function atualizarListaConsultas() {
 }
 
 function deletarConsulta(id) {
-    if (confirm('Tem certeza que deseja cancelar esta consulta?')) {
-        consultas = consultas.filter(c => c.id !== id);
-        atualizarListaConsultas();
-        atualizarDashboard();
-        mostrarNotificacao('Consulta cancelada!', 'info');
-    }
+    mostrarConfirmacao(
+        'Cancelar Consulta',
+        'Tem certeza que deseja cancelar esta consulta?',
+        async () => {
+            consultas = consultas.filter(c => c.id !== id);
+            
+            // Deletar do Firebase
+            try {
+                await deletarDados(`consultas/${id}`);
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaConsultas();
+            atualizarDashboard();
+            mostrarNotificacao('Consulta cancelada!', 'info');
+        }
+    );
 }
 
 // ============================================
@@ -263,6 +344,60 @@ function closeModalExame() {
 
 function limparFormularioExame() {
     document.getElementById('formExame').reset();
+    document.getElementById('buscaPacienteExame').value = '';
+    document.getElementById('examePacienteId').value = '';
+    document.getElementById('dadosPacienteExameDiv').classList.add('hidden');
+    document.getElementById('sugestoesPacientesExame').classList.add('hidden');
+}
+
+// Funções de busca de paciente para Exame
+function buscarPacientesExame() {
+    const termo = document.getElementById('buscaPacienteExame').value.toLowerCase().trim();
+    const sugestoes = document.getElementById('sugestoesPacientesExame');
+    const listaSugestoes = document.getElementById('listaSugestoesExame');
+
+    if (termo.length === 0) {
+        sugestoes.classList.add('hidden');
+        return;
+    }
+
+    // Filtrar pacientes pelo ID ou nome
+    const pacientesFiltrados = pacientes.filter(p => 
+        p.id.toLowerCase().includes(termo) || 
+        p.nome.toLowerCase().includes(termo)
+    );
+
+    if (pacientesFiltrados.length === 0) {
+        listaSugestoes.innerHTML = '<div class="px-4 py-2 text-gray-500 text-sm">Nenhum paciente encontrado</div>';
+        sugestoes.classList.remove('hidden');
+        return;
+    }
+
+    listaSugestoes.innerHTML = pacientesFiltrados.map(p => `
+        <div onclick="selecionarPacienteExame('${p.id}', '${p.nome}', '${p.idade}')" class="px-4 py-2 hover:bg-purple-100 cursor-pointer border-b border-gray-200 last:border-b-0">
+            <div class="font-semibold text-gray-800">${p.id}</div>
+            <div class="text-sm text-gray-600">${p.nome} - ${p.idade} anos</div>
+        </div>
+    `).join('');
+
+    sugestoes.classList.remove('hidden');
+}
+
+function selecionarPacienteExame(id, nome, idade) {
+    document.getElementById('buscaPacienteExame').value = id;
+    document.getElementById('examePacienteId').value = id;
+    document.getElementById('idPacienteExameExibicao').textContent = id;
+    document.getElementById('nomePacienteExameExibicao').textContent = nome;
+    document.getElementById('idadePacienteExameExibicao').textContent = idade;
+    document.getElementById('dadosPacienteExameDiv').classList.remove('hidden');
+    document.getElementById('sugestoesPacientesExame').classList.add('hidden');
+}
+
+function limparSelecaoPacienteExame() {
+    document.getElementById('buscaPacienteExame').value = '';
+    document.getElementById('examePacienteId').value = '';
+    document.getElementById('dadosPacienteExameDiv').classList.add('hidden');
+    document.getElementById('sugestoesPacientesExame').classList.add('hidden');
 }
 
 async function adicionarExame() {
@@ -272,13 +407,13 @@ async function adicionarExame() {
     const hora = document.getElementById('exameHora').value;
 
     if (!pacienteId || !tipo || !data || !hora) {
-        alert('Preencha todos os campos!');
+        mostrarErro('Campos Obrigatórios', 'Preencha todos os campos!');
         return;
     }
 
     // Verificar se paciente existe
     if (!pacientes.find(p => p.id === pacienteId)) {
-        alert('Paciente não encontrado!');
+        mostrarErro('Paciente Não Encontrado', 'Paciente não encontrado!');
         return;
     }
 
@@ -337,12 +472,24 @@ function atualizarListaExames() {
 }
 
 function deletarExame(id) {
-    if (confirm('Tem certeza que deseja cancelar este exame?')) {
-        exames = exames.filter(e => e.id !== id);
-        atualizarListaExames();
-        atualizarDashboard();
-        mostrarNotificacao('Exame cancelado!', 'info');
-    }
+    mostrarConfirmacao(
+        'Cancelar Exame',
+        'Tem certeza que deseja cancelar este exame?',
+        async () => {
+            exames = exames.filter(e => e.id !== id);
+            
+            // Deletar do Firebase
+            try {
+                await deletarDados(`exames/${id}`);
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaExames();
+            atualizarDashboard();
+            mostrarNotificacao('Exame cancelado!', 'info');
+        }
+    );
 }
 
 // ============================================
@@ -511,20 +658,20 @@ async function adicionarMedicamento() {
     const qtdAnalgesicos = parseInt(document.getElementById('qtdAnalgesicos').value) || 0;
 
     if (!pacienteId) {
-        alert('Selecione um paciente!');
+        mostrarErro('Paciente Obrigatório', 'Selecione um paciente!');
         return;
     }
 
     const totalItens = qtdKits + qtdAtaduras + qtdAnalgesicos;
     if (totalItens === 0) {
-        alert('Adicione pelo menos um medicamento!');
+        mostrarErro('Medicamentos Obrigatórios', 'Adicione pelo menos um medicamento!');
         return;
     }
 
     // Buscar paciente
     const paciente = pacientes.find(p => p.id === pacienteId);
     if (!paciente) {
-        alert('Paciente não encontrado!');
+        mostrarErro('Paciente Não Encontrado', 'Paciente não encontrado!');
         return;
     }
 
@@ -547,15 +694,15 @@ async function adicionarMedicamento() {
     const limites = { 'Kits': 5, 'Ataduras': 10, 'Analgésicos': 10 };
 
     if (medicamentosHoje['Kits'] + qtdKits > limites['Kits']) {
-        alert(`Limite de Kits excedido! Já registrados: ${medicamentosHoje['Kits']}, Limite: ${limites['Kits']}`);
+        mostrarErro('Limite Excedido', `Limite de Kits excedido! Já registrados: ${medicamentosHoje['Kits']}, Limite: ${limites['Kits']}`);
         return;
     }
     if (medicamentosHoje['Ataduras'] + qtdAtaduras > limites['Ataduras']) {
-        alert(`Limite de Ataduras excedido! Já registrados: ${medicamentosHoje['Ataduras']}, Limite: ${limites['Ataduras']}`);
+        mostrarErro('Limite Excedido', `Limite de Ataduras excedido! Já registrados: ${medicamentosHoje['Ataduras']}, Limite: ${limites['Ataduras']}`);
         return;
     }
     if (medicamentosHoje['Analgésicos'] + qtdAnalgesicos > limites['Analgésicos']) {
-        alert(`Limite de Analgésicos excedido! Já registrados: ${medicamentosHoje['Analgésicos']}, Limite: ${limites['Analgésicos']}`);
+        mostrarErro('Limite Excedido', `Limite de Analgésicos excedido! Já registrados: ${medicamentosHoje['Analgésicos']}, Limite: ${limites['Analgésicos']}`);
         return;
     }
 
@@ -681,12 +828,24 @@ function atualizarListaMedicamentos() {
 }
 
 function deletarMedicamento(id) {
-    if (confirm('Tem certeza que deseja remover este medicamento?')) {
-        medicamentos = medicamentos.filter(m => m.id !== id);
-        atualizarListaMedicamentos();
-        atualizarDashboard();
-        mostrarNotificacao('Medicamento removido!', 'info');
-    }
+    mostrarConfirmacao(
+        'Remover Medicamento',
+        'Tem certeza que deseja remover este medicamento?',
+        async () => {
+            medicamentos = medicamentos.filter(m => m.id !== id);
+            
+            // Deletar do Firebase
+            try {
+                await deletarDados(`medicamentos/${id}`);
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaMedicamentos();
+            atualizarDashboard();
+            mostrarNotificacao('Medicamento removido!', 'info');
+        }
+    );
 }
 
 // ============================================
@@ -700,23 +859,212 @@ function atualizarDashboard() {
 }
 
 // ============================================
-// CARREGAR DADOS (simulado - conectar ao Firebase depois)
+// CARREGAR DADOS DO FIREBASE
 // ============================================
 async function carregarDados() {
     try {
-        // Aqui você pode carregar dados do Firebase
-        // const dadosPacientes = await lerDados('pacientes');
-        // const dadosConsultas = await lerDados('consultas');
-        // etc...
+        // Carregar pacientes do Firebase
+        const dadosPacientes = await lerDados('pacientes');
+        if (dadosPacientes) {
+            pacientes = Object.values(dadosPacientes);
+            atualizarListaPacientes();
+            console.log('Pacientes carregados:', pacientes.length);
+        }
 
-        // Por enquanto, apenas atualiza o dashboard
+        // Carregar consultas do Firebase
+        const dadosConsultas = await lerDados('consultas');
+        if (dadosConsultas) {
+            consultas = Object.values(dadosConsultas);
+            atualizarListaConsultas();
+            console.log('Consultas carregadas:', consultas.length);
+        }
+
+        // Carregar exames do Firebase
+        const dadosExames = await lerDados('exames');
+        if (dadosExames) {
+            exames = Object.values(dadosExames);
+            atualizarListaExames();
+            console.log('Exames carregados:', exames.length);
+        }
+
+        // Carregar medicamentos do Firebase
+        const dadosMedicamentos = await lerDados('medicamentos');
+        if (dadosMedicamentos) {
+            medicamentos = Object.values(dadosMedicamentos);
+            atualizarListaMedicamentos();
+            console.log('Medicamentos carregados:', medicamentos.length);
+        }
+
         atualizarDashboard();
-        console.log('Dados carregados com sucesso');
+        console.log('✅ Todos os dados carregados com sucesso!');
     } catch (erro) {
-        console.error('Erro ao carregar dados:', erro);
+        console.error('⚠️ Erro ao carregar dados:', erro);
         // Continua funcionando mesmo se o Firebase não estiver configurado
         atualizarDashboard();
     }
+}
+
+// ============================================
+// DIÁLOGO CUSTOMIZADO (substitui alert)
+// ============================================
+function getDialogoElementos() {
+    if (!appReady) {
+        return {
+            dialog: null,
+            dialogIcon: null,
+            dialogTitle: null,
+            dialogMessage: null,
+            dialogButtons: null
+        };
+    }
+    
+    return {
+        dialog: document.getElementById('customDialog'),
+        dialogIcon: document.getElementById('dialogIcon'),
+        dialogTitle: document.getElementById('dialogTitle'),
+        dialogMessage: document.getElementById('dialogMessage'),
+        dialogButtons: document.getElementById('dialogButtons')
+    };
+}
+
+function mostrarDialog(titulo, mensagem, tipo = 'info', botoes = null) {
+    // Se o app ainda não está pronto, aguardar
+    if (!appReady) {
+        console.warn('App não está pronto ainda, aguardando...');
+        setTimeout(() => mostrarDialog(titulo, mensagem, tipo, botoes), 50);
+        return;
+    }
+    
+    // Obter elementos
+    const elementos = getDialogoElementos();
+    const { dialog, dialogIcon, dialogTitle, dialogMessage, dialogButtons } = elementos;
+    
+    // Se algum elemento não existe, tentar novamente
+    if (!dialog || !dialogIcon || !dialogTitle || !dialogMessage || !dialogButtons) {
+        console.warn('Elementos do diálogo não encontrados, tentando novamente...');
+        setTimeout(() => mostrarDialog(titulo, mensagem, tipo, botoes), 100);
+        return;
+    }
+
+    // Definir ícone e cor baseado no tipo
+    const iconesETitulos = {
+        success: { icon: '✅', color: '#10b981' },
+        error: { icon: '❌', color: '#ef4444' },
+        warning: { icon: '⚠️', color: '#f59e0b' },
+        info: { icon: 'ℹ️', color: '#3b82f6' },
+        question: { icon: '❓', color: '#8b5cf6' }
+    };
+
+    const config = iconesETitulos[tipo] || iconesETitulos.info;
+
+    dialogIcon.textContent = config.icon;
+    dialogIcon.style.color = config.color;
+    dialogTitle.textContent = titulo;
+    dialogMessage.textContent = mensagem;
+
+    // Criar botões
+    if (!botoes) {
+        botoes = [
+            {
+                texto: 'OK',
+                tipo: 'primary',
+                callback: () => fecharDialog()
+            }
+        ];
+    }
+
+    // Armazenar callbacks ANTES de criar os botões
+    window.dialogCallbacks = botoes.map(b => b.callback);
+
+    dialogButtons.innerHTML = botoes.map((botao, indice) => `
+        <button class="px-6 py-2 rounded-lg font-semibold transition ${
+            botao.tipo === 'primary'
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : botao.tipo === 'danger'
+                ? 'bg-red-600 text-white hover:bg-red-700'
+                : botao.tipo === 'secondary'
+                ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+        }" onclick="executarBotaoDialog(${indice})">
+            ${botao.texto}
+        </button>
+    `).join('');
+
+    dialog.classList.remove('modal-hidden');
+}
+
+function executarBotaoDialog(indice) {
+    if (window.dialogCallbacks && window.dialogCallbacks[indice]) {
+        const callback = window.dialogCallbacks[indice];
+        // Executar o callback (pode ser async ou não)
+        const resultado = callback();
+        
+        // Se for uma Promise, aguardar antes de fechar
+        if (resultado && typeof resultado.then === 'function') {
+            resultado.then(() => {
+                fecharDialog();
+            }).catch(erro => {
+                console.error('Erro ao executar callback:', erro);
+                fecharDialog();
+            });
+        } else {
+            fecharDialog();
+        }
+    } else {
+        fecharDialog();
+    }
+}
+
+function fecharDialog() {
+    const dialog = document.getElementById('customDialog');
+    if (dialog) {
+        dialog.classList.add('modal-hidden');
+    }
+    window.dialogCallbacks = null;
+}
+
+// Funções auxiliares para tipos específicos
+function mostrarAlerta(titulo, mensagem) {
+    mostrarDialog(titulo, mensagem, 'info');
+}
+
+function mostrarErro(titulo, mensagem) {
+    mostrarDialog(titulo, mensagem, 'error');
+}
+
+function mostrarSucesso(titulo, mensagem) {
+    mostrarDialog(titulo, mensagem, 'success');
+}
+
+function mostrarAviso(titulo, mensagem) {
+    mostrarDialog(titulo, mensagem, 'warning');
+}
+
+function mostrarConfirmacao(titulo, mensagem, callbackSim, callbackNao = null) {
+    const botoesConfirmacao = [
+        {
+            texto: 'Sim',
+            tipo: 'primary',
+            callback: async () => {
+                if (callbackSim) {
+                    await callbackSim();
+                }
+                fecharDialog();
+            }
+        },
+        {
+            texto: 'Não',
+            tipo: 'secondary',
+            callback: () => {
+                if (callbackNao) {
+                    callbackNao();
+                }
+                fecharDialog();
+            }
+        }
+    ];
+    
+    mostrarDialog(titulo, mensagem, 'question', botoesConfirmacao);
 }
 
 // ============================================
@@ -773,5 +1121,13 @@ window.deletarMedicamento = deletarMedicamento;
 window.buscarPacientes = buscarPacientes;
 window.selecionarPaciente = selecionarPaciente;
 window.limparSelecaoPaciente = limparSelecaoPaciente;
+window.buscarPacientesConsulta = buscarPacientesConsulta;
+window.selecionarPacienteConsulta = selecionarPacienteConsulta;
+window.limparSelecaoPacienteConsulta = limparSelecaoPacienteConsulta;
+window.buscarPacientesExame = buscarPacientesExame;
+window.selecionarPacienteExame = selecionarPacienteExame;
+window.limparSelecaoPacienteExame = limparSelecaoPacienteExame;
 window.atualizarTotal = atualizarTotal;
 window.atualizarConsumosDia = atualizarConsumosDia;
+window.executarBotaoDialog = executarBotaoDialog;
+window.fecharDialog = fecharDialog;
