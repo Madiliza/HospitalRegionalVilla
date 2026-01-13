@@ -561,7 +561,6 @@ function selecionarPaciente(id, nome, idade) {
     document.getElementById('idadePacienteExibicao').textContent = idade;
     document.getElementById('dadosPacienteDiv').classList.remove('hidden');
     document.getElementById('sugestoesPacientes').classList.add('hidden');
-    atualizarConsumosDia();
 }
 
 function limparSelecaoPaciente() {
@@ -569,10 +568,6 @@ function limparSelecaoPaciente() {
     document.getElementById('medicamentoPacienteId').value = '';
     document.getElementById('dadosPacienteDiv').classList.add('hidden');
     document.getElementById('sugestoesPacientes').classList.add('hidden');
-    document.getElementById('qtdKits').value = '0';
-    document.getElementById('qtdAtaduras').value = '0';
-    document.getElementById('qtdAnalgesicos').value = '0';
-    atualizarTotal();
 }
 
 function closeModalMedicamento() {
@@ -594,188 +589,19 @@ function limparFormularioMedicamento() {
 }
 
 function limparAvisos() {
-    document.getElementById('avisoKits').classList.add('hidden');
-    document.getElementById('avisoAtaduras').classList.add('hidden');
-    document.getElementById('avisoAnalgesicos').classList.add('hidden');
+    // Avisos foram removidos na refatoração
 }
 
 function atualizarConsumosDia() {
-    const pacienteId = document.getElementById('medicamentoPacienteId').value;
-    if (!pacienteId) return;
-
-    const hoje = new Date().toISOString().split('T')[0];
-
-    // Medicamentos do dia para este paciente
-    const medicamentosHoje = {
-        'Kits': 0,
-        'Ataduras': 0,
-        'Analgésicos': 0
-    };
-
-    medicamentos.forEach(m => {
-        if (m.pacienteId === pacienteId) {
-            medicamentosHoje[m.nome] = (medicamentosHoje[m.nome] || 0) + m.quantidade;
-        }
-    });
-
-    // Atualizar displays de consumo
-    document.getElementById('kitsDiaInfo').innerHTML = `Registrado hoje: ${medicamentosHoje['Kits']}/5`;
-    document.getElementById('atadurasDiaInfo').innerHTML = `Registrado hoje: ${medicamentosHoje['Ataduras']}/10`;
-    document.getElementById('analgesicoDiaInfo').innerHTML = `Registrado hoje: ${medicamentosHoje['Analgésicos']}/10`;
-
-    // Adicionar avisos se limite atingido
-    if (medicamentosHoje['Kits'] >= 5) {
-        document.getElementById('avisoKits').textContent = '⚠️ Limite diário atingido!';
-        document.getElementById('avisoKits').classList.remove('hidden');
-        document.getElementById('qtdKits').disabled = true;
-    } else {
-        document.getElementById('qtdKits').disabled = false;
-    }
-
-    if (medicamentosHoje['Ataduras'] >= 10) {
-        document.getElementById('avisoAtaduras').textContent = '⚠️ Limite diário atingido!';
-        document.getElementById('avisoAtaduras').classList.remove('hidden');
-        document.getElementById('qtdAtaduras').disabled = true;
-    } else {
-        document.getElementById('qtdAtaduras').disabled = false;
-    }
-
-    if (medicamentosHoje['Analgésicos'] >= 10) {
-        document.getElementById('avisoAnalgesicos').textContent = '⚠️ Limite diário atingido!';
-        document.getElementById('avisoAnalgesicos').classList.remove('hidden');
-        document.getElementById('qtdAnalgesicos').disabled = true;
-    } else {
-        document.getElementById('qtdAnalgesicos').disabled = false;
-    }
-
-    atualizarTotal();
+    // Função removida - elementos Kits, Ataduras e Analgésicos foram removidos
 }
 
 function atualizarTotal() {
-    const qtdKits = parseInt(document.getElementById('qtdKits').value) || 0;
-    const qtdAtaduras = parseInt(document.getElementById('qtdAtaduras').value) || 0;
-    const qtdAnalgesicos = parseInt(document.getElementById('qtdAnalgesicos').value) || 0;
-
-    const resumo = [];
-    if (qtdKits > 0) resumo.push(`${qtdKits} Kit${qtdKits > 1 ? 's' : ''}`);
-    if (qtdAtaduras > 0) resumo.push(`${qtdAtaduras} Atadura${qtdAtaduras > 1 ? 's' : ''}`);
-    if (qtdAnalgesicos > 0) resumo.push(`${qtdAnalgesicos} Analgésico${qtdAnalgesicos > 1 ? 's' : ''}`);
-
-    const totalItens = qtdKits + qtdAtaduras + qtdAnalgesicos;
-
-    if (resumo.length === 0) {
-        document.getElementById('resumoMedicamentos').innerHTML = '<p class="text-gray-600">Selecione medicamentos acima</p>';
-    } else {
-        document.getElementById('resumoMedicamentos').innerHTML = resumo.map(item => `<p class="text-gray-700">✓ ${item}</p>`).join('');
-    }
-
-    document.getElementById('totalItens').textContent = totalItens;
+    // Esta função foi refatorada - o total é calculado em atualizarResume()
 }
 
 async function adicionarMedicamento() {
-    const pacienteId = document.getElementById('medicamentoPacienteId').value;
-    const qtdKits = parseInt(document.getElementById('qtdKits').value) || 0;
-    const qtdAtaduras = parseInt(document.getElementById('qtdAtaduras').value) || 0;
-    const qtdAnalgesicos = parseInt(document.getElementById('qtdAnalgesicos').value) || 0;
-
-    if (!pacienteId) {
-        mostrarErro('Paciente Obrigatório', 'Selecione um paciente!');
-        return;
-    }
-
-    const totalItens = qtdKits + qtdAtaduras + qtdAnalgesicos;
-    if (totalItens === 0) {
-        mostrarErro('Medicamentos Obrigatórios', 'Adicione pelo menos um medicamento!');
-        return;
-    }
-
-    // Buscar paciente
-    const paciente = pacientes.find(p => p.id === pacienteId);
-    if (!paciente) {
-        mostrarErro('Paciente Não Encontrado', 'Paciente não encontrado!');
-        return;
-    }
-
-    const hoje = new Date().toISOString().split('T')[0];
-
-    // Verificar limites
-    const medicamentosHoje = {
-        'Kits': 0,
-        'Ataduras': 0,
-        'Analgésicos': 0
-    };
-
-    medicamentos.forEach(m => {
-        if (m.pacienteId === pacienteId) {
-            medicamentosHoje[m.nome] = (medicamentosHoje[m.nome] || 0) + m.quantidade;
-        }
-    });
-
-    // Validar limites
-    const limites = { 'Kits': 5, 'Ataduras': 10, 'Analgésicos': 10 };
-
-    if (medicamentosHoje['Kits'] + qtdKits > limites['Kits']) {
-        mostrarErro('Limite Excedido', `Limite de Kits excedido! Já registrados: ${medicamentosHoje['Kits']}, Limite: ${limites['Kits']}`);
-        return;
-    }
-    if (medicamentosHoje['Ataduras'] + qtdAtaduras > limites['Ataduras']) {
-        mostrarErro('Limite Excedido', `Limite de Ataduras excedido! Já registrados: ${medicamentosHoje['Ataduras']}, Limite: ${limites['Ataduras']}`);
-        return;
-    }
-    if (medicamentosHoje['Analgésicos'] + qtdAnalgesicos > limites['Analgésicos']) {
-        mostrarErro('Limite Excedido', `Limite de Analgésicos excedido! Já registrados: ${medicamentosHoje['Analgésicos']}, Limite: ${limites['Analgésicos']}`);
-        return;
-    }
-
-    // Registrar medicamentos
-    const medicamentosParaRegistrar = [];
-
-    if (qtdKits > 0) {
-        medicamentosParaRegistrar.push({
-            nome: 'Kits',
-            quantidade: qtdKits
-        });
-    }
-    if (qtdAtaduras > 0) {
-        medicamentosParaRegistrar.push({
-            nome: 'Ataduras',
-            quantidade: qtdAtaduras
-        });
-    }
-    if (qtdAnalgesicos > 0) {
-        medicamentosParaRegistrar.push({
-            nome: 'Analgésicos',
-            quantidade: qtdAnalgesicos
-        });
-    }
-
-    // Salvar medicamentos
-    for (const med of medicamentosParaRegistrar) {
-        const novoMedicamento = {
-            id: `MED-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            nome: med.nome,
-            quantidade: med.quantidade,
-            pacienteId: paciente.id,
-            pacienteNome: paciente.nome,
-            dataCriacao: new Date().toLocaleDateString('pt-BR'),
-            dataRegistro: hoje
-        };
-
-        medicamentos.push(novoMedicamento);
-
-        // Salvar no Firebase
-        try {
-            await salvarDados(`medicamentos/${novoMedicamento.id}`, novoMedicamento);
-        } catch (erro) {
-            console.warn('Firebase não configurado, dados salvos localmente apenas', erro);
-        }
-    }
-
-    closeModalMedicamento();
-    atualizarListaMedicamentos();
-    atualizarDashboard();
-
-    mostrarNotificacao('✅ Medicamentos registrados com sucesso!', 'success');
+    // Esta função foi substituída por adicionarMedicamentoNovo() que usa medicamentosSelecionados
 }
 
 function atualizarListaMedicamentos() {
@@ -835,10 +661,15 @@ function atualizarListaMedicamentos() {
 
         return `
             <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-lg border-l-4 border-orange-600 mb-4">
-                <div class="mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">${dados.pacienteName}</h3>
-                    <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>ID: ${pacienteId}</p>
-                    <span class="inline-block mt-2 px-3 py-1 bg-orange-200 text-orange-800 rounded-full text-xs">Paciente</span>
+                <div class="mb-4 flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800">${dados.pacienteName}</h3>
+                        <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>ID: ${pacienteId}</p>
+                        <span class="inline-block mt-2 px-3 py-1 bg-orange-200 text-orange-800 rounded-full text-xs">Paciente</span>
+                    </div>
+                    <button onclick="apagarAtendimento('${pacienteId}')" class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm">
+                        <i class="fas fa-trash-alt mr-1"></i> Apagar Tudo
+                    </button>
                 </div>
                 <div class="border-t pt-4 space-y-3">
                     ${medicamentosHtml}
@@ -868,6 +699,37 @@ function deletarMedicamento(id) {
             atualizarListaMedicamentos();
             atualizarDashboard();
             mostrarNotificacao('Medicamento removido!', 'info');
+        }
+    );
+}
+
+function apagarAtendimento(pacienteId) {
+    const paciente = pacientes.find(p => p.id === pacienteId);
+    const nomePaciente = paciente ? paciente.nome : pacienteId;
+    
+    mostrarConfirmacao(
+        'Apagar Atendimento',
+        `Tem certeza que deseja apagar TODO o atendimento de ${nomePaciente}?\n\nTodos os medicamentos registrados serão removidos permanentemente.`,
+        async () => {
+            // Obter IDs dos medicamentos a remover
+            const medicamentosRemover = medicamentos.filter(m => m.pacienteId === pacienteId);
+            const ids = medicamentosRemover.map(m => m.id);
+            
+            // Remover da lista local
+            medicamentos = medicamentos.filter(m => m.pacienteId !== pacienteId);
+            
+            // Deletar do Firebase
+            try {
+                for (const id of ids) {
+                    await deletarDados(`medicamentos/${id}`);
+                }
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaMedicamentos();
+            atualizarDashboard();
+            mostrarNotificacao(`✅ Atendimento de ${nomePaciente} removido completamente!`, 'success');
         }
     );
 }
@@ -1439,37 +1301,63 @@ function openModalMedicamentoConfig() {
 
 function closeModalMedicamentoConfig() {
     document.getElementById('modalMedicamentoConfig').classList.add('modal-hidden');
+    document.getElementById('modalMedicamentoConfigTitle').textContent = 'Novo Medicamento';
 }
 
 function limparFormularioMedicamentoConfig() {
     document.getElementById('formMedicamentoConfig').reset();
+    document.getElementById('medicamentoConfigId').value = '';
 }
 
 async function adicionarMedicamentoConfig() {
+    const id = document.getElementById('medicamentoConfigId').value;
     const nome = document.getElementById('medicamentoConfigNome').value;
     const preco = document.getElementById('medicamentoConfigPreco').value;
+    const qtdMax = document.getElementById('medicamentoConfigQtdMax').value;
 
-    if (!nome || !preco) {
+    if (!nome || !preco || !qtdMax) {
         mostrarErro('Validação', 'Preencha todos os campos obrigatórios!');
         return;
     }
 
-    const novoMedicamento = {
-        id: Date.now().toString(),
-        nome,
-        preco: parseFloat(preco),
-        dataCriacao: new Date().toLocaleString('pt-BR')
-    };
+    // Verificar se é edição ou criação
+    if (id) {
+        // EDIÇÃO
+        const medicamentoExistente = medicamentosConfig.find(m => m.id === id);
+        if (medicamentoExistente) {
+            medicamentoExistente.nome = nome;
+            medicamentoExistente.preco = parseFloat(preco);
+            medicamentoExistente.quantidadeMaxima = parseInt(qtdMax);
+            
+            try {
+                await salvarDados(`medicamentosConfig/${id}`, medicamentoExistente);
+                closeModalMedicamentoConfig();
+                atualizarListaMedicamentosConfig();
+                mostrarSucesso('Sucesso', 'Medicamento atualizado com sucesso!');
+            } catch (erro) {
+                mostrarErro('Erro', 'Erro ao atualizar medicamento: ' + erro.message);
+            }
+        }
+    } else {
+        // CRIAÇÃO
+        const novoMedicamento = {
+            id: Date.now().toString(),
+            nome,
+            preco: parseFloat(preco),
+            quantidadeMaxima: parseInt(qtdMax),
+            dataCriacao: new Date().toLocaleString('pt-BR')
+        };
 
-    medicamentosConfig.push(novoMedicamento);
+        medicamentosConfig.push(novoMedicamento);
 
-    try {
-        await salvarDados(`medicamentosConfig/${novoMedicamento.id}`, novoMedicamento);
-        closeModalMedicamentoConfig();
-        atualizarListaMedicamentosConfig();
-        mostrarSucesso('Sucesso', 'Medicamento configurado com sucesso!');
-    } catch (erro) {
-        mostrarErro('Erro', 'Erro ao salvar medicamento: ' + erro.message);
+        try {
+            await salvarDados(`medicamentosConfig/${novoMedicamento.id}`, novoMedicamento);
+            closeModalMedicamentoConfig();
+            atualizarListaMedicamentosConfig();
+            mostrarSucesso('Sucesso', 'Medicamento configurado com sucesso!');
+        } catch (erro) {
+            mostrarErro('Erro', 'Erro ao salvar medicamento: ' + erro.message);
+        }
     }
 }
 
@@ -1497,9 +1385,15 @@ function atualizarListaMedicamentosConfig() {
                 </div>
             </div>
 
-            <div class="border-t pt-4">
-                <p class="text-xs text-gray-500 uppercase font-semibold">Preço</p>
-                <p class="text-lg font-bold text-orange-600">R$ ${med.preco.toFixed(2)}</p>
+            <div class="grid grid-cols-2 gap-4 border-t pt-4">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-semibold">Preço</p>
+                    <p class="text-lg font-bold text-orange-600">R$ ${med.preco.toFixed(2)}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-semibold">Máximo por Paciente</p>
+                    <p class="text-lg font-bold text-blue-600">${med.quantidadeMaxima || 'N/A'} unid.</p>
+                </div>
             </div>
 
             <p class="text-xs text-gray-500 mt-4">Criado em: ${med.dataCriacao}</p>
@@ -1508,7 +1402,24 @@ function atualizarListaMedicamentosConfig() {
 }
 
 function editarMedicamentoConfig(id) {
-    mostrarAlerta('Em Desenvolvimento', 'Funcionalidade de edição em desenvolvimento');
+    const medicamento = medicamentosConfig.find(m => m.id === id);
+    
+    if (!medicamento) {
+        mostrarErro('Erro', 'Medicamento não encontrado!');
+        return;
+    }
+    
+    // Preencher formulário com dados existentes
+    document.getElementById('medicamentoConfigId').value = id;
+    document.getElementById('medicamentoConfigNome').value = medicamento.nome;
+    document.getElementById('medicamentoConfigPreco').value = medicamento.preco.toFixed(2);
+    document.getElementById('medicamentoConfigQtdMax').value = medicamento.quantidadeMaxima || '';
+    
+    // Mudar título da modal
+    document.getElementById('modalMedicamentoConfigTitle').textContent = 'Editar Medicamento';
+    
+    // Abrir modal
+    document.getElementById('modalMedicamentoConfig').classList.remove('modal-hidden');
 }
 
 function apagarMedicamentoConfig(id) {
@@ -1609,6 +1520,26 @@ function removerMedicamentoSelecionado(id) {
     atualizarResume();
 }
 
+function atualizarQuantidadeMedicamento(id, novaQuantidade) {
+    novaQuantidade = parseInt(novaQuantidade) || 0;
+    
+    if (novaQuantidade < 0) {
+        mostrarErro('Quantidade Inválida', 'A quantidade não pode ser negativa!');
+        return;
+    }
+    
+    if (novaQuantidade === 0) {
+        delete medicamentosSelecionados[id];
+    } else {
+        if (medicamentosSelecionados[id]) {
+            medicamentosSelecionados[id].quantidade = novaQuantidade;
+        }
+    }
+    
+    atualizarListaMedicamentosSelecionados();
+    atualizarResume();
+}
+
 function atualizarListaMedicamentosSelecionados() {
     const secao = document.getElementById('secaoMedicamentosSelecionados');
     const div = document.getElementById('medicamentosSelecionadosDiv');
@@ -1623,14 +1554,27 @@ function atualizarListaMedicamentosSelecionados() {
 
     secao.classList.remove('hidden');
     div.innerHTML = selecionados.map(([id, med]) => `
-        <div class="flex justify-between items-center p-3 bg-orange-50 rounded border border-orange-200">
+        <div class="flex justify-between items-center p-4 bg-orange-50 rounded-lg border border-orange-200 hover:border-orange-400 transition">
             <div class="flex-1">
                 <p class="font-semibold text-gray-800">${med.nome}</p>
-                <p class="text-sm text-gray-600">R$ ${med.preco.toFixed(2)} x ${med.quantidade} = R$ ${(med.preco * med.quantidade).toFixed(2)}</p>
+                <p class="text-sm text-gray-600">Preço unitário: R$ ${med.preco.toFixed(2)}</p>
             </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="removerMedicamentoSelecionado('${id}')" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">
-                    <i class="fas fa-minus"></i>
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2 bg-white p-2 rounded border border-gray-300">
+                    <button type="button" onclick="atualizarQuantidadeMedicamento('${id}', ${med.quantidade - 1})" class="px-2 py-1 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition">
+                        <i class="fas fa-minus text-sm"></i>
+                    </button>
+                    <input type="number" value="${med.quantidade}" min="0" onchange="atualizarQuantidadeMedicamento('${id}', this.value)" class="w-12 text-center border-0 focus:ring-0 font-semibold" />
+                    <button type="button" onclick="atualizarQuantidadeMedicamento('${id}', ${med.quantidade + 1})" class="px-2 py-1 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition">
+                        <i class="fas fa-plus text-sm"></i>
+                    </button>
+                </div>
+                <div class="text-right min-w-fit">
+                    <p class="text-sm text-gray-600">Subtotal:</p>
+                    <p class="font-bold text-orange-600">R$ ${(med.preco * med.quantidade).toFixed(2)}</p>
+                </div>
+                <button type="button" onclick="removerMedicamentoSelecionado('${id}')" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         </div>
@@ -1685,6 +1629,41 @@ function adicionarMedicamentoNovo() {
 
     const hoje = new Date().toISOString().split('T')[0];
     
+    // Validar limite diário por paciente E limite individual por medicamento
+    const medicamentosHoje = medicamentos.filter(m => m.pacienteId === pacienteId && m.dataRegistro === hoje);
+    const qtdHoje = medicamentosHoje.length;
+    
+    // Calcular quantidade total a adicionar
+    let quantidadeTotal = 0;
+    selecionados.forEach(([_, med]) => {
+        quantidadeTotal += med.quantidade;
+    });
+    
+    // Verificar limite individual por medicamento
+    for (const [medId, med] of selecionados) {
+        const configMed = medicamentosConfig.find(m => m.nome === med.nome);
+        if (configMed && configMed.quantidadeMaxima) {
+            const qtdMedHoje = medicamentosHoje.filter(m => m.nome === med.nome).length;
+            if (qtdMedHoje + med.quantidade > configMed.quantidadeMaxima) {
+                mostrarErro(
+                    'Limite do Medicamento Excedido',
+                    `Medicamento: ${med.nome}\n\nLimite máximo: ${configMed.quantidadeMaxima} unidades\nJá registrado hoje: ${qtdMedHoje}\nTentando adicionar: ${med.quantidade}\n\nReduz a quantidade deste medicamento.`
+                );
+                return;
+            }
+        }
+    }
+    
+    // Limite de 20 medicamentos por dia por paciente
+    const LIMITE_DIARIO = 20;
+    if (qtdHoje + quantidadeTotal > LIMITE_DIARIO) {
+        mostrarErro(
+            'Limite Diário Excedido',
+            `Limite de ${LIMITE_DIARIO} medicamentos por dia atingido.\n\nJá registrados hoje: ${qtdHoje}\nTentando adicionar: ${quantidadeTotal}\nTotal: ${qtdHoje + quantidadeTotal}\n\nReduz a quantidade de medicamentos selecionados.`
+        );
+        return;
+    }
+    
     // Salvar medicamentos
     let valorTotal = 0;
     selecionados.forEach(([id, med]) => {
@@ -1733,6 +1712,7 @@ window.deletarExame = deletarExame;
 window.openModalMedicamento = openModalMedicamento;
 window.closeModalMedicamento = closeModalMedicamento;
 window.deletarMedicamento = deletarMedicamento;
+window.apagarAtendimento = apagarAtendimento;
 window.buscarPacientes = buscarPacientes;
 window.selecionarPaciente = selecionarPaciente;
 window.limparSelecaoPaciente = limparSelecaoPaciente;
@@ -1775,4 +1755,5 @@ window.atualizarListaMedicamentosDisponiveis = atualizarListaMedicamentosDisponi
 window.atualizarListaMedicamentosNoModal = atualizarListaMedicamentosNoModal;
 window.selecionarMedicamento = selecionarMedicamento;
 window.removerMedicamentoSelecionado = removerMedicamentoSelecionado;
+window.atualizarQuantidadeMedicamento = atualizarQuantidadeMedicamento;
 window.adicionarMedicamentoNovo = adicionarMedicamentoNovo;
