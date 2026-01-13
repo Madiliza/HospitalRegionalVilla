@@ -1,7 +1,7 @@
 // Importar Firebase
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set, get, child } from 'firebase/database';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from 'firebase/auth';
 
 // Configuração do Firebase (Use variáveis de ambiente do Vite)
 const firebaseConfig = {
@@ -75,6 +75,7 @@ export async function fazerLogin(email, senha) {
     return userCredential.user;
   } catch (erro) {
     console.error("Erro ao fazer login:", erro.message);
+    throw erro; // Propagar erro para tratamento na UI
   }
 }
 
@@ -83,9 +84,53 @@ export async function fazerLogout() {
   try {
     await signOut(auth);
     console.log("Logout realizado com sucesso!");
+    return true;
   } catch (erro) {
     console.error("Erro ao fazer logout:", erro.message);
+    throw erro;
   }
+}
+
+// Função para alterar senha
+export async function alterarSenha(senhaAtual, novaSenha) {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('Usuário não autenticado');
+    
+    // Reautenticar usuário
+    const credential = EmailAuthProvider.credential(user.email, senhaAtual);
+    await reauthenticateWithCredential(user, credential);
+    
+    // Alterar senha
+    await updatePassword(user, novaSenha);
+    console.log("Senha alterada com sucesso!");
+    return true;
+  } catch (erro) {
+    console.error("Erro ao alterar senha:", erro.message);
+    throw erro;
+  }
+}
+
+// Função para enviar email de recuperação de senha
+export async function enviarEmailRecuperacao(email) {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    console.log("Email de recuperação enviado!");
+    return true;
+  } catch (erro) {
+    console.error("Erro ao enviar email:", erro.message);
+    throw erro;
+  }
+}
+
+// Função para verificar autenticação
+export function verificarAutenticacao(callback) {
+  return onAuthStateChanged(auth, callback);
+}
+
+// Obter usuário atual
+export function getUsuarioAtual() {
+  return auth.currentUser;
 }
 
 export { database, auth, app };

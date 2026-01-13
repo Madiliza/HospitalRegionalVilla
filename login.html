@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Hospital Regional Villa</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .login-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #7f1d1d 100%);
+            min-height: 100vh;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .input-field {
+            padding-left: 42px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-loading .btn-text {
+            visibility: hidden;
+        }
+
+        .btn-loading .btn-spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9ca3af;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="login-bg flex items-center justify-center p-4">
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <div class="login-card rounded-2xl shadow-2xl p-8 w-full max-w-md fade-in">
+        <!-- Logo e Título -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4 pulse-icon">
+                <i class="fas fa-hospital text-red-600 text-4xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">Hospital Regional Villa</h1>
+            <p class="text-gray-500 mt-2">Sistema de Gestão Hospitalar</p>
+        </div>
+
+        <!-- Formulário de Login -->
+        <form id="loginForm" class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ID do Usuário</label>
+                <div class="relative">
+                    <i class="fas fa-id-badge input-icon"></i>
+                    <input 
+                        type="text" 
+                        id="usuarioId" 
+                        required
+                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                        placeholder="Digite seu ID de usuário"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                <div class="relative">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        required
+                        class="input-field w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <label class="flex items-center">
+                    <input type="checkbox" id="lembrar" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                    <span class="ml-2 text-sm text-gray-600">Lembrar-me</span>
+                </label>
+                
+            </div>
+
+            <button 
+                type="submit" 
+                id="btnLogin"
+                class="relative w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-lg shadow-lg hover:shadow-xl"
+            >
+                <span class="btn-text flex items-center justify-center">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Entrar
+                </span>
+                <span class="btn-spinner hidden">
+                    <i class="fas fa-spinner fa-spin text-xl"></i>
+                </span>
+            </button>
+        </form>
+
+        <!-- Divisor -->
+        <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-200"></div>
+            </div>
+            <div class="relative flex justify-center">
+                <span class="bg-white px-4 text-sm text-gray-500">ou</span>
+            </div>
+        </div>
+
+        <!-- Link para registro (se necessário no futuro) -->
+        <p class="text-center text-gray-600">
+            Não tem uma conta? 
+            <a href="#" onclick="mostrarToast('Entre em contato com o administrador', 'info')" class="text-red-600 hover:text-red-700 font-medium">
+                Solicitar acesso
+            </a>
+        </p>
+
+        <!-- Footer -->
+        <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+            <p class="text-xs text-gray-400">
+                © 2026 Hospital Regional Villa. Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal Esqueci Senha -->
+    <div id="modalEsqueciSenha" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
+                    <i class="fas fa-key text-yellow-600 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">Recuperar Senha</h3>
+                <p class="text-gray-500 mt-2">Digite seu e-mail para receber o link de recuperação</p>
+            </div>
+            <form id="formEsqueciSenha">
+                <div class="mb-4">
+                    <div class="relative">
+                        <i class="fas fa-id-badge input-icon"></i>
+                        <input 
+                            type="text" 
+                            id="usuarioIdRecuperacao" 
+                            required
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                            placeholder="Digite seu ID de usuário"
+                        >
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button 
+                        type="button" 
+                        onclick="fecharEsqueciSenha()"
+                        class="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="flex-1 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+                    >
+                        <i class="fas fa-paper-plane mr-2"></i>Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, database } from './config/firebase-config.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { ref, get, child } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Verificar se já está logado
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuário já está logado, redirecionar para o sistema
+                window.location.href = '/index.html';
+            }
+        });
+
+        // Função para debugar - verificar se consegue ler do Firebase
+        window.testarConexaoFirebase = async function() {
+            try {
+                console.log('🔍 Testando conexão com Firebase...');
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, 'usuarios'));
+                
+                console.log('✅ Conseguiu conectar ao Firebase!');
+                console.log('📊 Dados encontrados:', snapshot.val());
+                
+                if (snapshot.exists()) {
+                    const usuarios = snapshot.val();
+                    console.log('👥 IDs de usuários disponíveis:', Object.keys(usuarios));
+                    alert('✅ Firebase OK! Usuários: ' + Object.keys(usuarios).join(', '));
+                } else {
+                    console.log('❌ Nenhum dado encontrado em "usuarios"');
+                    alert('❌ Nenhum usuário encontrado no Firebase. Verifique a importação!');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao conectar:', error);
+                alert('❌ Erro ao conectar no Firebase:\n' + error.message);
+            }
+        };
+
+        // Adicionar botão de teste no formulário
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const testBtn = document.createElement('button');
+            testBtn.type = 'button';
+            testBtn.innerHTML = '<i class="fas fa-flask mr-2"></i>Testar Conexão Firebase';
+            testBtn.className = 'w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium text-sm mt-2';
+            testBtn.onclick = testarConexaoFirebase;
+            form.appendChild(testBtn);
+        });
+
+        // Função para fazer login com ID
+        window.fazerLoginComId = async function(usuarioId, senha) {
+            try {
+                // Buscar usuário pelo ID no banco de dados
+                const dbRef = ref(database);
+                console.log('🔍 Buscando usuário:', usuarioId);
+                const snapshot = await get(child(dbRef, `usuarios/${usuarioId}`));
+                
+                console.log('📊 Snapshot existe:', snapshot.exists());
+                console.log('📋 Dados:', snapshot.val());
+                
+                if (!snapshot.exists()) {
+                    // Tentar listar todos os usuários disponíveis
+                    const allSnapshot = await get(child(dbRef, 'usuarios'));
+                    if (allSnapshot.exists()) {
+                        const usuariosDisponiveis = Object.keys(allSnapshot.val());
+                        console.log('❌ Usuário não encontrado! Disponíveis:', usuariosDisponiveis);
+                        throw new Error(`Usuário "${usuarioId}" não encontrado. Disponíveis: ${usuariosDisponiveis.join(', ')}`);
+                    } else {
+                        throw new Error('Nenhum usuário configurado no Firebase! Importe os usuários primeiro.');
+                    }
+                }
+                
+                const usuario = snapshot.val();
+                
+                // Verificar senha (em produção, isso deve ser criptografado)
+                if (usuario.senha !== senha) {
+                    throw new Error('Senha incorreta');
+                }
+                
+                // Simular login
+                localStorage.setItem('usuarioLogado', usuarioId);
+                localStorage.setItem('usuarioEmail', usuario.email || '');
+                localStorage.setItem('usuarioNome', usuario.nome || usuarioId);
+                
+                return { uid: usuarioId, email: usuario.email };
+            } catch (error) {
+                console.error('❌ Erro na busca:', error);
+                throw error;
+            }
+        };
+
+        // Função para solicitar recuperação de senha
+        window.solicitarRecuperacaoSenha = async function(usuarioId) {
+            try {
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, `usuarios/${usuarioId}`));
+                
+                if (!snapshot.exists()) {
+                    throw new Error('Usuário não encontrado');
+                }
+                
+                // Aqui você pode adicionar lógica para enviar email ou notificação
+                // Por enquanto, apenas simula
+                throw new Error('Entre em contato com o administrador do sistema');
+            } catch (error) {
+                throw error;
+            }
+        };
+
+        // Toggle password visibility
+        window.togglePassword = function() {
+            const senhaInput = document.getElementById('senha');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (senhaInput.type === 'password') {
+                senhaInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                senhaInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        };
+
+        // Toast notification
+        window.mostrarToast = function(mensagem, tipo = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${tipo}`;
+            toast.innerHTML = `<i class="fas ${tipo === 'success' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>${mensagem}`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        };
+
+        // Modal esqueci senha
+        window.abrirEsqueciSenha = function() {
+            document.getElementById('modalEsqueciSenha').classList.remove('hidden');
+        };
+
+        window.fecharEsqueciSenha = function() {
+            document.getElementById('modalEsqueciSenha').classList.add('hidden');
+            document.getElementById('usuarioIdRecuperacao').value = '';
+        };
+
+        // Form esqueci senha
+        document.getElementById('formEsqueciSenha').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usuarioId = document.getElementById('usuarioIdRecuperacao').value.trim();
+            
+            try {
+                await solicitarRecuperacaoSenha(usuarioId);
+                mostrarToast('Instruções de recuperação enviadas para o administrador!', 'success');
+                fecharEsqueciSenha();
+            } catch (error) {
+                console.error('Erro ao recuperar senha:', error);
+                mostrarToast(error.message || 'Erro ao recuperar senha', 'error');
+            }
+        });
+
+        // Form login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const usuarioId = document.getElementById('usuarioId').value.trim();
+            const senha = document.getElementById('senha').value;
+            const lembrar = document.getElementById('lembrar').checked;
+            const btnLogin = document.getElementById('btnLogin');
+            
+            // Validar entrada
+            if (!usuarioId || !senha) {
+                mostrarToast('Preencha todos os campos', 'error');
+                return;
+            }
+            
+            // Ativar loading
+            btnLogin.classList.add('btn-loading');
+            btnLogin.querySelector('.btn-spinner').classList.remove('hidden');
+            
+            try {
+                const user = await fazerLoginComId(usuarioId, senha);
+                
+                if (user) {
+                    // Salvar preferência de lembrar
+                    if (lembrar) {
+                        localStorage.setItem('rememberUser', usuarioId);
+                    } else {
+                        localStorage.removeItem('rememberUser');
+                    }
+                    
+                    mostrarToast('Login realizado com sucesso!', 'success');
+                    
+                    // Redirecionar para o sistema
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 1000);
+                } else {
+                    mostrarToast('ID ou senha incorretos', 'error');
+                }
+            } catch (error) {
+                console.error('Erro no login:', error);
+                mostrarToast(error.message || 'ID ou senha incorretos', 'error');
+            } finally {
+                // Desativar loading
+                btnLogin.classList.remove('btn-loading');
+                btnLogin.querySelector('.btn-spinner').classList.add('hidden');
+            }
+        });
+
+        // Carregar ID salvo
+        const savedId = localStorage.getItem('rememberUser');
+        if (savedId) {
+            document.getElementById('usuarioId').value = savedId;
+            document.getElementById('lembrar').checked = true;
+        }
+    </script>
+</body>
+</html>
