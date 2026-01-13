@@ -15,14 +15,17 @@ export let valoresAtendimentos = {
 export let medicamentosConfig = [];
 
 export function init(dadosCarregados) {
+    // Carregar valores de atendimento
     if (dadosCarregados.valoresAtendimentos) {
-        if (dadosCarregados.valoresAtendimentos.tratamentoInterno !== undefined) {
-            valoresAtendimentos = dadosCarregados.valoresAtendimentos;
-        }
-        else if (dadosCarregados.valoresAtendimentos.valoresAtendimentos) {
-            valoresAtendimentos = dadosCarregados.valoresAtendimentos.valoresAtendimentos;
+        const va = dadosCarregados.valoresAtendimentos;
+        // Verificar se tem as propriedades diretamente ou dentro de outro objeto
+        if (va.tratamentoInterno !== undefined) {
+            valoresAtendimentos = va;
+        } else if (va.valoresAtendimentos) {
+            valoresAtendimentos = va.valoresAtendimentos;
         }
     }
+    
     
     medicamentosConfig = dadosCarregados.medicamentosConfig || [];
     
@@ -168,10 +171,20 @@ export function limparTudo() {
     calcularTotal();
 }
 
+// Função para obter valores de atendimento atuais
+export function getValoresAtendimentos() {
+    return valoresAtendimentos;
+}
+
 // Exportar como global
 window.moduloCalculadora = {
     calcularTotal,
     limparTudo,
     init,
-    valoresAtendimentos
+    get valoresAtendimentos() {
+        return valoresAtendimentos;
+    },
+    set valoresAtendimentos(v) {
+        valoresAtendimentos = v;
+    }
 };

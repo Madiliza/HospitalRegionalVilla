@@ -36,7 +36,7 @@ export async function carregarDadosFirebase() {
             usuarios: converterParaArray(usuarios),
             medicamentosConfig: converterParaArray(medicamentosConfig),
             solicitacoesCadastro: converterParaArray(solicitacoesCadastro),
-            valoresAtendimentos: valoresAtendimentos || {}
+            valoresAtendimentos: valoresAtendimentos?.valoresAtendimentos || valoresAtendimentos || {}
         };
 
 
