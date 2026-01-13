@@ -302,6 +302,8 @@ export async function adicionarMedicamentoConfig() {
         return;
     }
 
+    let medicamentoParaSalvar;
+
     if (id) {
         // Editar
         const medicamentoExistente = medicamentosConfig.find(m => m.id === id);
@@ -309,6 +311,7 @@ export async function adicionarMedicamentoConfig() {
             medicamentoExistente.nome = nome;
             medicamentoExistente.preco = preco;
             medicamentoExistente.qtdMax = qtdMax;
+            medicamentoParaSalvar = medicamentoExistente;
         }
     } else {
         // Criar novo
@@ -320,10 +323,11 @@ export async function adicionarMedicamentoConfig() {
             dataCriacao: new Date().toLocaleString('pt-BR')
         };
         medicamentosConfig.push(novoMedicamento);
+        medicamentoParaSalvar = novoMedicamento;
     }
 
     try {
-        await salvarNoFirebase('medicamentosConfig', medicamentosConfig);
+        await salvarNoFirebase('medicamentosConfig', medicamentoParaSalvar);
     } catch (erro) {
         console.error('Erro ao salvar medicamento:', erro);
     }

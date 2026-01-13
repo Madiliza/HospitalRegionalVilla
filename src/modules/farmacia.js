@@ -99,34 +99,75 @@ export function limparSelecaoPaciente() {
     document.getElementById('sugestoesPacientes').classList.add('hidden');
 }
 
+// Função para obter quantidade já dispensada hoje para um paciente
+function getQuantidadeDispensadaHoje(pacienteId, medicamentoId) {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    return medicamentos
+        .filter(m => m.pacienteId === pacienteId && m.dataAtendimento === hoje)
+        .reduce((total, atendimento) => {
+            const meds = atendimento.medicamentos || [];
+            const med = meds.find(m => m.id === medicamentoId);
+            return total + (med ? med.quantidade : 0);
+        }, 0);
+}
+
+// Função para obter o limite máximo de um medicamento
+function getLimiteMedicamento(medicamentoId) {
+    const config = medicamentosConfig.find(m => m.id === medicamentoId);
+    return config ? parseInt(config.qtdMax) || 999 : 999;
+}
+
 export function atualizarListaMedicamentosNoModal() {
     const lista = document.getElementById('listaMedicamentosDisponiveis');
+    const pacienteId = document.getElementById('medicamentoPacienteId').value;
 
     if (medicamentosConfig.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum medicamento configurado</p>';
         return;
     }
 
-    lista.innerHTML = medicamentosConfig.map(med => `
-        <div class="p-4 bg-white rounded-lg border border-gray-200 flex items-center justify-between">
+    lista.innerHTML = medicamentosConfig.map(med => {
+        const qtdMax = parseInt(med.qtdMax) || 999;
+        const jaDispensado = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, med.id) : 0;
+        const disponivel = qtdMax - jaDispensado;
+        const desabilitado = disponivel <= 0;
+        
+        return `
+        <div class="p-4 bg-white rounded-lg border border-gray-200 flex items-center justify-between ${desabilitado ? 'opacity-50' : ''}">
             <div>
                 <h5 class="font-semibold text-gray-800">${med.nome}</h5>
                 <p class="text-sm text-gray-600">R$ ${parseFloat(med.preco).toFixed(2)}</p>
+                <p class="text-xs ${desabilitado ? 'text-red-600 font-bold' : 'text-gray-500'}">Limite diário: ${qtdMax} | Disponível: ${disponivel > 0 ? disponivel : 0}</p>
             </div>
-            <button type="button" onclick="window.moduloFarmacia.selecionarMedicamento('${med.id}', '${med.nome}', ${med.preco})" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                Adicionar
+            <button type="button" 
+                onclick="window.moduloFarmacia.selecionarMedicamento('${med.id}', '${med.nome}', ${med.preco}, ${qtdMax})" 
+                class="px-4 py-2 ${desabilitado ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-700'} text-white rounded-lg transition"
+                ${desabilitado ? 'disabled' : ''}>
+                ${desabilitado ? 'Limite atingido' : 'Adicionar'}
             </button>
         </div>
-    `).join('');
+    `}).join('');
 }
 
-export function selecionarMedicamento(id, nome, preco) {
+export function selecionarMedicamento(id, nome, preco, qtdMax) {
+    const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    const limiteMax = qtdMax || getLimiteMedicamento(id);
+    const jaDispensadoHoje = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, id) : 0;
+    const jaSelecionado = medicamentosSelecionados[id]?.quantidade || 0;
+    const totalComNovo = jaDispensadoHoje + jaSelecionado + 1;
+
+    if (totalComNovo > limiteMax) {
+        mostrarErro('Limite Excedido', `O paciente já atingiu o limite diário de ${limiteMax} unidades para ${nome}. Já dispensado hoje: ${jaDispensadoHoje}, Selecionado: ${jaSelecionado}`);
+        return;
+    }
+
     if (!medicamentosSelecionados[id]) {
         medicamentosSelecionados[id] = {
             id,
             nome,
             preco: parseFloat(preco),
-            quantidade: 1
+            quantidade: 1,
+            qtdMax: limiteMax
         };
     } else {
         medicamentosSelecionados[id].quantidade++;
@@ -135,6 +176,7 @@ export function selecionarMedicamento(id, nome, preco) {
     document.getElementById('secaoMedicamentosSelecionados').classList.remove('hidden');
     atualizarListaMedicamentosSelecionados();
     atualizarResume();
+    atualizarListaMedicamentosNoModal(); // Atualizar disponibilidade
 }
 
 export function removerMedicamentoSelecionado(id) {
@@ -150,10 +192,24 @@ export function atualizarQuantidadeMedicamento(id, novaQuantidade) {
     const quantidade = parseInt(novaQuantidade);
     if (quantidade <= 0) {
         removerMedicamentoSelecionado(id);
-    } else {
-        medicamentosSelecionados[id].quantidade = quantidade;
-        atualizarResume();
+        return;
     }
+
+    const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    const limiteMax = medicamentosSelecionados[id]?.qtdMax || getLimiteMedicamento(id);
+    const jaDispensadoHoje = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, id) : 0;
+    const limiteDisponivel = limiteMax - jaDispensadoHoje;
+
+    if (quantidade > limiteDisponivel) {
+        mostrarErro('Limite Excedido', `Quantidade máxima disponível para hoje: ${limiteDisponivel}. Já dispensado: ${jaDispensadoHoje}, Limite diário: ${limiteMax}`);
+        medicamentosSelecionados[id].quantidade = limiteDisponivel > 0 ? limiteDisponivel : 1;
+        atualizarListaMedicamentosSelecionados();
+        atualizarResume();
+        return;
+    }
+
+    medicamentosSelecionados[id].quantidade = quantidade;
+    atualizarResume();
 }
 
 export function atualizarListaMedicamentosSelecionados() {
@@ -164,20 +220,28 @@ export function atualizarListaMedicamentosSelecionados() {
         return;
     }
 
-    div.innerHTML = Object.entries(medicamentosSelecionados).map(([id, med]) => `
+    const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    
+    div.innerHTML = Object.entries(medicamentosSelecionados).map(([id, med]) => {
+        const limiteMax = med.qtdMax || getLimiteMedicamento(id);
+        const jaDispensadoHoje = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, id) : 0;
+        const limiteDisponivel = limiteMax - jaDispensadoHoje;
+        
+        return `
         <div class="p-3 bg-gray-50 rounded-lg flex items-center justify-between border border-gray-200">
             <div class="flex-1">
                 <p class="font-semibold text-gray-800">${med.nome}</p>
                 <p class="text-sm text-gray-600">R$ ${med.preco.toFixed(2)}</p>
+                <p class="text-xs text-gray-500">Limite: ${limiteMax} | Já dispensado hoje: ${jaDispensadoHoje} | Máx disponível: ${limiteDisponivel}</p>
             </div>
             <div class="flex items-center space-x-2">
-                <input type="number" value="${med.quantidade}" min="1" onchange="window.moduloFarmacia.atualizarQuantidadeMedicamento('${id}', this.value)" class="w-16 px-2 py-1 border border-gray-300 rounded">
+                <input type="number" value="${med.quantidade}" min="1" max="${limiteDisponivel}" onchange="window.moduloFarmacia.atualizarQuantidadeMedicamento('${id}', this.value)" class="w-16 px-2 py-1 border border-gray-300 rounded">
                 <button type="button" onclick="window.moduloFarmacia.removerMedicamentoSelecionado('${id}')" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
                     Remover
                 </button>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 export function atualizarResume() {
@@ -214,7 +278,25 @@ export async function adicionarMedicamento() {
         return;
     }
 
+    // Validar limites antes de salvar
     const medicamentosArray = Object.values(medicamentosSelecionados);
+    const errosLimite = [];
+    
+    for (const med of medicamentosArray) {
+        const limiteMax = med.qtdMax || getLimiteMedicamento(med.id);
+        const jaDispensadoHoje = getQuantidadeDispensadaHoje(pacienteId, med.id);
+        const totalAposAtendimento = jaDispensadoHoje + med.quantidade;
+        
+        if (totalAposAtendimento > limiteMax) {
+            errosLimite.push(`${med.nome}: solicitado ${med.quantidade}, já dispensado ${jaDispensadoHoje}, limite ${limiteMax}`);
+        }
+    }
+
+    if (errosLimite.length > 0) {
+        mostrarErro('Limites Excedidos', `Os seguintes medicamentos excedem o limite diário:\n\n${errosLimite.join('\n')}`);
+        return;
+    }
+
     const novoAtendimento = {
         id: `MED-${Date.now()}`,
         pacienteId,
@@ -246,35 +328,40 @@ export function atualizarLista() {
         return;
     }
 
-    const medicamentosPorPaciente = {};
-    medicamentos.forEach(med => {
-        if (!medicamentosPorPaciente[med.pacienteId]) {
-            medicamentosPorPaciente[med.pacienteId] = [];
-        }
-        medicamentosPorPaciente[med.pacienteId].push(med);
+    // Ordenar por data/hora mais recente primeiro
+    const atendimentosOrdenados = [...medicamentos].sort((a, b) => {
+        const dataA = new Date(`${a.dataAtendimento} ${a.horaAtendimento}`);
+        const dataB = new Date(`${b.dataAtendimento} ${b.horaAtendimento}`);
+        return dataB - dataA;
     });
 
-    lista.innerHTML = Object.entries(medicamentosPorPaciente).map(([pacienteId, atendimentos]) => {
-        const totalValor = atendimentos.reduce((sum, a) => sum + a.valorTotal, 0);
-        const totalMedicamentos = atendimentos.reduce((sum, a) => sum + a.medicamentos.reduce((s, m) => s + m.quantidade, 0), 0);
-
+    lista.innerHTML = atendimentosOrdenados.map(atendimento => {
+        const meds = atendimento.medicamentos || [];
+        const totalMedicamentos = meds.reduce((sum, m) => sum + (m.quantidade || 0), 0);
+        
         return `
             <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-lg border-l-4 border-orange-600">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
-                        <h3 class="text-lg font-bold text-gray-800">Paciente: ${pacienteId}</h3>
-                        <p class="text-gray-600 mt-2"><i class="fas fa-pills mr-2"></i>Total de Medicamentos: ${totalMedicamentos}</p>
-                        <p class="text-gray-600"><i class="fas fa-money-bill mr-2"></i>Valor Total: R$ ${totalValor.toFixed(2)}</p>
-                        <div class="mt-3 space-y-1">
-                            ${atendimentos.map(a => `
-                                <div class="text-sm text-gray-700">
-                                    <span class="font-semibold">${a.dataAtendimento} ${a.horaAtendimento}</span> - 
-                                    ${a.medicamentos.map(m => `${m.nome} (${m.quantidade})`).join(', ')}
-                                </div>
-                            `).join('')}
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-orange-600 text-white text-xs px-2 py-1 rounded">${atendimento.id}</span>
+                            <span class="text-sm text-gray-500">${atendimento.dataAtendimento || ''} às ${atendimento.horaAtendimento || ''}</span>
                         </div>
+                        <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-user mr-2"></i>Paciente: ${atendimento.pacienteId}</h3>
+                        <div class="mt-3 bg-white p-3 rounded-lg">
+                            <p class="text-sm font-semibold text-gray-700 mb-2"><i class="fas fa-pills mr-2"></i>Medicamentos (${totalMedicamentos} itens):</p>
+                            <div class="space-y-1">
+                                ${meds.length > 0 ? meds.map(m => `
+                                    <div class="flex justify-between text-sm text-gray-600">
+                                        <span>${m.nome} x${m.quantidade}</span>
+                                        <span>R$ ${((m.preco || 0) * (m.quantidade || 0)).toFixed(2)}</span>
+                                    </div>
+                                `).join('') : '<p class="text-gray-500 text-sm">Sem medicamentos</p>'}
+                            </div>
+                        </div>
+                        <p class="text-gray-800 font-bold mt-3"><i class="fas fa-money-bill mr-2"></i>Valor Total: R$ ${(atendimento.valorTotal || 0).toFixed(2)}</p>
                     </div>
-                    <button onclick="window.moduloFarmacia.apagarAtendimento('${pacienteId}')" class="text-red-600 hover:text-red-800 transition">
+                    <button onclick="window.moduloFarmacia.deletar('${atendimento.id}')" class="text-red-600 hover:text-red-800 transition">
                         <i class="fas fa-trash text-xl"></i>
                     </button>
                 </div>
@@ -285,11 +372,17 @@ export function atualizarLista() {
 
 export function apagarAtendimento(pacienteId) {
     mostrarConfirmacao(
-        'Apagar Atendimento',
-        `Tem certeza que deseja apagar TODO o atendimento do paciente ${pacienteId}?\n\nTodos os medicamentos registrados serão removidos permanentemente.`,
+        'Apagar Todos os Atendimentos',
+        `Tem certeza que deseja apagar TODOS os atendimentos do paciente ${pacienteId}?\n\nTodos os medicamentos registrados serão removidos permanentemente.`,
         async () => {
+            const idsParaDeletar = medicamentos.filter(m => m.pacienteId === pacienteId).map(m => m.id);
             medicamentos = medicamentos.filter(m => m.pacienteId !== pacienteId);
-            await deletarDoFirebase('medicamentos', pacienteId);
+            
+            // Deletar cada atendimento individualmente do Firebase
+            for (const id of idsParaDeletar) {
+                await deletarDoFirebase('medicamentos', id);
+            }
+            
             atualizarLista();
             mostrarNotificacao('Atendimento removido com sucesso!', 'success');
         }

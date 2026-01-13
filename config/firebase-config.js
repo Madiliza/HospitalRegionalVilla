@@ -34,13 +34,15 @@ export async function lerDados(caminho) {
   try {
     const snapshot = await get(child(ref(database), caminho));
     if (snapshot.exists()) {
-      console.log("Dados:", snapshot.val());
+      console.log(`Dados de ${caminho}:`, snapshot.val());
       return snapshot.val();
     } else {
-      console.log("Nenhum dado encontrado");
+      console.log(`Nenhum dado encontrado em ${caminho}`);
+      return null;
     }
   } catch (erro) {
-    console.error("Erro ao ler dados:", erro);
+    console.error(`Erro ao ler dados de ${caminho}:`, erro);
+    return null;
   }
 }
 
