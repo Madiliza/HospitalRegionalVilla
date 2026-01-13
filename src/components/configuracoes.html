@@ -23,6 +23,10 @@
                 <i class="fas fa-pills"></i>
                 <span>Medicamentos</span>
             </button>
+            <button id="tabAtendimentos" onclick="window.moduloConfig.mostrarAba('atendimentos')" class="tab-btn-config px-6 py-3 border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-2">
+                <i class="fas fa-stethoscope"></i>
+                <span>Valores de Atendimento</span>
+            </button>
         </div>
 
         <!-- Aba: Cargos -->
@@ -76,6 +80,62 @@
             <div id="medicamentosList" class="space-y-4">
                 <p class="text-gray-500 text-center py-8">Nenhum medicamento configurado</p>
             </div>
+        </div>
+
+        <!-- Aba: Valores de Atendimento -->
+        <div id="aba-atendimentos" class="space-y-6 hidden">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Configurar Valores de Atendimento</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Tratamento Interno -->
+                <div class="bg-white p-6 rounded-lg border border-purple-200">
+                    <label class="block text-gray-700 font-semibold mb-3">
+                        <i class="fas fa-clinic-medical text-purple-600 mr-2"></i>
+                        Tratamento Interno
+                    </label>
+                    <input type="number" id="config-tratamento-interno" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="0.00" step="0.01" min="0">
+                </div>
+
+                <!-- Atendimento Externo (Sul) -->
+                <div class="bg-white p-6 rounded-lg border border-purple-200">
+                    <label class="block text-gray-700 font-semibold mb-3">
+                        <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
+                        Atendimento Externo (Sul)
+                    </label>
+                    <input type="number" id="config-externo-sul" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="0.00" step="0.01" min="0">
+                </div>
+
+                <!-- Atendimento Externo (Norte) -->
+                <div class="bg-white p-6 rounded-lg border border-purple-200">
+                    <label class="block text-gray-700 font-semibold mb-3">
+                        <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
+                        Atendimento Externo (Norte)
+                    </label>
+                    <input type="number" id="config-externo-norte" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="0.00" step="0.01" min="0">
+                </div>
+
+                <!-- Consulta -->
+                <div class="bg-white p-6 rounded-lg border border-blue-200">
+                    <label class="block text-gray-700 font-semibold mb-3">
+                        <i class="fas fa-comments text-blue-600 mr-2"></i>
+                        Consulta
+                    </label>
+                    <input type="number" id="config-consulta" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01" min="0">
+                </div>
+
+                <!-- Exame -->
+                <div class="bg-white p-6 rounded-lg border border-green-200">
+                    <label class="block text-gray-700 font-semibold mb-3">
+                        <i class="fas fa-flask text-green-600 mr-2"></i>
+                        Exame
+                    </label>
+                    <input type="number" id="config-exame" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="0.00" step="0.01" min="0">
+                </div>
+            </div>
+
+            <button onclick="window.moduloConfig.salvarValoresAtendimentos()" class="btn-modern w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition mt-6">
+                <i class="fas fa-save mr-2"></i>
+                Salvar Valores
+            </button>
         </div>
     </div>
 </section>

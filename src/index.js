@@ -14,6 +14,7 @@ import * as moduloConsultas from './modules/consultas.js';
 import * as moduloExames from './modules/exames.js';
 import * as moduloFarmacia from './modules/farmacia.js';
 import * as moduloConfig from './modules/configuracoes.js';
+import * as moduloCalculadora from './modules/calculadora.js';
 
 // ============================================
 // INICIALIZAÇÃO
@@ -33,7 +34,7 @@ let usuarioLogado = null;
 
 // Carregador de componentes HTML
 async function carregarComponentes() {
-    const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes'];
+    const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes', 'calculadora'];
     const containerComponentes = document.getElementById('componentes');
     
     // Aguardar que o container exista
@@ -99,6 +100,7 @@ async function inicializarSistema() {
     moduloExames.init(dadosGlobais);
     moduloFarmacia.init(dadosGlobais);
     moduloConfig.init(dadosGlobais);
+    moduloCalculadora.init(dadosGlobais);
     
     // Aguardar um pouco mais para garantir que o DOM está completamente pronto
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -168,6 +170,7 @@ function aplicarPermissoesPorModulo(dados) {
     controlarBotao('sidebarConsultas', 'consulta', 'visualizar', 'Sidebar Consultas');
     controlarBotao('sidebarExames', 'exame', 'visualizar', 'Sidebar Exames');
     controlarBotao('sidebarFarmacia', 'farmacia', 'visualizar', 'Sidebar Farmácia');
+    controlarBotao('sidebarCalculadora', 'cargo', 'visualizar', 'Sidebar Calculadora');
     controlarBotao('sidebarConfiguracoes', 'cargo', 'visualizar', 'Sidebar Configurações');
 }
 
@@ -192,7 +195,8 @@ function showSection(sectionId) {
         'pacientes': ['paciente', 'visualizar'],
         'consultas': ['consulta', 'visualizar'],
         'exames': ['exame', 'visualizar'],
-        'farmacia': ['farmacia', 'visualizar']
+        'farmacia': ['farmacia', 'visualizar'],
+        'calculadora': ['cargo', 'visualizar']
     };
     
     // Se é um módulo que requer permissão

@@ -1,0 +1,171 @@
+<!-- ============================================
+     SEÇÃO DE CALCULADORA
+     ============================================ -->
+<section id="calculadora" class="space-y-6 modal-hidden">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Calculadora de Atendimento</h2>
+            <button onclick="window.moduloCalculadora.limparTudo()" class="btn-modern px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center space-x-2">
+                <i class="fas fa-trash"></i>
+                <span>Limpar Tudo</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Coluna Esquerda: Medicamentos e Parcerias -->
+            <div class="space-y-6">
+                <!-- Medicamentos -->
+                <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                    <h3 class="text-xl font-bold text-blue-800 mb-4 flex items-center space-x-2">
+                        <i class="fas fa-pills"></i>
+                        <span>Medicamentos</span>
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="med-bandagem" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-gray-700">Bandagem</span>
+                            </label>
+                            <input type="number" id="med-bandagem-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="med-analgesico" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-gray-700">Analgésico</span>
+                            </label>
+                            <input type="number" id="med-analgesico-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="med-kit" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-gray-700">Kit Médico</span>
+                            </label>
+                            <input type="number" id="med-kit-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parcerias -->
+                <div class="bg-green-50 rounded-lg p-6 border border-green-200">
+                    <h3 class="text-xl font-bold text-green-800 mb-4 flex items-center space-x-2">
+                        <i class="fas fa-handshake"></i>
+                        <span>Parcerias</span>
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="parc-bandagem" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-green-600 rounded">
+                                <span class="text-gray-700">Bandagem</span>
+                            </label>
+                            <input type="number" id="parc-bandagem-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="parc-analgesico" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-green-600 rounded">
+                                <span class="text-gray-700">Analgésico</span>
+                            </label>
+                            <input type="number" id="parc-analgesico-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="parc-kit" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-green-600 rounded">
+                                <span class="text-gray-700">Kit Médico</span>
+                            </label>
+                            <input type="number" id="parc-kit-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Atendimentos -->
+            <div class="space-y-6">
+                <!-- Atendimentos -->
+                <div class="bg-purple-50 rounded-lg p-6 border border-purple-200">
+                    <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center space-x-2">
+                        <i class="fas fa-stethoscope"></i>
+                        <span>Atendimentos</span>
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="atend-interno" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <span class="text-gray-700">Tratamento Interno</span>
+                            </label>
+                            <input type="number" id="atend-interno-qtd" class="w-16 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="atend-externo-sul" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <span class="text-gray-700">Atendimento Externo (Sul)</span>
+                            </label>
+                            <input type="number" id="atend-externo-sul-qtd" class="w-16 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="atend-externo-norte" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <span class="text-gray-700">Atendimento Externo (Norte)</span>
+                            </label>
+                            <input type="number" id="atend-externo-norte-qtd" class="w-16 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="atend-consulta" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <span class="text-gray-700">Consulta</span>
+                            </label>
+                            <input type="number" id="atend-consulta-qtd" class="w-16 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center space-x-2 flex-1">
+                                <input type="checkbox" id="atend-exame" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <span class="text-gray-700">Exame</span>
+                            </label>
+                            <input type="number" id="atend-exame-qtd" class="w-16 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                            <span class="text-gray-500 text-sm">un.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo Total -->
+        <div class="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8 border-2 border-blue-300">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Resumo do Atendimento</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Total Medicamentos -->
+                <div class="bg-white p-4 rounded-lg border border-blue-200">
+                    <p class="text-sm text-gray-600 font-semibold mb-2"><i class="fas fa-pills text-blue-600 mr-2"></i>Total Medicamentos</p>
+                    <p class="text-2xl font-bold text-blue-600">R$ <span id="total-medicamentos">0.00</span></p>
+                </div>
+
+                <!-- Total Parcerias -->
+                <div class="bg-white p-4 rounded-lg border border-green-200">
+                    <p class="text-sm text-gray-600 font-semibold mb-2"><i class="fas fa-handshake text-green-600 mr-2"></i>Total Parcerias</p>
+                    <p class="text-2xl font-bold text-green-600">R$ <span id="total-parcerias">0.00</span></p>
+                </div>
+
+                <!-- Total Atendimentos -->
+                <div class="bg-white p-4 rounded-lg border border-purple-200">
+                    <p class="text-sm text-gray-600 font-semibold mb-2"><i class="fas fa-stethoscope text-purple-600 mr-2"></i>Total Atendimentos</p>
+                    <p class="text-2xl font-bold text-purple-600">R$ <span id="total-atendimentos">0.00</span></p>
+                </div>
+            </div>
+
+            <!-- Total Geral -->
+            <div class="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+                <p class="text-lg font-semibold mb-2">TOTAL GERAL DO ATENDIMENTO</p>
+                <p class="text-5xl font-bold">R$ <span id="total-geral">0.00</span></p>
+            </div>
+        </div>
+    </div>
+</section>

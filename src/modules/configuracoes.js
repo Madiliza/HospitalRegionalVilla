@@ -49,8 +49,8 @@ export function aplicarPermissoesAbas() {
     controlarAba('tabCargos', 'aba-cargos', 'cargo', 'visualizar', 'Cargos');
     controlarAba('tabUsuarios', 'aba-usuarios', 'usuario', 'visualizar', 'Usuários');
     controlarAba('tabMedicamentos', 'aba-medicamentos', 'farmacia', 'visualizar', 'Medicamentos');
-    // Solicitações usa permissão de cargo (função administrativa)
     controlarAba('tabSolicitacoes', 'aba-solicitacoes', 'cargo', 'visualizar', 'Solicitações');
+    controlarAba('tabAtendimentos', 'aba-atendimentos', 'cargo', 'visualizar', 'Valores de Atendimento');
 }
 
 function configurarEventos() {
@@ -108,6 +108,11 @@ export function mostrarAba(aba) {
             // Aba de Medicamentos verifica permissão 'farmacia'
             temAcessoAba = temPermissao('farmacia', 'visualizar');
             break;
+        case 'atendimentos':
+            // Aba de Valores de Atendimento verifica permissão 'cargo' (função administrativa)
+            temAcessoAba = temPermissao('cargo', 'visualizar');
+            if (temAcessoAba) atualizarCamposAtendimentos();
+            break;
         default:
             temAcessoAba = false;
     }
@@ -123,6 +128,7 @@ export function mostrarAba(aba) {
     document.getElementById('aba-usuarios').classList.add('hidden');
     document.getElementById('aba-solicitacoes').classList.add('hidden');
     document.getElementById('aba-medicamentos').classList.add('hidden');
+    document.getElementById('aba-atendimentos').classList.add('hidden');
 
     // Mostrar aba selecionada
     document.getElementById(`aba-${abaNormalizada}`).classList.remove('hidden');
@@ -1022,5 +1028,43 @@ window.moduloConfig = {
     apagarMedicamentoConfig,
     aceitarSolicitacao,
     rejeitarSolicitacao,
-    aplicarPermissoesAbas
+    aplicarPermissoesAbas,
+    salvarValoresAtendimentos
 };
+
+// ============================================
+// VALORES DE ATENDIMENTO
+// ============================================
+function atualizarCamposAtendimentos() {
+    // Importar valores da calculadora se disponível
+    if (window.moduloCalculadora && window.moduloCalculadora.valoresAtendimentos) {
+        const valores = window.moduloCalculadora.valoresAtendimentos;
+        document.getElementById('config-tratamento-interno').value = valores.tratamentoInterno || 0;
+        document.getElementById('config-externo-sul').value = valores.atendimentoExternoSul || 0;
+        document.getElementById('config-externo-norte').value = valores.atendimentoExternoNorte || 0;
+        document.getElementById('config-consulta').value = valores.consulta || 0;
+        document.getElementById('config-exame').value = valores.exame || 0;
+    }
+}
+
+export async function salvarValoresAtendimentos() {
+    const valores = {
+        tratamentoInterno: parseFloat(document.getElementById('config-tratamento-interno').value) || 0,
+        atendimentoExternoSul: parseFloat(document.getElementById('config-externo-sul').value) || 0,
+        atendimentoExternoNorte: parseFloat(document.getElementById('config-externo-norte').value) || 0,
+        consulta: parseFloat(document.getElementById('config-consulta').value) || 0,
+        exame: parseFloat(document.getElementById('config-exame').value) || 0
+    };
+
+    // Atualizar calculadora se disponível
+    if (window.moduloCalculadora) {
+        window.moduloCalculadora.valoresAtendimentos = valores;
+    }
+
+    try {
+        await salvarNoFirebase('valoresAtendimentos', valores);
+        mostrarNotificacao('Valores de atendimento salvos com sucesso!', 'success');
+    } catch (erro) {
+        mostrarErro('Erro', 'Não foi possível salvar os valores de atendimento');
+    }
+}
