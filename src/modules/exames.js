@@ -49,6 +49,7 @@ function limparFormulario() {
     document.getElementById('examePacienteId').value = '';
     document.getElementById('dadosPacienteExameDiv').classList.add('hidden');
     document.getElementById('sugestoesPacientesExame').classList.add('hidden');
+    document.getElementById('exameResumo').value = '';
 }
 
 // Busca de paciente
@@ -109,6 +110,7 @@ export async function adicionarExame() {
     const tipo = tiposSelecionados.join(', ');
     const data = document.getElementById('exameData').value;
     const hora = document.getElementById('exameHora').value;
+    const resumo = document.getElementById('exameResumo').value;
 
     if (!pacienteId || tiposSelecionados.length === 0 || !data || !hora) {
         mostrarErro('Campos Obrigatórios', 'Por favor, preencha todos os campos e selecione pelo menos um tipo de exame');
@@ -127,6 +129,7 @@ export async function adicionarExame() {
         tipo,
         data,
         hora,
+        resumo,
         dataCriacao: new Date().toLocaleDateString('pt-BR')
     };
 
@@ -164,6 +167,7 @@ export function atualizarLista() {
                     <p class="text-gray-600"><i class="fas fa-user mr-2"></i>Paciente ID: ${exame.pacienteId}</p>
                     <p class="text-gray-600"><i class="fas fa-calendar-alt mr-2"></i>${exame.data} às ${exame.hora}</p>
                     <p class="text-gray-600"><i class="fas fa-clock mr-2"></i>Agendado em: ${exame.dataCriacao}</p>
+                    ${exame.resumo ? `<p class="text-gray-700 mt-3"><strong>Resumo:</strong> ${exame.resumo}</p>` : ''}
                 </div>
                 <button onclick="window.moduloExames.deletar('${exame.id}')" class="text-red-600 hover:text-red-800 transition">
                     <i class="fas fa-trash text-xl"></i>

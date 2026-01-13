@@ -155,21 +155,34 @@ export function atualizarLista() {
         return;
     }
 
-    lista.innerHTML = consultas.map(consulta => `
-        <div class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg border-l-4 border-green-600">
+    lista.innerHTML = consultas.map(consulta => {
+        const bgColor = consulta.finalizada ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-600' : 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-500';
+        const statusText = consulta.finalizada ? `<p class="text-green-700"><i class="fas fa-check mr-2"></i>Finalizada em: ${consulta.dataFinalizacao}</p>` : '';
+        const botaoFinalizacao = consulta.finalizada ? '' : `<button onclick="window.moduloConsultas.abrirModalFinalizacao('${consulta.id}')" class="text-green-600 hover:text-green-800 transition" title="Finalizar Consulta">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </button>`;
+        
+        return `
+        <div class="p-6 rounded-lg border-l-4 shadow-md ${bgColor}">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-lg font-bold text-gray-800">Consulta: ${consulta.especialidade}</h3>
                     <p class="text-gray-600"><i class="fas fa-user mr-2"></i>Paciente ID: ${consulta.pacienteId}</p>
                     <p class="text-gray-600"><i class="fas fa-calendar-alt mr-2"></i>${consulta.data} às ${consulta.hora}</p>
                     <p class="text-gray-600"><i class="fas fa-clock mr-2"></i>Agendada em: ${consulta.dataCriacao}</p>
+                    ${statusText}
+                    ${consulta.observacoes ? `<p class="text-gray-600 mt-2"><i class="fas fa-note-sticky mr-2"></i><strong>Observações:</strong> ${consulta.observacoes}</p>` : ''}
                 </div>
-                <button onclick="window.moduloConsultas.deletar('${consulta.id}')" class="text-red-600 hover:text-red-800 transition">
-                    <i class="fas fa-trash text-xl"></i>
-                </button>
+                <div class="flex gap-2 ml-4">
+                    ${botaoFinalizacao}
+                    <button onclick="window.moduloConsultas.deletar('${consulta.id}')" class="text-red-600 hover:text-red-800 transition" title="Cancelar">
+                        <i class="fas fa-trash text-xl"></i>
+                    </button>
+                </div>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 export function deletar(id) {
@@ -191,6 +204,60 @@ export function deletar(id) {
     );
 }
 
+export function abrirModalFinalizacao(id) {
+    const modal = document.getElementById('modalFinalizarConsulta');
+    if (modal) {
+        document.getElementById('consultaIdFinalizacao').value = id;
+        document.getElementById('observacoesConsulta').value = '';
+        modal.classList.remove('modal-hidden');
+    }
+}
+
+export function fecharModalFinalizacao() {
+    const modal = document.getElementById('modalFinalizarConsulta');
+    if (modal) {
+        modal.classList.add('modal-hidden');
+    }
+}
+
+export async function finalizarConsulta() {
+    // Verificar permissão
+    if (!temPermissao('consulta', 'editar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para finalizar consultas');
+        return;
+    }
+
+    const consultaId = document.getElementById('consultaIdFinalizacao').value;
+    const observacoes = document.getElementById('observacoesConsulta').value;
+
+    if (!consultaId) {
+        mostrarErro('Erro', 'Consulta não encontrada');
+        return;
+    }
+
+    // Encontrar a consulta
+    const consulta = consultas.find(c => c.id === consultaId);
+    if (!consulta) {
+        mostrarErro('Erro', 'Consulta não encontrada');
+        return;
+    }
+
+    // Adicionar observações e marcar como finalizada
+    consulta.observacoes = observacoes;
+    consulta.finalizada = true;
+    consulta.dataFinalizacao = new Date().toLocaleDateString('pt-BR');
+
+    try {
+        await salvarNoFirebase('consultas', consulta);
+    } catch (erro) {
+        // Erro silencioso
+    }
+
+    fecharModalFinalizacao();
+    atualizarLista();
+    mostrarNotificacao('Consulta finalizada com sucesso!', 'success');
+}
+
 // Exportar como global
 window.moduloConsultas = {
     openModal,
@@ -199,5 +266,8 @@ window.moduloConsultas = {
     selecionarPaciente,
     limparSelecaoPaciente,
     deletar,
-    atualizarLista
+    atualizarLista,
+    abrirModalFinalizacao,
+    fecharModalFinalizacao,
+    finalizarConsulta
 };
