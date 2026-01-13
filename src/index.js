@@ -219,7 +219,7 @@ function showSection(sectionId) {
 
     // Atualizar botão ativo na sidebar
     document.querySelectorAll('aside button').forEach(btn => {
-        btn.classList.remove('bg-red-600', 'text-white');
+        btn.classList.remove('bg-blue-600', 'text-white');
         btn.classList.add('hover:bg-gray-100', 'text-gray-700');
     });
 
@@ -229,7 +229,7 @@ function showSection(sectionId) {
         if (btn.textContent.toLowerCase().includes(sectionId.toLowerCase()) || 
             btn.onclick.toString().includes(`'${sectionId}'`)) {
             btn.classList.remove('hover:bg-gray-100', 'text-gray-700');
-            btn.classList.add('bg-red-600', 'text-white');
+            btn.classList.add('bg-blue-600', 'text-white');
         }
     });
 }

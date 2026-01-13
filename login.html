@@ -8,8 +8,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .login-bg {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #7f1d1d 100%);
+            position: relative;
             min-height: 100vh;
+            background: linear-gradient(to right, #f3f4f6 0%, #dbeafe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-bg-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 900px;
+            height: 900px;
+            opacity: 0.1;
+            background-image: url('./public/image.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .login-bg > *:not(.login-bg-image) {
+            position: relative;
+            z-index: 2;
         }
 
         .login-card {
@@ -125,14 +150,17 @@
     </style>
 </head>
 <body class="login-bg flex items-center justify-center p-4">
+    <!-- Background Image -->
+    <div class="login-bg-image"></div>
+    
     <!-- Toast Container -->
     <div id="toastContainer"></div>
 
     <div class="login-card rounded-2xl shadow-2xl p-8 w-full max-w-md fade-in">
         <!-- Logo e Título -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4 pulse-icon">
-                <i class="fas fa-hospital text-red-600 text-4xl"></i>
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4 pulse-icon">
+                <img src="./public/image.png" alt="Logo Hospital" class="w-12 h-12">
             </div>
             <h1 class="text-3xl font-bold text-gray-800">Hospital Regional Villa</h1>
             <p class="text-gray-500 mt-2">Sistema de Gestão Hospitalar</p>
@@ -148,7 +176,7 @@
                         type="text" 
                         id="usuarioId" 
                         required
-                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="Digite seu ID de usuário"
                         autocomplete="off"
                     >
@@ -163,7 +191,7 @@
                         type="password" 
                         id="senha" 
                         required
-                        class="input-field w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                        class="input-field w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         placeholder="Digite sua senha"
                         autocomplete="current-password"
                     >
@@ -184,7 +212,7 @@
             <button 
                 type="submit" 
                 id="btnLogin"
-                class="relative w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-lg shadow-lg hover:shadow-xl"
+                class="relative w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-lg shadow-lg hover:shadow-xl"
             >
                 <span class="btn-text flex items-center justify-center">
                     <i class="fas fa-sign-in-alt mr-2"></i>
@@ -209,7 +237,7 @@
         <!-- Link para registro -->
         <p class="text-center text-gray-600">
             Não tem uma conta? 
-            <a href="#" onclick="abrirModalRegistro()" class="text-red-600 hover:text-red-700 font-medium">
+            <a href="#" onclick="abrirModalRegistro()" class="text-blue-600 hover:text-blue-700 font-medium">
                 Solicitar acesso
             </a>
         </p>
@@ -240,7 +268,7 @@
                             type="text" 
                             id="usuarioIdRecuperacao" 
                             required
-                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Digite seu ID de usuário"
                         >
                     </div>
@@ -255,7 +283,7 @@
                     </button>
                     <button 
                         type="submit" 
-                        class="flex-1 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+                        class="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
                     >
                         <i class="fas fa-paper-plane mr-2"></i>Enviar
                     </button>
@@ -285,8 +313,8 @@
                             type="text" 
                             id="registroId" 
                             required
-                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
-                            placeholder="Ex: maria.silva"
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            placeholder="Ex: 2025"
                         >
                     </div>
                 </div>
@@ -299,7 +327,7 @@
                             type="text" 
                             id="registroNome" 
                             required
-                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                             placeholder="Digite seu nome completo"
                         >
                     </div>
@@ -313,7 +341,7 @@
                             type="password" 
                             id="registroSenha" 
                             required
-                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                             placeholder="Digite uma senha"
                         >
                     </div>
@@ -327,7 +355,7 @@
                             type="password" 
                             id="registroConfirmSenha" 
                             required
-                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                             placeholder="Confirme sua senha"
                         >
                     </div>
@@ -335,14 +363,14 @@
 
                 <button 
                     type="submit" 
-                    class="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-lg shadow-lg hover:shadow-xl"
+                    class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-lg shadow-lg hover:shadow-xl"
                 >
                     <i class="fas fa-paper-plane mr-2"></i>Solicitar Acesso
                 </button>
 
                 <p class="text-center text-sm text-gray-600">
                     Já tem uma conta? 
-                    <a href="#" onclick="fecharModalRegistro()" class="text-red-600 hover:text-red-700 font-medium">
+                    <a href="#" onclick="fecharModalRegistro()" class="text-blue-600 hover:text-blue-700 font-medium">
                         Voltar ao login
                     </a>
                 </p>
