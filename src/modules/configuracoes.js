@@ -27,8 +27,6 @@ export function init(dadosCarregados) {
 // Controlar visibilidade das abas baseado em permissões
 // IMPORTANTE: Cada aba verifica seu módulo específico, não todos usam 'cargo'
 export function aplicarPermissoesAbas() {
-    console.log('🔐 Aplicando permissões às abas de configurações...');
-    
     // Função auxiliar para controlar aba
     function controlarAba(tabId, abaId, modulo, acao, nomeAba) {
         const btnTab = document.getElementById(tabId);
@@ -38,14 +36,10 @@ export function aplicarPermissoesAbas() {
             if (temPermissao(modulo, acao)) {
                 btnTab.style.display = '';
                 abaContent.style.display = '';
-                console.log(`✅ Aba "${nomeAba}" visível`);
             } else {
                 btnTab.style.display = 'none';
                 abaContent.style.display = 'none';
-                console.log(`❌ Aba "${nomeAba}" oculta (sem permissão ${modulo}/${acao})`);
             }
-        } else {
-            console.warn(`⚠️ Elementos da aba "${nomeAba}" não encontrados (tabId=${tabId}, abaId=${abaId})`);
         }
     }
     
@@ -57,8 +51,6 @@ export function aplicarPermissoesAbas() {
     controlarAba('tabMedicamentos', 'aba-medicamentos', 'farmacia', 'visualizar', 'Medicamentos');
     // Solicitações usa permissão de cargo (função administrativa)
     controlarAba('tabSolicitacoes', 'aba-solicitacoes', 'cargo', 'visualizar', 'Solicitações');
-    
-    console.log('🔐 Permissões das abas aplicadas!');
 }
 
 function configurarEventos() {
@@ -117,7 +109,6 @@ export function mostrarAba(aba) {
             temAcessoAba = temPermissao('farmacia', 'visualizar');
             break;
         default:
-            console.warn(`⚠️ [Configurações] Aba desconhecida: ${aba}`);
             temAcessoAba = false;
     }
     
@@ -214,7 +205,7 @@ export async function adicionarCargo() {
     try {
         await salvarNoFirebase('cargos', novoCargo);
     } catch (erro) {
-        console.error('Erro ao salvar cargo:', erro);
+        // Erro silencioso
     }
 
     closeModalCargo();
@@ -350,7 +341,6 @@ export async function adicionarUsuario() {
     try {
         await salvarNoFirebase('usuarios', novoUsuario);
     } catch (erro) {
-        console.error('Erro ao salvar usuário:', erro);
         mostrarErro('Erro', 'Não foi possível salvar o usuário no Firebase');
         return;
     }
@@ -487,7 +477,6 @@ export async function salvarNovoCargoUsuario() {
                 atualizarListaUsuarios();
                 mostrarNotificacao(`Cargo alterado para ${cargo ? cargo.nome : 'N/A'} com sucesso!`, 'success');
             } catch (erro) {
-                console.error('Erro ao alterar cargo:', erro);
                 mostrarErro('Erro', 'Não foi possível alterar o cargo');
             }
         }
@@ -531,7 +520,6 @@ export async function salvarNovaSenha() {
                 atualizarListaUsuarios();
                 mostrarNotificacao('Senha alterada com sucesso!', 'success');
             } catch (erro) {
-                console.error('Erro ao alterar senha:', erro);
                 mostrarErro('Erro', 'Não foi possível alterar a senha');
             }
         }
@@ -559,7 +547,6 @@ export function inativarUsuario(id) {
                 atualizarListaUsuarios();
                 mostrarNotificacao(`${usuario.nome} foi inativado com sucesso!`, 'success');
             } catch (erro) {
-                console.error('Erro ao inativar usuário:', erro);
                 mostrarErro('Erro', 'Não foi possível inativar o usuário');
             }
         }
@@ -583,7 +570,6 @@ export function ativarUsuario(id) {
                 atualizarListaUsuarios();
                 mostrarNotificacao(`${usuario.nome} foi ativado com sucesso!`, 'success');
             } catch (erro) {
-                console.error('Erro ao ativar usuário:', erro);
                 mostrarErro('Erro', 'Não foi possível ativar o usuário');
             }
         }
@@ -613,7 +599,6 @@ export function apagarUsuario(id) {
                 atualizarListaUsuarios();
                 mostrarNotificacao('Usuário excluído com sucesso!', 'success');
             } catch (erro) {
-                console.error('Erro ao excluir usuário:', erro);
                 mostrarErro('Erro', 'Não foi possível excluir o usuário');
             }
         }
@@ -704,7 +689,7 @@ export async function adicionarMedicamentoConfig() {
     try {
         await salvarNoFirebase('medicamentosConfig', medicamentoParaSalvar);
     } catch (erro) {
-        console.error('Erro ao salvar medicamento:', erro);
+        // Erro silencioso
     }
 
     closeModalMedicamentoConfig();
@@ -852,7 +837,6 @@ export function aceitarSolicitacao(id) {
                 atualizarListaUsuarios();
                 mostrarNotificacao(`Solicitação de ${solicitacao.nome} aceita com sucesso!`, 'success');
             } catch (erro) {
-                console.error('Erro ao aceitar solicitação:', erro);
                 mostrarErro('Erro', 'Não foi possível aceitar a solicitação');
             }
         }
@@ -882,7 +866,6 @@ export function rejeitarSolicitacao(id) {
                 atualizarListaSolicitacoes();
                 mostrarNotificacao(`Solicitação de ${solicitacao.nome} rejeitada!`, 'success');
             } catch (erro) {
-                console.error('Erro ao rejeitar solicitação:', erro);
                 mostrarErro('Erro', 'Não foi possível rejeitar a solicitação');
             }
         }

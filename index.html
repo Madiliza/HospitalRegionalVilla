@@ -298,14 +298,11 @@
                 await set(ref(database, 'cargos/cargo_dev'), cargoDev);
                 await set(ref(database, 'cargos/cargo_diretor'), cargoDiretor);
                 
-                console.log('✅ Cargos sincronizados! Recarregue a página.');
                 alert('✅ Cargos sincronizados! Recarregue a página para ver a aba de Usuários.');
             } catch (erro) {
-                console.error('❌ Erro ao sincronizar:', erro);
+                // Erro silencioso
             }
         };
-        
-        console.log('💡 Para sincronizar o Firebase, execute no console: window.sincronizarFirebase()');
     </script>
 
     <script type="module" src="./src/index.js"></script>

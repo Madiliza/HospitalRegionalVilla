@@ -134,7 +134,7 @@ export async function adicionarConsulta() {
     try {
         await salvarNoFirebase('consultas', novaConsulta);
     } catch (erro) {
-        console.error('Erro ao salvar consulta:', erro);
+        // Erro silencioso
     }
 
     closeModal();
@@ -147,7 +147,6 @@ export function atualizarLista() {
     const lista = document.getElementById('consultasList');
 
     if (!lista) {
-        console.warn('⚠️ Elemento consultasList não encontrado ainda');
         return;
     }
 

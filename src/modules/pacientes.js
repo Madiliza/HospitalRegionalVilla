@@ -76,7 +76,7 @@ export async function adicionarPaciente() {
     try {
         await salvarNoFirebase('pacientes', novoPaciente);
     } catch (erro) {
-        console.error('Erro ao salvar paciente:', erro);
+        // Erro silencioso
     }
 
     closeModal();
@@ -89,7 +89,6 @@ export function atualizarLista() {
     const lista = document.getElementById('pacientesList');
 
     if (!lista) {
-        console.warn('⚠️ Elemento pacientesList não encontrado ainda');
         return;
     }
 

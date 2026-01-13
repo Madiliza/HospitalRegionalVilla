@@ -12,25 +12,16 @@ let cargoAtual = null;
  * @param {object} cargos - Lista de cargos
  */
 export function inicializarPermissoes(usuarioId, usuarios, cargos) {
-    console.log('🔐 Inicializando permissões para usuário:', usuarioId);
-    console.log('📋 Total de usuários:', usuarios?.length || 0);
-    console.log('📋 Total de cargos:', cargos?.length || 0);
-    
     // Buscar usuário
     usuarioAtual = usuarios.find(u => u.id === usuarioId);
     
     if (!usuarioAtual) {
-        console.error('❌ Usuário não encontrado:', usuarioId);
         return false;
     }
-    
-    console.log('👤 Usuário encontrado:', usuarioAtual.nome);
     
     // CORREÇÃO CRÍTICA: O campo pode ser 'cargoId' ou 'cargo' dependendo de como foi salvo
     // Tentar ambos os campos para compatibilidade
     const cargoDoUsuario = usuarioAtual.cargoId || usuarioAtual.cargo;
-    
-    console.log('🔍 Buscando cargo:', cargoDoUsuario);
     
     // Buscar cargo do usuário
     // O cargo pode estar armazenado como nome (string) ou como ID
@@ -41,9 +32,6 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
     );
     
     if (!cargoAtual) {
-        console.error('❌ Cargo não encontrado:', cargoDoUsuario);
-        console.log('📋 Cargos disponíveis:', cargos.map(c => `${c.id} (${c.nome})`).join(', '));
-        
         // Se nenhum cargo foi encontrado, criar um cargo padrão com acesso total (para DEV)
         if (cargoDoUsuario === 'Desenvolvedor' || cargoDoUsuario === 'DEV' || cargoDoUsuario === 'Admin') {
             cargoAtual = {
@@ -58,7 +46,6 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'usuario': ['criar', 'visualizar', 'editar', 'apagar']
                 }
             };
-            console.log('⚠️ Usando cargo temporário DEV com acesso total');
         } else {
             cargoAtual = {
                 id: 'cargo_padrao_temp',
@@ -72,11 +59,8 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'cargo': []
                 }
             };
-            console.log('⚠️ Usando cargo temporário padrão (somente visualizar)');
         }
     } else {
-        console.log('✅ Cargo encontrado:', cargoAtual.nome);
-        console.log('📋 Permissões do cargo:', JSON.stringify(cargoAtual.permissoes, null, 2));
     }
     
     return true;
@@ -102,7 +86,6 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
 export function temPermissao(modulo, acao) {
     // Validação defensiva: se cargo não foi inicializado, retorna false
     if (!cargoAtual || !cargoAtual.permissoes) {
-        console.warn('⚠️ [Permissões] Cargo não inicializado. Retornando acesso negado.');
         return false;
     }
     
@@ -112,7 +95,6 @@ export function temPermissao(modulo, acao) {
     
     // Validação: módulo e ação devem ser strings não-vazias
     if (!moduloNormalizado || !acaoNormalizada) {
-        console.warn(`⚠️ [Permissões] Parâmetros inválidos: modulo="${modulo}", acao="${acao}"`);
         return false;
     }
     
@@ -121,13 +103,11 @@ export function temPermissao(modulo, acao) {
     
     // Se o módulo não existe, retorna false
     if (!permissoesDoModulo) {
-        console.warn(`⚠️ [Permissões] Módulo "${moduloNormalizado}" não encontrado no cargo "${cargoAtual.nome}"`);
         return false;
     }
     
     // Validação: permissões deve ser um array
     if (!Array.isArray(permissoesDoModulo)) {
-        console.warn(`⚠️ [Permissões] Permissões do módulo "${moduloNormalizado}" não é um array`);
         return false;
     }
     
@@ -135,11 +115,6 @@ export function temPermissao(modulo, acao) {
     const temAcesso = permissoesDoModulo.some(p => 
         (p || '').toLowerCase().trim() === acaoNormalizada
     );
-    
-    // Log detalhado apenas se acesso foi negado (evita spam)
-    if (!temAcesso) {
-        console.warn(`❌ [Permissões] Acesso negado: ${cargoAtual.nome} não pode "${acaoNormalizada}" em "${moduloNormalizado}"`);
-    }
     
     return temAcesso;
 }
@@ -231,7 +206,6 @@ export function obterCargoAtual() {
  */
 export function exigirPermissao(modulo, acao) {
     if (!temPermissao(modulo, acao)) {
-        console.error(`❌ Acesso negado para ${modulo}.${acao}`);
         return false;
     }
     return true;
@@ -276,8 +250,6 @@ export function aplicarControleDePermissoes(usuarios, cargos) {
  */
 export function executarComPermissao(modulo, acao, callback) {
     if (!temPermissao(modulo, acao)) {
-        const nomeModulo = modulo.charAt(0).toUpperCase() + modulo.slice(1);
-        console.error(`❌ Acesso negado: Você não tem permissão para ${acao} ${nomeModulo}s`);
         return;
     }
     
@@ -288,28 +260,10 @@ export function executarComPermissao(modulo, acao, callback) {
 
 /**
  * Debug: Exibir informações completas sobre o usuário e suas permissões
+ * (Função mantida mas sem output para produção)
  */
 export function debugPermissoes() {
-    console.log('='.repeat(60));
-    console.log('🔍 DEBUG DE PERMISSÕES');
-    console.log('='.repeat(60));
-    
-    console.log('📌 Usuário Atual:', usuarioAtual);
-    console.log('📌 Cargo Atual:', cargoAtual);
-    
-    if (cargoAtual && cargoAtual.permissoes) {
-        console.log('📌 Permissões do Cargo:', cargoAtual.permissoes);
-        
-        const modulos = Object.keys(cargoAtual.permissoes);
-        console.log(`\n📊 Módulos cadastrados: ${modulos.join(', ')}`);
-        
-        modulos.forEach(modulo => {
-            const perms = cargoAtual.permissoes[modulo];
-            console.log(`  • ${modulo}: ${Array.isArray(perms) && perms.length > 0 ? perms.join(', ') : '(sem permissões)'}`);
-        });
-    }
-    
-    console.log('='.repeat(60));
+    // Debug desabilitado em produção
 }
 
 // Exportar para uso global

@@ -138,7 +138,6 @@
                 statusText.innerHTML = '<span class="success">✅ Cargos atualizados com sucesso!</span><br><br>Recarregue a página do sistema para ver as mudanças.';
                 statusText.style.color = '#10b981';
             } catch (erro) {
-                console.error('Erro:', erro);
                 statusText.innerHTML = `<span class="error">❌ Erro ao atualizar: ${erro.message}</span>`;
                 statusText.style.color = '#ef4444';
                 btn.disabled = false;

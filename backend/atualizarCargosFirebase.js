@@ -2,7 +2,7 @@
  * Script para atualizar cargos no Firebase com a permissão 'usuario'
  * Copie e cole no console do navegador (F12):
  * 
- * import('./backend/atualizarCargosFirebase.js').then(m => m.atualizarCargos()).catch(e => console.error(e));
+ * import('./backend/atualizarCargosFirebase.js').then(m => m.atualizarCargos());
  */
 
 import { salvarDados } from '../config/firebase-config.js';
@@ -47,10 +47,8 @@ export async function atualizarCargos() {
 
         await salvarDados('cargos/cargo_diretor', cargoDiretor);
 
-        console.log('🎉 Cargos atualizados com sucesso! Recarregue a página.');
         return true;
     } catch (erro) {
-        console.error('❌ Erro ao atualizar cargos:', erro);
         return false;
     }
 }

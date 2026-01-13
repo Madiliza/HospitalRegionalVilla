@@ -40,7 +40,6 @@ export async function carregarDadosFirebase() {
 
         return dadosCarregados;
     } catch (erro) {
-        console.error('Erro ao carregar dados do Firebase:', erro);
         return {
             pacientes: [],
             consultas: [],
@@ -60,7 +59,6 @@ export async function salvarNoFirebase(colecao, dados) {
         await salvarDados(`${colecao}/${dados.id}`, dados);
 
     } catch (erro) {
-        console.error(`Erro ao salvar em ${colecao}:`, erro);
         throw erro;
     }
 }
@@ -70,7 +68,6 @@ export async function deletarDoFirebase(colecao, id) {
         await deletarDados(`${colecao}/${id}`);
 
     } catch (erro) {
-        console.error(`Erro ao deletar de ${colecao}:`, erro);
         throw erro;
     }
 }

@@ -376,7 +376,6 @@
                     alert('❌ Nenhum usuário encontrado no Firebase. Verifique a importação!');
                 }
             } catch (error) {
-                console.error('❌ Erro ao conectar:', error);
                 alert('❌ Erro ao conectar no Firebase:\n' + error.message);
             }
         };
@@ -386,7 +385,6 @@
             const form = document.getElementById('loginForm');
             const testBtn = document.createElement('button');
             testBtn.type = 'button';
-            testBtn.className = 'w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium text-sm mt-2';
             testBtn.onclick = testarConexaoFirebase;
             form.appendChild(testBtn);
         });
@@ -428,7 +426,6 @@
                 
                 return { uid: usuarioId, email: usuario.email };
             } catch (error) {
-                console.error('❌ Erro na busca:', error);
                 throw error;
             }
         };
@@ -511,7 +508,6 @@
                 mostrarToast('Instruções de recuperação enviadas para o administrador!', 'success');
                 fecharEsqueciSenha();
             } catch (error) {
-                console.error('Erro ao recuperar senha:', error);
                 mostrarToast(error.message || 'Erro ao recuperar senha', 'error');
             }
         });
@@ -577,7 +573,6 @@
                 fecharModalRegistro();
                 
             } catch (error) {
-                console.error('Erro ao solicitar cadastro:', error);
                 mostrarToast(error.message || 'Erro ao solicitar cadastro', 'error');
             }
         });
@@ -622,7 +617,6 @@
                     mostrarToast('ID ou senha incorretos', 'error');
                 }
             } catch (error) {
-                console.error('Erro no login:', error);
                 mostrarToast(error.message || 'ID ou senha incorretos', 'error');
             } finally {
                 // Desativar loading

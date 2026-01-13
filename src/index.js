@@ -38,7 +38,6 @@ async function carregarComponentes() {
     
     // Aguardar que o container exista
     if (!containerComponentes) {
-        console.error('❌ Container de componentes não encontrado');
         return;
     }
     
@@ -50,7 +49,7 @@ async function carregarComponentes() {
             div.innerHTML = html;
             containerComponentes.appendChild(div);
         } catch (error) {
-            console.error(`❌ Erro ao carregar componente ${nome}:`, error);
+            // Erro silencioso ao carregar componente
         }
     }
     
@@ -128,8 +127,6 @@ async function inicializarSistema() {
     
     // Marcar app como pronto
     setAppReady(true);
-    
-    console.log('✅ Sistema inicializado com sucesso!');
 }
 
 /**
@@ -137,21 +134,15 @@ async function inicializarSistema() {
  * Usa IDs para seleção robusta de botões
  */
 function aplicarPermissoesPorModulo(dados) {
-    console.log('🔐 Iniciando aplicação de permissões na interface...');
-    
     // Função auxiliar para controlar visibilidade de botões
     function controlarBotao(id, modulo, acao, nomeAmigavel) {
         const btn = document.getElementById(id);
         if (btn) {
             if (temPermissao(modulo, acao)) {
                 btn.style.display = '';
-                console.log(`✅ Botão "${nomeAmigavel}" visível`);
             } else {
                 btn.style.display = 'none';
-                console.log(`❌ Botão "${nomeAmigavel}" oculto (sem permissão ${modulo}/${acao})`);
             }
-        } else {
-            console.warn(`⚠️ Botão "${nomeAmigavel}" (id=${id}) não encontrado no DOM`);
         }
     }
     
@@ -178,18 +169,6 @@ function aplicarPermissoesPorModulo(dados) {
     controlarBotao('sidebarExames', 'exame', 'visualizar', 'Sidebar Exames');
     controlarBotao('sidebarFarmacia', 'farmacia', 'visualizar', 'Sidebar Farmácia');
     controlarBotao('sidebarConfiguracoes', 'cargo', 'visualizar', 'Sidebar Configurações');
-    
-    // Mostrar informações do usuário e cargo
-    console.log('🔐 Permissões aplicadas com sucesso!');
-    
-    const usuarioAtual = obterUsuarioAtual();
-    const cargoAtual = obterCargoAtual();
-    
-    if (usuarioAtual && cargoAtual) {
-        console.log(`👤 Usuário: ${usuarioAtual.nome}`);
-        console.log(`💼 Cargo: ${cargoAtual.nome}`);
-        console.log(`📋 Permissões: ${Object.keys(cargoAtual.permissoes || {}).join(', ')}`);
-    }
 }
 
 function atualizarInfoUsuario(user) {
@@ -235,7 +214,6 @@ function showSection(sectionId) {
     if (targetSection) {
         targetSection.classList.remove('modal-hidden');
     } else {
-        console.error(`Seção "${sectionId}" não encontrada`);
         return;
     }
 
@@ -342,7 +320,6 @@ function setupFormAlterarSenha() {
                 mostrarNotificacao('Senha alterada com sucesso!', 'success');
                 fecharModalAlterarSenha();
             } catch (error) {
-                console.error('Erro ao alterar senha:', error);
                 if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                     mostrarNotificacao('Senha atual incorreta!', 'error');
                 } else if (error.code === 'auth/weak-password') {
@@ -377,7 +354,6 @@ async function logout() {
             window.location.href = '/login.html';
         }, 1000);
     } catch (error) {
-        console.error('Erro ao fazer logout:', error);
         mostrarNotificacao('Erro ao fazer logout', 'error');
     }
 }

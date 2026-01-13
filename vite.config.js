@@ -16,10 +16,9 @@ const copyComponentsPlugin = () => ({
         const src = `src/components/${componente}.html`;
         const dest = `dist/src/components/${componente}.html`;
         copyFileSync(src, dest);
-        console.log(`✓ Componente ${componente}.html copiado para dist`);
       }
     } catch (error) {
-      console.warn('⚠️ Erro ao copiar componentes:', error.message);
+      // Erro silencioso
     }
   }
 })

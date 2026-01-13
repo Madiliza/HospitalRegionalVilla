@@ -6,8 +6,7 @@
  * 
  * fetch('./config/setup-dev-cargo.js')
  *   .then(r => r.text())
- *   .then(eval)
- *   .catch(e => console.error('Erro:', e))
+ *   .then(eval);
  */
 
 import { salvarDados } from '../config/firebase-config.js';
@@ -46,12 +45,8 @@ export async function configurarCargoDev() {
 
         await salvarDados('usuarios/2003', usuarioDev);
 
-        console.log('🎉 Configuração concluída! Recarregue a página para ver as mudanças.');
-        console.log('📝 Faça login com: ID=2003, Senha=DevLiza123!');
-
         return true;
     } catch (erro) {
-        console.error('❌ Erro ao configurar cargo DEV:', erro);
         return false;
     }
 }

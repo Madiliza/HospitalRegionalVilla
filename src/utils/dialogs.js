@@ -12,7 +12,6 @@ let appReady = false;
 export function safeGetElement(id) {
     const element = document.getElementById(id);
     if (!element) {
-        console.warn(`⚠️ Elemento ${id} não encontrado`);
         return null;
     }
     return element;
@@ -24,7 +23,6 @@ export function setAppReady(ready) {
 
 export function getDialogoElementos() {
     if (!appReady) {
-        console.warn('App ainda não está pronto');
         return null;
     }
     
@@ -40,7 +38,6 @@ export function getDialogoElementos() {
 export function mostrarDialog(titulo, mensagem, tipo = 'info', botoes = null) {
     // Se o app ainda não está pronto, aguardar
     if (!appReady) {
-        console.warn('App não está pronto para mostrar dialogo');
         return;
     }
     
@@ -50,7 +47,6 @@ export function mostrarDialog(titulo, mensagem, tipo = 'info', botoes = null) {
     
     // Se algum elemento não existe, tentar novamente
     if (!dialog || !dialogIcon || !dialogTitle || !dialogMessage || !dialogButtons) {
-        console.warn('Elementos do diálogo não encontrados');
         return;
     }
 

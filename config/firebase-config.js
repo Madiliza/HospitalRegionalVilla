@@ -24,7 +24,7 @@ export async function salvarDados(caminho, dados) {
   try {
     await set(ref(database, caminho), dados);
   } catch (erro) {
-    console.error("Erro ao salvar dados:", erro);
+    // Erro silencioso
   }
 }
 
@@ -38,7 +38,6 @@ export async function lerDados(caminho) {
       return null;
     }
   } catch (erro) {
-    console.error(`Erro ao ler dados de ${caminho}:`, erro);
     return null;
   }
 }
@@ -48,7 +47,7 @@ export async function deletarDados(caminho) {
   try {
     await set(ref(database, caminho), null);
   } catch (erro) {
-    console.error("Erro ao deletar dados:", erro);
+    // Erro silencioso
   }
 }
 
@@ -56,10 +55,9 @@ export async function deletarDados(caminho) {
 export async function criarUsuario(email, senha) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
-    console.log("Usuário criado:", userCredential.user.uid);
     return userCredential.user;
   } catch (erro) {
-    console.error("Erro ao criar usuário:", erro.message);
+    // Erro silencioso
   }
 }
 
@@ -67,10 +65,8 @@ export async function criarUsuario(email, senha) {
 export async function fazerLogin(email, senha) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-    console.log("Login realizado:", userCredential.user.uid);
     return userCredential.user;
   } catch (erro) {
-    console.error("Erro ao fazer login:", erro.message);
     throw erro; // Propagar erro para tratamento na UI
   }
 }
@@ -81,7 +77,6 @@ export async function fazerLogout() {
     await signOut(auth);
     return true;
   } catch (erro) {
-    console.error("Erro ao fazer logout:", erro.message);
     throw erro;
   }
 }
@@ -98,10 +93,8 @@ export async function alterarSenha(senhaAtual, novaSenha) {
     
     // Alterar senha
     await updatePassword(user, novaSenha);
-    console.log("Senha alterada com sucesso!");
     return true;
   } catch (erro) {
-    console.error("Erro ao alterar senha:", erro.message);
     throw erro;
   }
 }
@@ -112,7 +105,6 @@ export async function enviarEmailRecuperacao(email) {
     await sendPasswordResetEmail(auth, email);
     return true;
   } catch (erro) {
-    console.error("Erro ao enviar email:", erro.message);
     throw erro;
   }
 }

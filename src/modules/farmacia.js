@@ -101,7 +101,6 @@ export function buscarPacientes() {
     const listaSugestoes = document.getElementById('listaSugestoes');
     
     if (!buscaInput || !sugestoes || !listaSugestoes) {
-        console.warn('⚠️ Elementos da busca não encontrados');
         return;
     }
     
@@ -212,7 +211,6 @@ export function atualizarListaMedicamentosNoModal() {
     const pacienteId = document.getElementById('medicamentoPacienteId');
     
     if (!lista || !pacienteId) {
-        console.warn('⚠️ Elementos do modal de medicamentos não encontrados ainda');
         return;
     }
     
@@ -327,7 +325,6 @@ export function atualizarListaMedicamentosSelecionados() {
     const pacienteIdElement = document.getElementById('medicamentoPacienteId');
 
     if (!div || !pacienteIdElement) {
-        console.warn('⚠️ Elementos do modal não encontrados ainda');
         return;
     }
 
@@ -376,7 +373,6 @@ export function atualizarResume() {
 
     const resumo = document.getElementById('resumoMedicamentos');
     if (!resumo) {
-        console.warn('⚠️ Elemento resumoMedicamentos não encontrado');
         return;
     }
     
@@ -454,7 +450,7 @@ export async function adicionarMedicamento() {
     try {
         await salvarNoFirebase('medicamentos', novoAtendimento);
     } catch (erro) {
-        console.error('Erro ao salvar medicamentos:', erro);
+        // Erro silencioso
     }
 
     closeModal();
@@ -467,7 +463,6 @@ export function atualizarLista() {
     const lista = document.getElementById('farmaciaList');
 
     if (!lista) {
-        console.warn('⚠️ Elemento farmaciaList não encontrado ainda');
         return;
     }
 

@@ -134,7 +134,7 @@ export async function adicionarExame() {
     try {
         await salvarNoFirebase('exames', novoExame);
     } catch (erro) {
-        console.error('Erro ao salvar exame:', erro);
+        // Erro silencioso
     }
 
     closeModal();
@@ -147,7 +147,6 @@ export function atualizarLista() {
     const lista = document.getElementById('examesList');
 
     if (!lista) {
-        console.warn('⚠️ Elemento examesList não encontrado ainda');
         return;
     }
 
