@@ -25,56 +25,78 @@ export function init(dadosCarregados) {
     }
     
     medicamentosConfig = dadosCarregados.medicamentosConfig || [];
+    
+    // Aguardar DOM carregar e renderizar medicamentos
+    setTimeout(() => {
+        renderizarMedicamentos();
+    }, 500);
 }
 
-function obterValorMedicamento(nomeMedicamento, isParceria = false) {
-    const med = medicamentosConfig.find(m => m.nome === nomeMedicamento);
-    if (!med) return 0;
+function renderizarMedicamentos() {
+    const listaMedicamentos = document.getElementById('lista-medicamentos-calc');
+    const listaParcerias = document.getElementById('lista-parcerias-calc');
     
-    if (isParceria) {
-        return parseFloat(med.precoParceria) || parseFloat(med.preco) || 0;
+    if (!listaMedicamentos || !listaParcerias) return;
+    
+    if (medicamentosConfig.length === 0) {
+        listaMedicamentos.innerHTML = '<p class="text-gray-500 text-sm">Nenhum medicamento cadastrado</p>';
+        listaParcerias.innerHTML = '<p class="text-gray-500 text-sm">Nenhum medicamento cadastrado</p>';
+        return;
     }
-    return parseFloat(med.preco) || 0;
+    
+    // Renderizar medicamentos normais
+    listaMedicamentos.innerHTML = medicamentosConfig.map((med, index) => `
+        <div class="flex items-center justify-between">
+            <label class="flex items-center space-x-2 flex-1">
+                <input type="checkbox" id="med-${index}" data-med-id="${med.id}" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-gray-700">${med.nome}</span>
+                <span class="text-xs text-gray-500">(R$ ${parseFloat(med.preco).toFixed(2)})</span>
+            </label>
+            <input type="number" id="med-${index}-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+            <span class="text-gray-500 text-sm ml-1">un.</span>
+        </div>
+    `).join('');
+    
+    // Renderizar parcerias
+    listaParcerias.innerHTML = medicamentosConfig.map((med, index) => `
+        <div class="flex items-center justify-between">
+            <label class="flex items-center space-x-2 flex-1">
+                <input type="checkbox" id="parc-${index}" data-med-id="${med.id}" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-green-600 rounded">
+                <span class="text-gray-700">${med.nome}</span>
+                <span class="text-xs text-gray-500">(R$ ${parseFloat(med.precoParceria || med.preco).toFixed(2)})</span>
+            </label>
+            <input type="number" id="parc-${index}-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+            <span class="text-gray-500 text-sm ml-1">un.</span>
+        </div>
+    `).join('');
 }
 
 export function calcularTotal() {
-    // Medicamentos
-    const medicamentos = {
-        bandagem: {
-            checkbox: document.getElementById('med-bandagem'),
-            quantidade: document.getElementById('med-bandagem-qtd'),
-            nome: 'Bandagem'
-        },
-        analgesico: {
-            checkbox: document.getElementById('med-analgesico'),
-            quantidade: document.getElementById('med-analgesico-qtd'),
-            nome: 'Analgésico'
-        },
-        kit: {
-            checkbox: document.getElementById('med-kit'),
-            quantidade: document.getElementById('med-kit-qtd'),
-            nome: 'Kit Médico'
+    // Calcular total de medicamentos (dinâmico)
+    let totalMedicamentos = 0;
+    medicamentosConfig.forEach((med, index) => {
+        const checkbox = document.getElementById(`med-${index}`);
+        const quantidade = document.getElementById(`med-${index}-qtd`);
+        
+        if (checkbox && checkbox.checked && quantidade) {
+            const qtd = parseInt(quantidade.value) || 0;
+            const valor = parseFloat(med.preco) || 0;
+            totalMedicamentos += qtd * valor;
         }
-    };
+    });
 
-    // Parcerias
-    const parcerias = {
-        bandagem: {
-            checkbox: document.getElementById('parc-bandagem'),
-            quantidade: document.getElementById('parc-bandagem-qtd'),
-            nome: 'Bandagem'
-        },
-        analgesico: {
-            checkbox: document.getElementById('parc-analgesico'),
-            quantidade: document.getElementById('parc-analgesico-qtd'),
-            nome: 'Analgésico'
-        },
-        kit: {
-            checkbox: document.getElementById('parc-kit'),
-            quantidade: document.getElementById('parc-kit-qtd'),
-            nome: 'Kit Médico'
+    // Calcular total de parcerias (dinâmico)
+    let totalParcerias = 0;
+    medicamentosConfig.forEach((med, index) => {
+        const checkbox = document.getElementById(`parc-${index}`);
+        const quantidade = document.getElementById(`parc-${index}-qtd`);
+        
+        if (checkbox && checkbox.checked && quantidade) {
+            const qtd = parseInt(quantidade.value) || 0;
+            const valor = parseFloat(med.precoParceria) || parseFloat(med.preco) || 0;
+            totalParcerias += qtd * valor;
         }
-    };
+    });
 
     // Atendimentos
     const atendimentos = {
@@ -99,26 +121,6 @@ export function calcularTotal() {
             quantidade: document.getElementById('atend-exame-qtd')
         }
     };
-
-    // Calcular total de medicamentos
-    let totalMedicamentos = 0;
-    Object.values(medicamentos).forEach(med => {
-        if (med.checkbox && med.quantidade && med.checkbox.checked) {
-            const qtd = parseInt(med.quantidade.value) || 0;
-            const valor = obterValorMedicamento(med.nome, false);
-            totalMedicamentos += qtd * valor;
-        }
-    });
-
-    // Calcular total de parcerias
-    let totalParcerias = 0;
-    Object.values(parcerias).forEach(parc => {
-        if (parc.checkbox && parc.quantidade && parc.checkbox.checked) {
-            const qtd = parseInt(parc.quantidade.value) || 0;
-            const valor = obterValorMedicamento(parc.nome, true);
-            totalParcerias += qtd * valor;
-        }
-    });
 
     // Calcular total de atendimentos
     let totalAtendimentos = 0;
@@ -158,15 +160,8 @@ export function limparTudo() {
         checkbox.checked = false;
     });
 
-    // Limpar quantidades de medicamentos e parcerias
-    document.querySelectorAll('#calculadora input[type="number"][id*="-qtd"]').forEach(input => {
-        if (!input.id.includes('atend-')) {
-            input.value = '0';
-        }
-    });
-
-    // Limpar quantidades de atendimentos
-    document.querySelectorAll('#calculadora input[type="number"][id*="atend-"][id*="-qtd"]').forEach(input => {
+    // Limpar todas as quantidades
+    document.querySelectorAll('#calculadora input[type="number"]').forEach(input => {
         input.value = '0';
     });
 
@@ -177,5 +172,6 @@ export function limparTudo() {
 window.moduloCalculadora = {
     calcularTotal,
     limparTudo,
-    init
+    init,
+    valoresAtendimentos
 };

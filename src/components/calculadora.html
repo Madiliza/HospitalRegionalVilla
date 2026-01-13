@@ -20,31 +20,8 @@
                         <i class="fas fa-pills"></i>
                         <span>Medicamentos</span>
                     </h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="med-bandagem" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-gray-700">Bandagem</span>
-                            </label>
-                            <input type="number" id="med-bandagem-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
-                            <span class="text-gray-500 text-sm">un.</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="med-analgesico" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-gray-700">Analgésico</span>
-                            </label>
-                            <input type="number" id="med-analgesico-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
-                            <span class="text-gray-500 text-sm">un.</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="med-kit" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-gray-700">Kit Médico</span>
-                            </label>
-                            <input type="number" id="med-kit-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
-                            <span class="text-gray-500 text-sm">un.</span>
-                        </div>
+                    <div id="lista-medicamentos-calc" class="space-y-3">
+                        <p class="text-gray-500 text-sm">Carregando medicamentos...</p>
                     </div>
                 </div>
 
@@ -54,31 +31,8 @@
                         <i class="fas fa-handshake"></i>
                         <span>Parcerias</span>
                     </h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="parc-bandagem" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-green-600 rounded">
-                                <span class="text-gray-700">Bandagem</span>
-                            </label>
-                            <input type="number" id="parc-bandagem-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
-                            <span class="text-gray-500 text-sm">un.</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="parc-analgesico" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-green-600 rounded">
-                                <span class="text-gray-700">Analgésico</span>
-                            </label>
-                            <input type="number" id="parc-analgesico-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
-                            <span class="text-gray-500 text-sm">un.</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="parc-kit" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-green-600 rounded">
-                                <span class="text-gray-700">Kit Médico</span>
-                            </label>
-                            <input type="number" id="parc-kit-qtd" class="w-20 px-2 py-1 border border-gray-300 rounded text-center" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
-                            <span class="text-gray-500 text-sm">un.</span>
-                        </div>
+                    <div id="lista-parcerias-calc" class="space-y-3">
+                        <p class="text-gray-500 text-sm">Carregando medicamentos...</p>
                     </div>
                 </div>
             </div>
