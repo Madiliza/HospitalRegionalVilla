@@ -7,7 +7,6 @@ import { salvarDados, lerDados, deletarDados } from '../../config/firebase-confi
 export async function carregarDadosFirebase() {
     try {
         
-        // Carregar todas as coleções em paralelo
         const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro, valoresAtendimentos] = await Promise.all([
             lerDados('pacientes'),
             lerDados('consultas'),
@@ -20,7 +19,6 @@ export async function carregarDadosFirebase() {
             lerDados('valoresAtendimentos')
         ]);
 
-        // Converter objetos do Firebase para arrays
         const converterParaArray = (dados) => {
             if (!dados) return [];
             if (Array.isArray(dados)) return dados;
@@ -58,7 +56,6 @@ export async function carregarDadosFirebase() {
 
 export async function salvarNoFirebase(colecao, dados) {
     try {
-        // Salvar usando o ID do item como chave
         await salvarDados(`${colecao}/${dados.id}`, dados);
 
     } catch (erro) {

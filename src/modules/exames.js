@@ -155,7 +155,7 @@ export function atualizarLista() {
     }
 
     if (exames.length === 0) {
-        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum exame agendado</p>';
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum exame realizados</p>';
         return;
     }
 
