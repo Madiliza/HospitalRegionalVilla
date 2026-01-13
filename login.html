@@ -579,8 +579,13 @@
                 const snapshotSolicitacao = await get(child(dbRef, `solicitacoes_cadastro/${usuarioId}`));
                 
                 if (snapshotSolicitacao.exists()) {
-                    mostrarToast('Você já tem uma solicitação pendente', 'info');
-                    return;
+                    const solicitacaoExistente = snapshotSolicitacao.val();
+                    // Apenas bloquear se a solicitação estiver pendente
+                    if (solicitacaoExistente.status === 'pendente') {
+                        mostrarToast('Você já tem uma solicitação pendente', 'info');
+                        return;
+                    }
+                    // Se foi rejeitada, permite enviar novamente (o registro antigo será sobrescrito)
                 }
                 
                 // Criar solicitação de cadastro pendente

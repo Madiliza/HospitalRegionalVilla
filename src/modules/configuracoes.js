@@ -984,15 +984,14 @@ export function rejeitarSolicitacao(id) {
         `Deseja rejeitar a solicitação de ${solicitacao.nome}?`,
         async () => {
             try {
-                // Atualizar status da solicitação para 'rejeitada'
-                solicitacao.status = 'rejeitada';
-                await salvarNoFirebase('solicitacoes_cadastro', solicitacao);
+                // Deletar a solicitação do Firebase para permitir nova solicitação
+                await deletarDoFirebase('solicitacoes_cadastro', id);
                 
                 // Remover da lista local
                 solicitacoesCadastro = solicitacoesCadastro.filter(s => s.id !== id);
                 
                 atualizarListaSolicitacoes();
-                mostrarNotificacao(`Solicitação de ${solicitacao.nome} rejeitada!`, 'success');
+                mostrarNotificacao(`Solicitação de ${solicitacao.nome} rejeitada! A pessoa poderá enviar uma nova solicitação.`, 'success');
             } catch (erro) {
                 mostrarErro('Erro', 'Não foi possível rejeitar a solicitação');
             }
