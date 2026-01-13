@@ -6,17 +6,17 @@ import { salvarDados, lerDados, deletarDados } from '../../config/firebase-confi
 
 export async function carregarDadosFirebase() {
     try {
-        console.log('Carregando dados do Firebase...');
         
         // Carregar todas as coleções em paralelo
-        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig] = await Promise.all([
+        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro] = await Promise.all([
             lerDados('pacientes'),
             lerDados('consultas'),
             lerDados('exames'),
             lerDados('medicamentos'),
             lerDados('cargos'),
             lerDados('usuarios'),
-            lerDados('medicamentosConfig')
+            lerDados('medicamentosConfig'),
+            lerDados('solicitacoes_cadastro')
         ]);
 
         // Converter objetos do Firebase para arrays
@@ -33,10 +33,11 @@ export async function carregarDadosFirebase() {
             medicamentos: converterParaArray(medicamentos),
             cargos: converterParaArray(cargos),
             usuarios: converterParaArray(usuarios),
-            medicamentosConfig: converterParaArray(medicamentosConfig)
+            medicamentosConfig: converterParaArray(medicamentosConfig),
+            solicitacoesCadastro: converterParaArray(solicitacoesCadastro)
         };
 
-        console.log('Dados carregados do Firebase:', dadosCarregados);
+
         return dadosCarregados;
     } catch (erro) {
         console.error('Erro ao carregar dados do Firebase:', erro);
@@ -47,17 +48,17 @@ export async function carregarDadosFirebase() {
             medicamentos: [],
             cargos: [],
             usuarios: [],
-            medicamentosConfig: []
+            medicamentosConfig: [],
+            solicitacoesCadastro: []
         };
     }
 }
 
 export async function salvarNoFirebase(colecao, dados) {
     try {
-        console.log(`Salvando dados em ${colecao}:`, dados);
         // Salvar usando o ID do item como chave
         await salvarDados(`${colecao}/${dados.id}`, dados);
-        console.log(`Dados salvos com sucesso em ${colecao}`);
+
     } catch (erro) {
         console.error(`Erro ao salvar em ${colecao}:`, erro);
         throw erro;
@@ -66,9 +67,8 @@ export async function salvarNoFirebase(colecao, dados) {
 
 export async function deletarDoFirebase(colecao, id) {
     try {
-        console.log(`Deletando ${id} de ${colecao}`);
         await deletarDados(`${colecao}/${id}`);
-        console.log(`Item ${id} deletado com sucesso de ${colecao}`);
+
     } catch (erro) {
         console.error(`Erro ao deletar de ${colecao}:`, erro);
         throw erro;

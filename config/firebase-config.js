@@ -23,7 +23,6 @@ const auth = getAuth(app);
 export async function salvarDados(caminho, dados) {
   try {
     await set(ref(database, caminho), dados);
-    console.log("Dados salvos com sucesso!");
   } catch (erro) {
     console.error("Erro ao salvar dados:", erro);
   }
@@ -34,10 +33,8 @@ export async function lerDados(caminho) {
   try {
     const snapshot = await get(child(ref(database), caminho));
     if (snapshot.exists()) {
-      console.log(`Dados de ${caminho}:`, snapshot.val());
       return snapshot.val();
     } else {
-      console.log(`Nenhum dado encontrado em ${caminho}`);
       return null;
     }
   } catch (erro) {
@@ -50,7 +47,6 @@ export async function lerDados(caminho) {
 export async function deletarDados(caminho) {
   try {
     await set(ref(database, caminho), null);
-    console.log("Dados deletados com sucesso!");
   } catch (erro) {
     console.error("Erro ao deletar dados:", erro);
   }
@@ -83,7 +79,6 @@ export async function fazerLogin(email, senha) {
 export async function fazerLogout() {
   try {
     await signOut(auth);
-    console.log("Logout realizado com sucesso!");
     return true;
   } catch (erro) {
     console.error("Erro ao fazer logout:", erro.message);
@@ -115,7 +110,6 @@ export async function alterarSenha(senhaAtual, novaSenha) {
 export async function enviarEmailRecuperacao(email) {
   try {
     await sendPasswordResetEmail(auth, email);
-    console.log("Email de recuperação enviado!");
     return true;
   } catch (erro) {
     console.error("Erro ao enviar email:", erro.message);

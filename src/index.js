@@ -25,7 +25,8 @@ let dadosGlobais = {
     medicamentos: [],
     medicamentosConfig: [],
     cargos: [],
-    usuarios: []
+    usuarios: [],
+    solicitacoesCadastro: []
 };
 
 let usuarioLogado = null;
@@ -48,7 +49,6 @@ async function carregarComponentes() {
             const div = document.createElement('div');
             div.innerHTML = html;
             containerComponentes.appendChild(div);
-            console.log(`✅ Componente ${nome} carregado`);
         } catch (error) {
             console.error(`❌ Erro ao carregar componente ${nome}:`, error);
         }
@@ -72,14 +72,12 @@ verificarAutenticacao(async (user) => {
     
     if (!user && !usuarioLogadoLocal) {
         // Usuário não autenticado, redirecionar para login
-        console.log('Usuário não autenticado. Redirecionando para login...');
         window.location.href = '/login.html';
         return;
     }
     
     // Usuário autenticado
     usuarioLogado = user || { uid: usuarioLogadoLocal };
-    console.log('Usuário autenticado:', usuarioLogado.uid || usuarioLogadoLocal);
     
     // Atualizar nome do usuário no navbar
     atualizarInfoUsuario(usuarioLogado);
@@ -89,7 +87,6 @@ verificarAutenticacao(async (user) => {
 });
 
 async function inicializarSistema() {
-    console.log('🏥 Sistema Hospital Regional Villa - Iniciando...');
     
     // Carregar componentes HTML
     await carregarComponentes();
@@ -481,4 +478,3 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFormAlterarSenha();
 });
 
-console.log(' Aplicação pronta para uso!');

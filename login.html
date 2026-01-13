@@ -206,10 +206,10 @@
             </div>
         </div>
 
-        <!-- Link para registro (se necessário no futuro) -->
+        <!-- Link para registro -->
         <p class="text-center text-gray-600">
             Não tem uma conta? 
-            <a href="#" onclick="mostrarToast('Entre em contato com o administrador', 'info')" class="text-red-600 hover:text-red-700 font-medium">
+            <a href="#" onclick="abrirModalRegistro()" class="text-red-600 hover:text-red-700 font-medium">
                 Solicitar acesso
             </a>
         </p>
@@ -264,6 +264,92 @@
         </div>
     </div>
 
+    <!-- Modal Criar Conta (Solicitar Acesso) -->
+    <div id="modalRegistro" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Solicitar Acesso</h3>
+                <button type="button" onclick="fecharModalRegistro()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <p class="text-gray-600 mb-6 text-sm">
+                Preencha os dados abaixo para solicitar uma conta. Um administrador analisará sua solicitação.
+            </p>
+
+            <form id="formRegistro" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ID de Usuário</label>
+                    <div class="relative">
+                        <i class="fas fa-id-badge input-icon"></i>
+                        <input 
+                            type="text" 
+                            id="registroId" 
+                            required
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                            placeholder="Ex: maria.silva"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                    <div class="relative">
+                        <i class="fas fa-user input-icon"></i>
+                        <input 
+                            type="text" 
+                            id="registroNome" 
+                            required
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                            placeholder="Digite seu nome completo"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                    <div class="relative">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            id="registroSenha" 
+                            required
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                            placeholder="Digite uma senha"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar Senha</label>
+                    <div class="relative">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            id="registroConfirmSenha" 
+                            required
+                            class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                            placeholder="Confirme sua senha"
+                        >
+                    </div>
+                </div>
+
+                <button 
+                    type="submit" 
+                    class="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-lg shadow-lg hover:shadow-xl"
+                >
+                    <i class="fas fa-paper-plane mr-2"></i>Solicitar Acesso
+                </button>
+
+                <p class="text-center text-sm text-gray-600">
+                    Já tem uma conta? 
+                    <a href="#" onclick="fecharModalRegistro()" class="text-red-600 hover:text-red-700 font-medium">
+                        Voltar ao login
+                    </a>
+                </p>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { auth, database } from './config/firebase-config.js';
         import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -280,19 +366,13 @@
         // Função para debugar - verificar se consegue ler do Firebase
         window.testarConexaoFirebase = async function() {
             try {
-                console.log('🔍 Testando conexão com Firebase...');
                 const dbRef = ref(database);
                 const snapshot = await get(child(dbRef, 'usuarios'));
                 
-                console.log('✅ Conseguiu conectar ao Firebase!');
-                console.log('📊 Dados encontrados:', snapshot.val());
-                
                 if (snapshot.exists()) {
                     const usuarios = snapshot.val();
-                    console.log('👥 IDs de usuários disponíveis:', Object.keys(usuarios));
                     alert('✅ Firebase OK! Usuários: ' + Object.keys(usuarios).join(', '));
                 } else {
-                    console.log('❌ Nenhum dado encontrado em "usuarios"');
                     alert('❌ Nenhum usuário encontrado no Firebase. Verifique a importação!');
                 }
             } catch (error) {
@@ -306,7 +386,6 @@
             const form = document.getElementById('loginForm');
             const testBtn = document.createElement('button');
             testBtn.type = 'button';
-            testBtn.innerHTML = '<i class="fas fa-flask mr-2"></i>Testar Conexão Firebase';
             testBtn.className = 'w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium text-sm mt-2';
             testBtn.onclick = testarConexaoFirebase;
             form.appendChild(testBtn);
@@ -317,18 +396,13 @@
             try {
                 // Buscar usuário pelo ID no banco de dados
                 const dbRef = ref(database);
-                console.log('🔍 Buscando usuário:', usuarioId);
                 const snapshot = await get(child(dbRef, `usuarios/${usuarioId}`));
-                
-                console.log('📊 Snapshot existe:', snapshot.exists());
-                console.log('📋 Dados:', snapshot.val());
                 
                 if (!snapshot.exists()) {
                     // Tentar listar todos os usuários disponíveis
                     const allSnapshot = await get(child(dbRef, 'usuarios'));
                     if (allSnapshot.exists()) {
                         const usuariosDisponiveis = Object.keys(allSnapshot.val());
-                        console.log('❌ Usuário não encontrado! Disponíveis:', usuariosDisponiveis);
                         throw new Error(`Usuário "${usuarioId}" não encontrado. Disponíveis: ${usuariosDisponiveis.join(', ')}`);
                     } else {
                         throw new Error('Nenhum usuário configurado no Firebase! Importe os usuários primeiro.');
@@ -412,6 +486,16 @@
             document.getElementById('usuarioIdRecuperacao').value = '';
         };
 
+        // Modal criar conta
+        window.abrirModalRegistro = function() {
+            document.getElementById('modalRegistro').classList.remove('hidden');
+        };
+
+        window.fecharModalRegistro = function() {
+            document.getElementById('modalRegistro').classList.add('hidden');
+            document.getElementById('formRegistro').reset();
+        };
+
         // Form esqueci senha
         document.getElementById('formEsqueciSenha').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -424,6 +508,72 @@
             } catch (error) {
                 console.error('Erro ao recuperar senha:', error);
                 mostrarToast(error.message || 'Erro ao recuperar senha', 'error');
+            }
+        });
+
+        // Form criar conta (solicitar acesso)
+        document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const usuarioId = document.getElementById('registroId').value.trim();
+            const nome = document.getElementById('registroNome').value.trim();
+            const senha = document.getElementById('registroSenha').value;
+            const confirmSenha = document.getElementById('registroConfirmSenha').value;
+            
+            // Validações
+            if (!usuarioId || !nome || !senha || !confirmSenha) {
+                mostrarToast('Preencha todos os campos', 'error');
+                return;
+            }
+            
+            if (senha !== confirmSenha) {
+                mostrarToast('As senhas não conferem', 'error');
+                return;
+            }
+            
+            if (senha.length < 6) {
+                mostrarToast('A senha deve ter no mínimo 6 caracteres', 'error');
+                return;
+            }
+            
+            try {
+                // Verificar se o ID já existe em usuários
+                const dbRef = ref(database);
+                const snapshotUsuario = await get(child(dbRef, `usuarios/${usuarioId}`));
+                
+                if (snapshotUsuario.exists()) {
+                    mostrarToast('Este ID de usuário já existe', 'error');
+                    return;
+                }
+                
+                // Verificar se já tem solicitação pendente
+                const snapshotSolicitacao = await get(child(dbRef, `solicitacoes_cadastro/${usuarioId}`));
+                
+                if (snapshotSolicitacao.exists()) {
+                    mostrarToast('Você já tem uma solicitação pendente', 'info');
+                    return;
+                }
+                
+                // Criar solicitação de cadastro pendente
+                const { set } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                
+                const solicitacaoCadastro = {
+                    id: usuarioId,
+                    nome: nome,
+                    senha: senha,
+                    dataSolicitacao: new Date().toLocaleString('pt-BR'),
+                    status: 'pendente'
+                };
+                
+                // Salvar solicitação em "solicitacoes_cadastro"
+                await set(child(dbRef, `solicitacoes_cadastro/${usuarioId}`), solicitacaoCadastro);
+                
+                mostrarToast('Solicitação enviada! Um administrador irá analisá-la.', 'success');
+                fecharModalRegistro();
+                
+            } catch (error) {
+                console.error('Erro ao solicitar cadastro:', error);
+                mostrarToast(error.message || 'Erro ao solicitar cadastro', 'error');
             }
         });
 

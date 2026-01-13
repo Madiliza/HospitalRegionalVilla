@@ -14,7 +14,6 @@ import { salvarDados } from '../config/firebase-config.js';
 
 export async function configurarCargoDev() {
     try {
-        console.log('⚙️ Configurando cargo DEV com acesso total...');
         
         // Cargo DEV com todas as permissões
         const cargoDev = {
@@ -26,14 +25,14 @@ export async function configurarCargoDev() {
                 "consulta": ["criar", "visualizar", "editar", "apagar"],
                 "exame": ["criar", "visualizar", "editar", "apagar"],
                 "farmacia": ["criar", "visualizar", "editar", "apagar"],
-                "cargo": ["criar", "visualizar", "editar", "apagar"]
+                "cargo": ["criar", "visualizar", "editar", "apagar"],
+                "usuario": ["criar", "visualizar", "editar", "apagar"]
             },
             dataCriacao: new Date().toLocaleString('pt-BR')
         };
 
         // Salvar cargo DEV
         await salvarDados('cargos/cargo_dev', cargoDev);
-        console.log('✅ Cargo DEV criado com sucesso!');
 
         // Atualizar usuário DEV para usar o novo cargo
         const usuarioDev = {
@@ -46,7 +45,6 @@ export async function configurarCargoDev() {
         };
 
         await salvarDados('usuarios/2003', usuarioDev);
-        console.log('✅ Usuário DEV atualizado com cargo DEV!');
 
         console.log('🎉 Configuração concluída! Recarregue a página para ver as mudanças.');
         console.log('📝 Faça login com: ID=2003, Senha=DevLiza123!');

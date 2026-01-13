@@ -9,7 +9,8 @@
         "consulta": ["criar", "visualizar", "editar", "apagar"],
         "exame": ["criar", "visualizar", "editar", "apagar"],
         "farmacia": ["criar", "visualizar", "editar", "apagar"],
-        "cargo": ["criar", "visualizar", "editar", "apagar"]
+        "cargo": ["criar", "visualizar", "editar", "apagar"],
+        "usuario": ["criar", "visualizar", "editar", "apagar"]
       },
       "dataCriacao": "2026-01-13"
     },
@@ -22,7 +23,8 @@
         "consulta": ["criar", "visualizar", "editar", "apagar"],
         "exame": ["criar", "visualizar", "editar", "apagar"],
         "farmacia": ["criar", "visualizar", "editar", "apagar"],
-        "cargo": ["criar", "visualizar", "editar", "apagar"]
+        "cargo": ["criar", "visualizar", "editar", "apagar"],
+        "usuario": ["criar", "visualizar", "editar", "apagar"]
       },
       "dataCriacao": "2026-01-13"
     }

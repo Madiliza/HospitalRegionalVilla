@@ -17,7 +17,6 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
     
     if (!usuarioAtual) {
         console.error('❌ Usuário não encontrado:', usuarioId);
-        console.log('📋 Usuários disponíveis:', usuarios.map(u => `${u.nome} (${u.id})`).join(', '));
         return false;
     }
     
@@ -28,10 +27,8 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
     
     if (!cargoAtual) {
         console.error('❌ Cargo não encontrado:', usuarioAtual.cargo);
-        console.log('Cargos disponíveis:', cargos.map(c => `${c.nome} (${c.id})`).join(', '));
         // Se nenhum cargo foi encontrado, criar um cargo padrão com acesso total (para DEV)
         if (usuarioAtual.cargo === 'Desenvolvedor' || usuarioAtual.cargo === 'DEV' || usuarioAtual.cargo === 'Admin') {
-            console.log('⚠️ Criando cargo padrão com acesso total...');
             cargoAtual = {
                 id: 'cargo_dev_temp',
                 nome: usuarioAtual.cargo,
@@ -40,11 +37,11 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'consulta': ['criar', 'visualizar', 'editar', 'apagar'],
                     'exame': ['criar', 'visualizar', 'editar', 'apagar'],
                     'farmacia': ['criar', 'visualizar', 'editar', 'apagar'],
-                    'cargo': ['criar', 'visualizar', 'editar', 'apagar']
+                    'cargo': ['criar', 'visualizar', 'editar', 'apagar'],
+                    'usuario': ['criar', 'visualizar', 'editar', 'apagar']
                 }
             };
         } else {
-            console.log('⚠️ Cargo não encontrado e usuário não é DEV. Usando permissões mínimas...');
             cargoAtual = {
                 id: 'cargo_padrao_temp',
                 nome: usuarioAtual.cargo || 'Padrão',
@@ -53,42 +50,73 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'consulta': ['visualizar'],
                     'exame': ['visualizar'],
                     'farmacia': ['visualizar'],
+                    'usuario': ['visualizar'],
                     'cargo': []
                 }
             };
         }
     }
     
-    console.log('✅ Permissões inicializadas para:', usuarioAtual.nome, '(' + cargoAtual.nome + ')');
-    console.log('💼 Cargo:', cargoAtual.nome);
-    console.log('📋 Permissões:', cargoAtual.permissoes);
-    
     return true;
 }
 
 /**
  * Verificar se o usuário tem uma permissão específica
- * @param {string} modulo - Módulo (paciente, consulta, exame, farmacia, cargo)
+ * 
+ * IMPORTANTE: Este função é tolerante e robusta:
+ * - Converte módulo e ação para minúsculas automaticamente
+ * - Retorna false de forma segura se cargo/permissões não existirem
+ * - Suporta arrays tanto em permissões quanto em checks
+ * 
+ * @param {string} modulo - Módulo (paciente, consulta, exame, farmacia, cargo, usuario)
  * @param {string} acao - Ação (criar, visualizar, editar, apagar)
- * @returns {boolean}
+ * @returns {boolean} true se tem permissão, false caso contrário
+ * 
+ * @example
+ * temPermissao('cargo', 'visualizar')     // Verificar acesso
+ * temPermissao('CARGO', 'VISUALIZAR')     // Case-insensitive
+ * temPermissao('usuario', 'criar')         // Novo módulo de usuários
  */
 export function temPermissao(modulo, acao) {
+    // Validação defensiva: se cargo não foi inicializado, retorna false
     if (!cargoAtual || !cargoAtual.permissoes) {
-        console.warn('❌ Cargo ou permissões não inicializadas');
+        console.warn('⚠️ [Permissões] Cargo não inicializado. Retornando acesso negado.');
         return false;
     }
     
-    const permissoesDoModulo = cargoAtual.permissoes[modulo];
+    // Normalizar entrada para minúsculas para evitar erros de case
+    const moduloNormalizado = (modulo || '').toLowerCase().trim();
+    const acaoNormalizada = (acao || '').toLowerCase().trim();
     
+    // Validação: módulo e ação devem ser strings não-vazias
+    if (!moduloNormalizado || !acaoNormalizada) {
+        console.warn(`⚠️ [Permissões] Parâmetros inválidos: modulo="${modulo}", acao="${acao}"`);
+        return false;
+    }
+    
+    // Obter permissões do módulo
+    const permissoesDoModulo = cargoAtual.permissoes[moduloNormalizado];
+    
+    // Se o módulo não existe, retorna false
     if (!permissoesDoModulo) {
-        console.warn(`❌ Módulo ${modulo} não encontrado nas permissões`);
+        console.warn(`⚠️ [Permissões] Módulo "${moduloNormalizado}" não encontrado no cargo "${cargoAtual.nome}"`);
         return false;
     }
     
-    const temAcesso = permissoesDoModulo.includes(acao);
+    // Validação: permissões deve ser um array
+    if (!Array.isArray(permissoesDoModulo)) {
+        console.warn(`⚠️ [Permissões] Permissões do módulo "${moduloNormalizado}" não é um array`);
+        return false;
+    }
     
+    // Verificar se a ação está na lista de permissões (normalizado para minúsculas)
+    const temAcesso = permissoesDoModulo.some(p => 
+        (p || '').toLowerCase().trim() === acaoNormalizada
+    );
+    
+    // Log detalhado apenas se acesso foi negado (evita spam)
     if (!temAcesso) {
-        console.warn(`❌ Acesso negado para ${modulo}.${acao}`);
+        console.warn(`❌ [Permissões] Acesso negado: ${cargoAtual.nome} não pode "${acaoNormalizada}" em "${moduloNormalizado}"`);
     }
     
     return temAcesso;
