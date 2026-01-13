@@ -7,6 +7,10 @@ let pacientes = [];
 let consultas = [];
 let exames = [];
 let medicamentos = [];
+let cargos = [];
+let usuarios = [];
+let medicamentosConfig = [];
+let medicamentosSelecionados = {}; // Rastrear medicamentos selecionados
 
 // ============================================
 // INICIALIZAÇÃO
@@ -41,7 +45,23 @@ function configurarEventos() {
 
     document.getElementById('formMedicamento').addEventListener('submit', (e) => {
         e.preventDefault();
-        adicionarMedicamento();
+        adicionarMedicamentoNovo();
+    });
+
+    // Eventos de Configuração
+    document.getElementById('formCargo').addEventListener('submit', (e) => {
+        e.preventDefault();
+        adicionarCargo();
+    });
+
+    document.getElementById('formUsuario').addEventListener('submit', (e) => {
+        e.preventDefault();
+        adicionarUsuario();
+    });
+
+    document.getElementById('formMedicamentoConfig').addEventListener('submit', (e) => {
+        e.preventDefault();
+        adicionarMedicamentoConfig();
     });
 }
 
@@ -498,6 +518,7 @@ function deletarExame(id) {
 function openModalMedicamento() {
     document.getElementById('modalMedicamento').classList.remove('modal-hidden');
     limparFormularioMedicamento();
+    atualizarListaMedicamentosNoModal();
 }
 
 function buscarPacientes() {
@@ -562,13 +583,13 @@ function limparFormularioMedicamento() {
     document.getElementById('formMedicamento').reset();
     document.getElementById('buscaPacienteId').value = '';
     document.getElementById('medicamentoPacienteId').value = '';
-    document.getElementById('qtdKits').value = '0';
-    document.getElementById('qtdAtaduras').value = '0';
-    document.getElementById('qtdAnalgesicos').value = '0';
-    document.getElementById('resumoMedicamentos').innerHTML = '<p class="text-gray-600">Selecione medicamentos acima</p>';
+    document.getElementById('resumoMedicamentos').innerHTML = '<p class="text-gray-600">Nenhum medicamento selecionado</p>';
     document.getElementById('totalItens').textContent = '0';
+    document.getElementById('valorTotal').textContent = '0.00';
     document.getElementById('dadosPacienteDiv').classList.add('hidden');
     document.getElementById('sugestoesPacientes').classList.add('hidden');
+    document.getElementById('secaoMedicamentosSelecionados').classList.add('hidden');
+    medicamentosSelecionados = {};
     limparAvisos();
 }
 
@@ -825,6 +846,9 @@ function atualizarListaMedicamentos() {
             </div>
         `;
     }).join('');
+    
+    // Atualizar lista de medicamentos disponíveis na farmácia
+    atualizarListaMedicamentosDisponiveis();
 }
 
 function deletarMedicamento(id) {
@@ -893,6 +917,31 @@ async function carregarDados() {
             medicamentos = Object.values(dadosMedicamentos);
             atualizarListaMedicamentos();
             console.log('Medicamentos carregados:', medicamentos.length);
+        }
+
+        // Carregar cargos do Firebase
+        const dadosCargos = await lerDados('cargos');
+        if (dadosCargos) {
+            cargos = Object.values(dadosCargos);
+            atualizarListaCargos();
+            console.log('Cargos carregados:', cargos.length);
+        }
+
+        // Carregar usuários do Firebase
+        const dadosUsuarios = await lerDados('usuarios');
+        if (dadosUsuarios) {
+            usuarios = Object.values(dadosUsuarios);
+            atualizarListaUsuarios();
+            console.log('Usuários carregados:', usuarios.length);
+        }
+
+        // Carregar medicamentos config do Firebase
+        const dadosMedicamentosConfig = await lerDados('medicamentosConfig');
+        if (dadosMedicamentosConfig) {
+            medicamentosConfig = Object.values(dadosMedicamentosConfig);
+            atualizarListaMedicamentosConfig();
+            atualizarListaMedicamentosDisponiveis();
+            console.log('Medicamentos configurados carregados:', medicamentosConfig.length);
         }
 
         atualizarDashboard();
@@ -1104,7 +1153,573 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
     }, 3000);
 }
 
-// Exposer funções globais
+// ============================================
+// CONFIGURAÇÕES - ABAS
+// ============================================
+function mostrarAbaConfig(aba) {
+    // Esconder todas as abas
+    document.getElementById('aba-cargos').classList.add('hidden');
+    document.getElementById('aba-usuarios').classList.add('hidden');
+    document.getElementById('aba-medicamentos').classList.add('hidden');
+
+    // Mostrar aba selecionada
+    document.getElementById(`aba-${aba}`).classList.remove('hidden');
+
+    // Atualizar botões ativos
+    document.querySelectorAll('.tab-btn-config').forEach(btn => {
+        btn.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+        btn.classList.add('border-b-2', 'border-gray-300', 'text-gray-600');
+    });
+
+    event.target.closest('button').classList.remove('border-b-2', 'border-gray-300', 'text-gray-600');
+    event.target.closest('button').classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+}
+
+// ============================================
+// CARGOS
+// ============================================
+function openModalCargo() {
+    document.getElementById('modalCargo').classList.remove('modal-hidden');
+    limparFormularioCargo();
+}
+
+function closeModalCargo() {
+    document.getElementById('modalCargo').classList.add('modal-hidden');
+}
+
+function limparFormularioCargo() {
+    document.getElementById('formCargo').reset();
+    document.querySelectorAll('#formCargo input[type="checkbox"]').forEach(cb => cb.checked = false);
+}
+
+async function adicionarCargo() {
+    const nome = document.getElementById('cargoNome').value;
+    const descricao = document.getElementById('cargoDescricao').value;
+
+    if (!nome) {
+        mostrarErro('Validação', 'Preencha o nome do cargo!');
+        return;
+    }
+
+    // Coletar permissões
+    const permissoes = {
+        paciente: Array.from(document.querySelectorAll('input[name="permissaoPaciente"]:checked')).map(cb => cb.value),
+        consulta: Array.from(document.querySelectorAll('input[name="permissaoConsulta"]:checked')).map(cb => cb.value),
+        exame: Array.from(document.querySelectorAll('input[name="permissaoExame"]:checked')).map(cb => cb.value),
+        farmacia: Array.from(document.querySelectorAll('input[name="permissaoFarmacia"]:checked')).map(cb => cb.value),
+        cargo: Array.from(document.querySelectorAll('input[name="permissaoCargo"]:checked')).map(cb => cb.value)
+    };
+
+    const novoCargo = {
+        id: Date.now().toString(),
+        nome,
+        descricao,
+        permissoes,
+        dataCriacao: new Date().toLocaleString('pt-BR')
+    };
+
+    cargos.push(novoCargo);
+
+    try {
+        await salvarDados(`cargos/${novoCargo.id}`, novoCargo);
+        closeModalCargo();
+        atualizarListaCargos();
+        atualizarSelectCargoUsuario();
+        mostrarSucesso('Sucesso', 'Cargo criado com sucesso!');
+    } catch (erro) {
+        mostrarErro('Erro', 'Erro ao salvar cargo: ' + erro.message);
+    }
+}
+
+function atualizarListaCargos() {
+    const lista = document.getElementById('cargosList');
+    
+    if (cargos.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum cargo cadastrado</p>';
+        return;
+    }
+
+    lista.innerHTML = cargos.map(cargo => `
+        <div class="bg-blue-50 rounded-lg p-6 border border-blue-200 hover:shadow-lg transition">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">${cargo.nome}</h3>
+                    <p class="text-gray-600 text-sm mt-1">${cargo.descricao || 'Sem descrição'}</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editarCargo('${cargo.id}')" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button onclick="apagarCargo('${cargo.id}')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                        <i class="fas fa-trash"></i> Apagar
+                    </button>
+                </div>
+            </div>
+
+            <div class="border-t pt-4">
+                <p class="text-sm font-semibold text-gray-700 mb-3">Permissões:</p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <strong class="text-red-600">Pacientes:</strong>
+                        <div class="text-gray-600">${cargo.permissoes?.paciente?.join(', ') || 'Nenhuma'}</div>
+                    </div>
+                    <div>
+                        <strong class="text-green-600">Consultas:</strong>
+                        <div class="text-gray-600">${cargo.permissoes?.consulta?.join(', ') || 'Nenhuma'}</div>
+                    </div>
+                    <div>
+                        <strong class="text-purple-600">Exames:</strong>
+                        <div class="text-gray-600">${cargo.permissoes?.exame?.join(', ') || 'Nenhuma'}</div>
+                    </div>
+                    <div>
+                        <strong class="text-orange-600">Farmácia:</strong>
+                        <div class="text-gray-600">${cargo.permissoes?.farmacia?.join(', ') || 'Nenhuma'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-4">Criado em: ${cargo.dataCriacao}</p>
+        </div>
+    `).join('');
+}
+
+function editarCargo(id) {
+    mostrarAlerta('Em Desenvolvimento', 'Funcionalidade de edição em desenvolvimento');
+}
+
+function apagarCargo(id) {
+    mostrarConfirmacao(
+        'Remover Cargo',
+        'Tem certeza que deseja remover este cargo?',
+        async () => {
+            cargos = cargos.filter(c => c.id !== id);
+            
+            try {
+                await deletarDados(`cargos/${id}`);
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaCargos();
+            atualizarSelectCargoUsuario();
+            mostrarNotificacao('Cargo removido!', 'info');
+        }
+    );
+}
+
+// ============================================
+// USUÁRIOS
+// ============================================
+function openModalUsuario() {
+    document.getElementById('modalUsuario').classList.remove('modal-hidden');
+    limparFormularioUsuario();
+    atualizarSelectCargoUsuario();
+}
+
+function closeModalUsuario() {
+    document.getElementById('modalUsuario').classList.add('modal-hidden');
+}
+
+function limparFormularioUsuario() {
+    document.getElementById('formUsuario').reset();
+}
+
+function atualizarSelectCargoUsuario() {
+    const select = document.getElementById('usuarioCargo');
+    select.innerHTML = '<option value="">Selecione um cargo</option>';
+    
+    cargos.forEach(cargo => {
+        const option = document.createElement('option');
+        option.value = cargo.id;
+        option.textContent = cargo.nome;
+        select.appendChild(option);
+    });
+}
+
+async function adicionarUsuario() {
+    const email = document.getElementById('usuarioEmail').value;
+    const nome = document.getElementById('usuarioNome').value;
+    const senha = document.getElementById('usuarioSenha').value;
+    const cargoId = document.getElementById('usuarioCargo').value;
+
+    if (!email || !nome || !senha || !cargoId) {
+        mostrarErro('Validação', 'Preencha todos os campos obrigatórios!');
+        return;
+    }
+
+    const novoUsuario = {
+        id: Date.now().toString(),
+        email,
+        nome,
+        cargoId,
+        cargoNome: cargos.find(c => c.id === cargoId)?.nome || '',
+        dataCriacao: new Date().toLocaleString('pt-BR'),
+        ativo: true
+    };
+
+    usuarios.push(novoUsuario);
+
+    try {
+        // Aqui você poderia integrar com Firebase Auth para criar o usuário
+        // Por enquanto, apenas salva no banco de dados
+        await salvarDados(`usuarios/${novoUsuario.id}`, novoUsuario);
+        closeModalUsuario();
+        atualizarListaUsuarios();
+        mostrarSucesso('Sucesso', 'Usuário criado com sucesso!');
+    } catch (erro) {
+        mostrarErro('Erro', 'Erro ao salvar usuário: ' + erro.message);
+    }
+}
+
+function atualizarListaUsuarios() {
+    const lista = document.getElementById('usuariosList');
+    
+    if (usuarios.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum usuário cadastrado</p>';
+        return;
+    }
+
+    lista.innerHTML = usuarios.map(usuario => `
+        <div class="bg-purple-50 rounded-lg p-6 border border-purple-200 hover:shadow-lg transition">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">${usuario.nome}</h3>
+                    <p class="text-gray-600 text-sm">${usuario.email}</p>
+                    <div class="mt-2 flex items-center space-x-2">
+                        <span class="px-3 py-1 bg-purple-200 text-purple-800 rounded-full text-xs font-semibold">${usuario.cargoNome}</span>
+                        <span class="px-3 py-1 ${usuario.ativo ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded-full text-xs">
+                            ${usuario.ativo ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editarUsuario('${usuario.id}')" class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button onclick="apagarUsuario('${usuario.id}')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                        <i class="fas fa-trash"></i> Apagar
+                    </button>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500">Criado em: ${usuario.dataCriacao}</p>
+        </div>
+    `).join('');
+}
+
+function editarUsuario(id) {
+    mostrarAlerta('Em Desenvolvimento', 'Funcionalidade de edição em desenvolvimento');
+}
+
+function apagarUsuario(id) {
+    mostrarConfirmacao(
+        'Remover Usuário',
+        'Tem certeza que deseja remover este usuário?',
+        async () => {
+            usuarios = usuarios.filter(u => u.id !== id);
+            
+            try {
+                await deletarDados(`usuarios/${id}`);
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaUsuarios();
+            mostrarNotificacao('Usuário removido!', 'info');
+        }
+    );
+}
+
+// ============================================
+// MEDICAMENTOS CONFIGURAÇÃO
+// ============================================
+function openModalMedicamentoConfig() {
+    document.getElementById('modalMedicamentoConfig').classList.remove('modal-hidden');
+    limparFormularioMedicamentoConfig();
+}
+
+function closeModalMedicamentoConfig() {
+    document.getElementById('modalMedicamentoConfig').classList.add('modal-hidden');
+}
+
+function limparFormularioMedicamentoConfig() {
+    document.getElementById('formMedicamentoConfig').reset();
+}
+
+async function adicionarMedicamentoConfig() {
+    const nome = document.getElementById('medicamentoConfigNome').value;
+    const preco = document.getElementById('medicamentoConfigPreco').value;
+
+    if (!nome || !preco) {
+        mostrarErro('Validação', 'Preencha todos os campos obrigatórios!');
+        return;
+    }
+
+    const novoMedicamento = {
+        id: Date.now().toString(),
+        nome,
+        preco: parseFloat(preco),
+        dataCriacao: new Date().toLocaleString('pt-BR')
+    };
+
+    medicamentosConfig.push(novoMedicamento);
+
+    try {
+        await salvarDados(`medicamentosConfig/${novoMedicamento.id}`, novoMedicamento);
+        closeModalMedicamentoConfig();
+        atualizarListaMedicamentosConfig();
+        mostrarSucesso('Sucesso', 'Medicamento configurado com sucesso!');
+    } catch (erro) {
+        mostrarErro('Erro', 'Erro ao salvar medicamento: ' + erro.message);
+    }
+}
+
+function atualizarListaMedicamentosConfig() {
+    const lista = document.getElementById('medicamentosConfigList');
+    
+    if (medicamentosConfig.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum medicamento configurado</p>';
+        return;
+    }
+
+    lista.innerHTML = medicamentosConfig.map(med => `
+        <div class="bg-orange-50 rounded-lg p-6 border border-orange-200 hover:shadow-lg transition">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-800">${med.nome}</h3>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editarMedicamentoConfig('${med.id}')" class="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button onclick="apagarMedicamentoConfig('${med.id}')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                        <i class="fas fa-trash"></i> Apagar
+                    </button>
+                </div>
+            </div>
+
+            <div class="border-t pt-4">
+                <p class="text-xs text-gray-500 uppercase font-semibold">Preço</p>
+                <p class="text-lg font-bold text-orange-600">R$ ${med.preco.toFixed(2)}</p>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-4">Criado em: ${med.dataCriacao}</p>
+        </div>
+    `).join('');
+}
+
+function editarMedicamentoConfig(id) {
+    mostrarAlerta('Em Desenvolvimento', 'Funcionalidade de edição em desenvolvimento');
+}
+
+function apagarMedicamentoConfig(id) {
+    mostrarConfirmacao(
+        'Remover Medicamento',
+        'Tem certeza que deseja remover este medicamento?',
+        async () => {
+            medicamentosConfig = medicamentosConfig.filter(m => m.id !== id);
+            
+            try {
+                await deletarDados(`medicamentosConfig/${id}`);
+            } catch (erro) {
+                console.warn('Erro ao deletar do Firebase:', erro);
+            }
+            
+            atualizarListaMedicamentosConfig();
+            atualizarListaMedicamentosDisponiveis();
+            mostrarNotificacao('Medicamento removido!', 'info');
+        }
+    );
+}
+
+// ============================================
+// MEDICAMENTOS - FARMÁCIA
+// ============================================
+function atualizarListaMedicamentosDisponiveis() {
+    const container = document.getElementById('medicamentosDisponiveis');
+    
+    if (medicamentosConfig.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8 col-span-3">Nenhum medicamento configurado</p>';
+        return;
+    }
+
+    container.innerHTML = medicamentosConfig.map(med => `
+        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200 hover:shadow-lg transition">
+            <div class="mb-3">
+                <h4 class="font-bold text-gray-800">${med.nome}</h4>
+            </div>
+            <div class="mb-3 pb-3 border-b">
+                <p class="text-xs text-gray-600">Preço Unitário</p>
+                <p class="text-lg font-bold text-orange-600">R$ ${med.preco.toFixed(2)}</p>
+            </div>
+            <button onclick="window.location.hash='farmacia'; setTimeout(() => openModalMedicamento(), 100)" class="w-full px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm font-semibold">
+                <i class="fas fa-plus"></i> Usar
+            </button>
+        </div>
+    `).join('');
+}
+
+function atualizarListaMedicamentosNoModal() {
+    const lista = document.getElementById('listaMedicamentosDisponiveis');
+    
+    if (medicamentosConfig.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum medicamento configurado</p>';
+        return;
+    }
+
+    lista.innerHTML = medicamentosConfig.map(med => `
+        <div class="p-4 bg-orange-50 rounded-lg border border-orange-200 hover:shadow-md transition cursor-pointer" onclick="selecionarMedicamento('${med.id}', '${med.nome}', ${med.preco})">
+            <div class="flex justify-between items-start mb-2">
+                <div class="flex-1">
+                    <h5 class="font-bold text-gray-800">${med.nome}</h5>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-600">R$</p>
+                    <p class="text-lg font-bold text-orange-600">${med.preco.toFixed(2)}</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-center bg-white rounded px-2 py-1 mt-2">
+                <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-semibold">Clique para usar</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function selecionarMedicamento(id, nome, preco) {
+    if (!medicamentosSelecionados[id]) {
+        medicamentosSelecionados[id] = {
+            nome,
+            preco,
+            quantidade: 0
+        };
+    }
+    medicamentosSelecionados[id].quantidade += 1;
+    
+    atualizarListaMedicamentosSelecionados();
+    atualizarResume();
+}
+
+function removerMedicamentoSelecionado(id) {
+    if (medicamentosSelecionados[id]) {
+        medicamentosSelecionados[id].quantidade -= 1;
+        if (medicamentosSelecionados[id].quantidade <= 0) {
+            delete medicamentosSelecionados[id];
+        }
+    }
+    atualizarListaMedicamentosSelecionados();
+    atualizarResume();
+}
+
+function atualizarListaMedicamentosSelecionados() {
+    const secao = document.getElementById('secaoMedicamentosSelecionados');
+    const div = document.getElementById('medicamentosSelecionadosDiv');
+
+    const selecionados = Object.entries(medicamentosSelecionados).filter(([_, m]) => m.quantidade > 0);
+
+    if (selecionados.length === 0) {
+        secao.classList.add('hidden');
+        div.innerHTML = '<p class="text-gray-500 text-sm">Nenhum medicamento selecionado</p>';
+        return;
+    }
+
+    secao.classList.remove('hidden');
+    div.innerHTML = selecionados.map(([id, med]) => `
+        <div class="flex justify-between items-center p-3 bg-orange-50 rounded border border-orange-200">
+            <div class="flex-1">
+                <p class="font-semibold text-gray-800">${med.nome}</p>
+                <p class="text-sm text-gray-600">R$ ${med.preco.toFixed(2)} x ${med.quantidade} = R$ ${(med.preco * med.quantidade).toFixed(2)}</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="removerMedicamentoSelecionado('${id}')" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function atualizarResume() {
+    const selecionados = Object.values(medicamentosSelecionados).filter(m => m.quantidade > 0);
+    
+    let totalItens = 0;
+    let valorTotal = 0;
+    const resumo = [];
+
+    selecionados.forEach(med => {
+        totalItens += med.quantidade;
+        valorTotal += med.preco * med.quantidade;
+        resumo.push(`<p class="text-gray-700">✓ ${med.quantidade}x ${med.nome} - R$ ${(med.preco * med.quantidade).toFixed(2)}</p>`);
+    });
+
+    if (resumo.length === 0) {
+        document.getElementById('resumoMedicamentos').innerHTML = '<p class="text-gray-600">Nenhum medicamento selecionado</p>';
+        document.getElementById('totalItens').textContent = '0';
+        document.getElementById('valorTotal').textContent = '0.00';
+    } else {
+        document.getElementById('resumoMedicamentos').innerHTML = resumo.join('');
+        document.getElementById('totalItens').textContent = totalItens;
+        document.getElementById('valorTotal').textContent = valorTotal.toFixed(2);
+    }
+}
+
+function adicionarMedicamentoNovo() {
+    const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    
+    const selecionados = Object.entries(medicamentosSelecionados).filter(([_, m]) => m.quantidade > 0);
+    
+    if (!pacienteId) {
+        mostrarErro('Paciente Obrigatório', 'Selecione um paciente!');
+        return;
+    }
+
+    if (selecionados.length === 0) {
+        mostrarErro('Medicamentos Obrigatórios', 'Selecione pelo menos um medicamento!');
+        return;
+    }
+
+    // Buscar paciente
+    const paciente = pacientes.find(p => p.id === pacienteId);
+    if (!paciente) {
+        mostrarErro('Paciente Não Encontrado', 'Paciente não encontrado!');
+        return;
+    }
+
+    const hoje = new Date().toISOString().split('T')[0];
+    
+    // Salvar medicamentos
+    let valorTotal = 0;
+    selecionados.forEach(([id, med]) => {
+        for (let i = 0; i < med.quantidade; i++) {
+            const novoMedicamento = {
+                id: `MED-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                nome: med.nome,
+                quantidade: 1,
+                preco: med.preco,
+                valor: med.preco,
+                pacienteId: paciente.id,
+                pacienteNome: paciente.nome,
+                dataCriacao: new Date().toLocaleDateString('pt-BR'),
+                dataRegistro: hoje
+            };
+            
+            valorTotal += med.preco;
+            medicamentos.push(novoMedicamento);
+
+            // Salvar no Firebase
+            try {
+                salvarDados(`medicamentos/${novoMedicamento.id}`, novoMedicamento);
+            } catch (erro) {
+                console.warn('Firebase não configurado, dados salvos localmente apenas', erro);
+            }
+        }
+    });
+
+    closeModalMedicamento();
+    atualizarListaMedicamentos();
+    atualizarDashboard();
+    mostrarNotificacao(`✅ Atendimento registrado! Valor total: R$ ${valorTotal.toFixed(2)}`, 'success');
+}
+
+
 window.showSection = showSection;
 window.openModalPaciente = openModalPaciente;
 window.closeModalPaciente = closeModalPaciente;
@@ -1131,3 +1746,33 @@ window.atualizarTotal = atualizarTotal;
 window.atualizarConsumosDia = atualizarConsumosDia;
 window.executarBotaoDialog = executarBotaoDialog;
 window.fecharDialog = fecharDialog;
+// Configurações - Abas
+window.mostrarAbaConfig = mostrarAbaConfig;
+
+// Cargos
+window.openModalCargo = openModalCargo;
+window.closeModalCargo = closeModalCargo;
+window.adicionarCargo = adicionarCargo;
+window.editarCargo = editarCargo;
+window.apagarCargo = apagarCargo;
+
+// Usuários
+window.openModalUsuario = openModalUsuario;
+window.closeModalUsuario = closeModalUsuario;
+window.adicionarUsuario = adicionarUsuario;
+window.editarUsuario = editarUsuario;
+window.apagarUsuario = apagarUsuario;
+
+// Medicamentos Config
+window.openModalMedicamentoConfig = openModalMedicamentoConfig;
+window.closeModalMedicamentoConfig = closeModalMedicamentoConfig;
+window.adicionarMedicamentoConfig = adicionarMedicamentoConfig;
+window.editarMedicamentoConfig = editarMedicamentoConfig;
+window.apagarMedicamentoConfig = apagarMedicamentoConfig;
+
+// Medicamentos - Farmácia
+window.atualizarListaMedicamentosDisponiveis = atualizarListaMedicamentosDisponiveis;
+window.atualizarListaMedicamentosNoModal = atualizarListaMedicamentosNoModal;
+window.selecionarMedicamento = selecionarMedicamento;
+window.removerMedicamentoSelecionado = removerMedicamentoSelecionado;
+window.adicionarMedicamentoNovo = adicionarMedicamentoNovo;

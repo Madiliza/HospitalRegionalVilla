@@ -107,6 +107,10 @@
         .text-white {
             color: #ffffff;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -165,6 +169,11 @@
                         <i class="fas fa-pills"></i>
                         <span>Farmácia</span>
                     </button>
+                    <button onclick="showSection('Configuracoes')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </button>   
+
                     
                 </nav>
             </aside>
@@ -281,26 +290,88 @@
                             <h2 class="text-3xl font-bold text-gray-800">Controle de Farmácia</h2>
                             <button onclick="openModalMedicamento()" class="btn-modern px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center space-x-2">
                                 <i class="fas fa-plus"></i>
-                                <span>Registrar Medicamento</span>
+                                <span>Registrar Atendimento</span>
                             </button>
                         </div>
 
-                        <div id="farmaciaList" class="space-y-4">
-                            <p class="text-gray-500 text-center py-8">Nenhum medicamento registrado</p>
+                        <!-- Medicamentos Disponíveis -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Medicamentos Disponíveis</h3>
+                            <div id="medicamentosDisponiveis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <p class="text-gray-500 text-center py-8 col-span-3">Nenhum medicamento configurado</p>
+                            </div>
+                        </div>
+
+                        <!-- Histórico de Atendimentos -->
+                        <div class="border-t pt-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Atendimentos Registrados</h3>
+                            <div id="farmaciaList" class="space-y-4">
+                                <p class="text-gray-500 text-center py-8">Nenhum atendimento registrado</p>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Calculadora Section -->
-                <section id="calculadora" class="space-y-6 modal-hidden">
+                <!-- Configurações Section -->
+                <section id="Configuracoes" class="space-y-6 modal-hidden">
                     <div class="bg-white rounded-xl shadow-lg p-8">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-8">Calculadora de Medicamentos</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="space-y-4">
-                                <p class="text-gray-600 text-center py-8">
-                                    <i class="fas fa-wrench text-3xl text-gray-400"></i>
-                                </p>
-                                <p class="text-gray-500 text-center">Espaço reservado para a calculadora de medicamentos</p>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-8">Configurações do Sistema</h2>
+                        
+                        <!-- Abas de Configurações -->
+                        <div class="flex space-x-4 mb-8 border-b">
+                            <button onclick="mostrarAbaConfig('cargos')" class="tab-btn-config px-6 py-3 border-b-2 border-blue-600 text-blue-600 font-semibold transition flex items-center space-x-2">
+                                <i class="fas fa-briefcase"></i>
+                                <span>Cargos</span>
+                            </button>
+                            <button onclick="mostrarAbaConfig('usuarios')" class="tab-btn-config px-6 py-3 border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-2">
+                                <i class="fas fa-users"></i>
+                                <span>Usuários</span>
+                            </button>
+                            <button onclick="mostrarAbaConfig('medicamentos')" class="tab-btn-config px-6 py-3 border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-2">
+                                <i class="fas fa-pills"></i>
+                                <span>Medicamentos</span>
+                            </button>
+                        </div>
+
+                        <!-- Aba: Cargos -->
+                        <div id="aba-cargos" class="space-y-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-2xl font-bold text-gray-800">Gerenciar Cargos</h3>
+                                <button onclick="openModalCargo()" class="btn-modern px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center space-x-2">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Novo Cargo</span>
+                                </button>
+                            </div>
+                            <div id="cargosList" class="space-y-4">
+                                <p class="text-gray-500 text-center py-8">Nenhum cargo cadastrado</p>
+                            </div>
+                        </div>
+
+                        <!-- Aba: Usuários -->
+                        <div id="aba-usuarios" class="space-y-6 hidden">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-2xl font-bold text-gray-800">Gerenciar Usuários</h3>
+                                <button onclick="openModalUsuario()" class="btn-modern px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center space-x-2">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Novo Usuário</span>
+                                </button>
+                            </div>
+                            <div id="usuariosList" class="space-y-4">
+                                <p class="text-gray-500 text-center py-8">Nenhum usuário cadastrado</p>
+                            </div>
+                        </div>
+
+                        <!-- Aba: Medicamentos -->
+                        <div id="aba-medicamentos" class="space-y-6 hidden">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-2xl font-bold text-gray-800">Gerenciar Medicamentos</h3>
+                                <button onclick="openModalMedicamentoConfig()" class="btn-modern px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center space-x-2">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Novo Medicamento</span>
+                                </button>
+                            </div>
+                            <div id="medicamentosConfigList" class="space-y-4">
+                                <p class="text-gray-500 text-center py-8">Nenhum medicamento configurado</p>
                             </div>
                         </div>
                     </div>
@@ -510,52 +581,263 @@
 
                 <!-- Medicamentos -->
                 <div class="space-y-4 border-t pt-4">
-                    <h4 class="font-semibold text-gray-700">Medicamentos</h4>
+                    <h4 class="font-semibold text-gray-700 mb-4">Medicamentos Disponíveis</h4>
                     
-                    <!-- Kits -->
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="font-semibold text-gray-700">Kits</label>
-                            <span id="kitsDiaInfo" class="text-sm text-orange-600">Limite: 5</span>
-                        </div>
-                        <input type="number" id="qtdKits" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade de Kits" min="0" value="0" onchange="atualizarTotal()">
-                        <p id="avisoKits" class="text-xs text-orange-600 mt-1 hidden"></p>
+                    <!-- Lista de Medicamentos Configurados -->
+                    <div id="listaMedicamentosDisponiveis" class="space-y-3 max-h-64 overflow-y-auto">
+                        <p class="text-gray-500 text-center py-4">Nenhum medicamento configurado</p>
                     </div>
+                </div>
 
-                    <!-- Ataduras -->
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="font-semibold text-gray-700">Ataduras</label>
-                            <span id="atadurasDiaInfo" class="text-sm text-orange-600">Limite: 10</span>
-                        </div>
-                        <input type="number" id="qtdAtaduras" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade de Ataduras" min="0" value="0" onchange="atualizarTotal()">
-                        <p id="avisoAtaduras" class="text-xs text-orange-600 mt-1 hidden"></p>
-                    </div>
-
-                    <!-- Analgésicos -->
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="font-semibold text-gray-700">Analgésicos</label>
-                            <span id="analgesicoDiaInfo" class="text-sm text-orange-600">Limite: 10</span>
-                        </div>
-                        <input type="number" id="qtdAnalgesicos" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Quantidade de Analgésicos" min="0" value="0" onchange="atualizarTotal()">
-                        <p id="avisoAnalgesicos" class="text-xs text-orange-600 mt-1 hidden"></p>
+                <!-- Medicamentos Selecionados -->
+                <div id="secaoMedicamentosSelecionados" class="space-y-4 border-t pt-4 hidden">
+                    <h4 class="font-semibold text-gray-700">Medicamentos Selecionados</h4>
+                    <div id="medicamentosSelecionadosDiv" class="space-y-2">
+                        <p class="text-gray-500 text-sm">Nenhum medicamento selecionado</p>
                     </div>
                 </div>
 
                 <!-- Resumo Total -->
                 <div class="border-t pt-4 bg-red-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-3">Resumo do Registro</h4>
+                    <h4 class="font-semibold text-gray-700 mb-3">Resumo do Atendimento</h4>
                     <div id="resumoMedicamentos" class="space-y-2 text-sm">
-                        <p class="text-gray-600">Selecione medicamentos acima</p>
+                        <p class="text-gray-600">Nenhum medicamento selecionado</p>
                     </div>
-                    <div class="border-t mt-3 pt-3">
+                    <div class="border-t mt-3 pt-3 space-y-2">
                         <p class="text-lg font-bold text-gray-800">Total de Itens: <span id="totalItens">0</span></p>
+                        <p class="text-lg font-bold text-orange-600">Valor Total: R$ <span id="valorTotal">0.00</span></p>
                     </div>
                 </div>
 
                 <button type="submit" class="btn-modern w-full bg-orange-600 text-white font-bold py-3 rounded-lg hover:bg-orange-700 transition">
-                    Registrar Medicamentos
+                    Registrar Atendimento
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cargo -->
+    <div id="modalCargo" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full mx-4 fade-in max-h-96 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 sticky top-0 bg-white pb-4">
+                <h3 class="text-2xl font-bold text-gray-800">Novo Cargo</h3>
+                <button onclick="closeModalCargo()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="formCargo" class="space-y-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Nome do Cargo</label>
+                    <input type="text" id="cargoNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Médico, Enfermeiro, Administrador" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Descrição</label>
+                    <textarea id="cargoDescricao" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Descrição do cargo" rows="3"></textarea>
+                </div>
+
+                <div class="border-t pt-6">
+                    <h4 class="font-semibold text-gray-800 mb-4">Permissões</h4>
+                    
+                    <!-- Permissões -->
+                    <div class="space-y-4">
+                        <!-- Pacientes -->
+                        <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                                <i class="fas fa-users text-red-600"></i>
+                                <span>Pacientes</span>
+                            </h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoPaciente" value="criar" class="rounded">
+                                    <span class="text-sm">Criar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoPaciente" value="visualizar" class="rounded">
+                                    <span class="text-sm">Visualizar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoPaciente" value="editar" class="rounded">
+                                    <span class="text-sm">Editar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoPaciente" value="apagar" class="rounded">
+                                    <span class="text-sm">Apagar</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Consultas -->
+                        <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                                <i class="fas fa-calendar-check text-green-600"></i>
+                                <span>Consultas</span>
+                            </h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoConsulta" value="criar" class="rounded">
+                                    <span class="text-sm">Criar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoConsulta" value="visualizar" class="rounded">
+                                    <span class="text-sm">Visualizar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoConsulta" value="editar" class="rounded">
+                                    <span class="text-sm">Editar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoConsulta" value="apagar" class="rounded">
+                                    <span class="text-sm">Apagar</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Exames -->
+                        <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                                <i class="fas fa-flask text-purple-600"></i>
+                                <span>Exames</span>
+                            </h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoExame" value="criar" class="rounded">
+                                    <span class="text-sm">Criar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoExame" value="visualizar" class="rounded">
+                                    <span class="text-sm">Visualizar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoExame" value="editar" class="rounded">
+                                    <span class="text-sm">Editar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoExame" value="apagar" class="rounded">
+                                    <span class="text-sm">Apagar</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Farmácia -->
+                        <div class="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                                <i class="fas fa-pills text-orange-600"></i>
+                                <span>Farmácia</span>
+                            </h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoFarmacia" value="criar" class="rounded">
+                                    <span class="text-sm">Criar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoFarmacia" value="visualizar" class="rounded">
+                                    <span class="text-sm">Visualizar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoFarmacia" value="editar" class="rounded">
+                                    <span class="text-sm">Editar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoFarmacia" value="apagar" class="rounded">
+                                    <span class="text-sm">Apagar</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Cargos -->
+                        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                                <i class="fas fa-briefcase text-blue-600"></i>
+                                <span>Cargos</span>
+                            </h5>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoCargo" value="criar" class="rounded">
+                                    <span class="text-sm">Criar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoCargo" value="visualizar" class="rounded">
+                                    <span class="text-sm">Visualizar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoCargo" value="editar" class="rounded">
+                                    <span class="text-sm">Editar</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="permissaoCargo" value="apagar" class="rounded">
+                                    <span class="text-sm">Apagar</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-modern w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
+                    Salvar Cargo
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Usuário -->
+    <div id="modalUsuario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Novo Usuário</h3>
+                <button onclick="closeModalUsuario()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="formUsuario" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                    <input type="email" id="usuarioEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="email@exemplo.com" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Nome</label>
+                    <input type="text" id="usuarioNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Nome completo" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Senha</label>
+                    <input type="password" id="usuarioSenha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Senha" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Cargo</label>
+                    <select id="usuarioCargo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                        <option value="">Selecione um cargo</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-modern w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition">
+                    Criar Usuário
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Medicamento Config -->
+    <div id="modalMedicamentoConfig" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Novo Medicamento</h3>
+                <button onclick="closeModalMedicamentoConfig()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <form id="formMedicamentoConfig" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Nome do Medicamento</label>
+                    <input type="text" id="medicamentoConfigNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Ex: Dipirona 500mg" required>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Preço (R$)</label>
+                    <input type="number" id="medicamentoConfigPreco" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+
+                <button type="submit" class="btn-modern w-full bg-orange-600 text-white font-bold py-3 rounded-lg hover:bg-orange-700 transition">
+                    Salvar Medicamento
                 </button>
             </form>
         </div>
