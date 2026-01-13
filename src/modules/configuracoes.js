@@ -4,6 +4,7 @@
 
 import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/dialogs.js';
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
+import { temPermissao } from '../utils/permissoes.js';
 
 export let cargos = [];
 export let usuarios = [];
@@ -14,9 +15,52 @@ export function init(dadosCarregados) {
     usuarios = dadosCarregados.usuarios || [];
     medicamentosConfig = dadosCarregados.medicamentosConfig || [];
     configurarEventos();
+    aplicarPermissoesAbas(); // Aplicar permissões às abas
     atualizarListaCargos();
     atualizarListaUsuarios();
     atualizarListaMedicamentosConfig();
+}
+
+// Controlar visibilidade das abas baseado em permissões
+export function aplicarPermissoesAbas() {
+    // Botão e aba de Cargos
+    const btnCargos = document.querySelector('button[onclick="window.moduloConfig.mostrarAba(\'cargos\')"]');
+    const abaCargos = document.getElementById('aba-cargos');
+    if (btnCargos && abaCargos) {
+        if (temPermissao('cargo', 'visualizar')) {
+            btnCargos.style.display = '';
+            abaCargos.style.display = '';
+        } else {
+            btnCargos.style.display = 'none';
+            abaCargos.style.display = 'none';
+        }
+    }
+    
+    // Botão e aba de Usuários
+    const btnUsuarios = document.querySelector('button[onclick="window.moduloConfig.mostrarAba(\'usuarios\')"]');
+    const abaUsuarios = document.getElementById('aba-usuarios');
+    if (btnUsuarios && abaUsuarios) {
+        if (temPermissao('cargo', 'visualizar')) {
+            btnUsuarios.style.display = '';
+            abaUsuarios.style.display = '';
+        } else {
+            btnUsuarios.style.display = 'none';
+            abaUsuarios.style.display = 'none';
+        }
+    }
+    
+    // Botão e aba de Medicamentos
+    const btnMedicamentos = document.querySelector('button[onclick="window.moduloConfig.mostrarAba(\'medicamentos\')"]');
+    const abaMedicamentos = document.getElementById('aba-medicamentos');
+    if (btnMedicamentos && abaMedicamentos) {
+        if (temPermissao('cargo', 'visualizar')) {
+            btnMedicamentos.style.display = '';
+            abaMedicamentos.style.display = '';
+        } else {
+            btnMedicamentos.style.display = 'none';
+            abaMedicamentos.style.display = 'none';
+        }
+    }
 }
 
 function configurarEventos() {
@@ -49,6 +93,12 @@ function configurarEventos() {
 // ABAS DE CONFIGURAÇÃO
 // ============================================
 export function mostrarAba(aba) {
+    // Verificar permissão antes de mostrar aba
+    if (!temPermissao('cargo', 'visualizar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para acessar configurações');
+        return;
+    }
+    
     document.getElementById('aba-cargos').classList.add('hidden');
     document.getElementById('aba-usuarios').classList.add('hidden');
     document.getElementById('aba-medicamentos').classList.add('hidden');
@@ -191,23 +241,23 @@ export function atualizarSelectCargoUsuario() {
 }
 
 export async function adicionarUsuario() {
-    const email = document.getElementById('usuarioEmail').value;
-    const nome = document.getElementById('usuarioNome').value;
-    const senha = document.getElementById('usuarioSenha').value;
-    const cargoId = document.getElementById('usuarioCargo').value;
+    const usuarioId = document.getElementById('usuarioId')?.value;
+    const nome = document.getElementById('usuarioNome')?.value;
+    const senha = document.getElementById('usuarioSenha')?.value;
+    const cargoId = document.getElementById('usuarioCargo')?.value;
 
-    if (!email || !nome || !senha || !cargoId) {
-        mostrarErro('Campos Obrigatórios', 'Por favor, preencha todos os campos');
+    if (!usuarioId || !nome || !senha || !cargoId) {
+        mostrarErro('Campos Obrigatórios', 'Por favor, preencha todos os campos (ID, Nome, Senha, Cargo)');
         return;
     }
 
     const novoUsuario = {
-        id: Date.now().toString(),
-        email,
+        id: usuarioId,
         nome,
-        senha: btoa(senha), // Codificar senha (não é seguro para produção)
+        senha, // Em produção, isso deve ser criptografado
         cargoId,
-        dataCriacao: new Date().toLocaleString('pt-BR')
+        dataCriacao: new Date().toLocaleString('pt-BR'),
+        ativo: true
     };
 
     usuarios.push(novoUsuario);
@@ -216,6 +266,8 @@ export async function adicionarUsuario() {
         await salvarNoFirebase('usuarios', novoUsuario);
     } catch (erro) {
         console.error('Erro ao salvar usuário:', erro);
+        mostrarErro('Erro', 'Não foi possível salvar o usuário no Firebase');
+        return;
     }
 
     closeModalUsuario();
@@ -414,5 +466,6 @@ window.moduloConfig = {
     closeModalMedicamentoConfig,
     adicionarMedicamentoConfig,
     editarMedicamentoConfig,
-    apagarMedicamentoConfig
+    apagarMedicamentoConfig,
+    aplicarPermissoesAbas
 };

@@ -6,6 +6,7 @@
 import { setAppReady, mostrarNotificacao } from './utils/dialogs.js';
 import { carregarDadosFirebase } from './utils/firebase.js';
 import { verificarAutenticacao, fazerLogout, alterarSenha, getUsuarioAtual } from '../config/firebase-config.js';
+import { inicializarPermissoes, temPermissao, controlarVisibilidade, controlarHabilitacao, obterUsuarioAtual, obterCargoAtual } from './utils/permissoes.js';
 
 // Importar módulos
 import * as moduloPacientes from './modules/pacientes.js';
@@ -86,6 +87,22 @@ async function inicializarSistema() {
     moduloFarmacia.init(dadosGlobais);
     moduloConfig.init(dadosGlobais);
     
+    // Inicializar sistema de permissões
+    const usuarioId = localStorage.getItem('usuarioLogado');
+    if (usuarioId) {
+        const permissoesOk = inicializarPermissoes(usuarioId, dadosGlobais.usuarios, dadosGlobais.cargos);
+        
+        if (permissoesOk) {
+            // Aplicar controle de permissões na interface
+            aplicarPermissoesPorModulo(dadosGlobais);
+            
+            // Aplicar permissões específicas do módulo de configurações
+            if (moduloConfig.aplicarPermissoesAbas) {
+                moduloConfig.aplicarPermissoesAbas();
+            }
+        }
+    }
+    
     // Atualizar dashboard
     atualizarDashboard();
     
@@ -93,6 +110,127 @@ async function inicializarSistema() {
     setAppReady(true);
     
     console.log('✅ Sistema inicializado com sucesso!');
+}
+
+/**
+ * Aplicar controle de permissões por módulo
+ */
+function aplicarPermissoesPorModulo(dados) {
+    // Pacientes
+    const btnNovoPaciente = document.querySelector('button[onclick="window.moduloPacientes.openModal()"]');
+    if (btnNovoPaciente) {
+        if (temPermissao('paciente', 'criar')) {
+            btnNovoPaciente.style.display = '';
+        } else {
+            btnNovoPaciente.style.display = 'none';
+        }
+    }
+    
+    // Consultas
+    const btnNovaConsulta = document.querySelector('button[onclick="window.moduloConsultas.openModal()"]');
+    if (btnNovaConsulta) {
+        if (temPermissao('consulta', 'criar')) {
+            btnNovaConsulta.style.display = '';
+        } else {
+            btnNovaConsulta.style.display = 'none';
+        }
+    }
+    
+    // Exames
+    const btnNovoExame = document.querySelector('button[onclick="window.moduloExames.openModal()"]');
+    if (btnNovoExame) {
+        if (temPermissao('exame', 'criar')) {
+            btnNovoExame.style.display = '';
+        } else {
+            btnNovoExame.style.display = 'none';
+        }
+    }
+    
+    // Farmácia
+    const btnRegistrarMedicamento = document.querySelector('button[onclick="window.moduloFarmacia.openModal()"]');
+    if (btnRegistrarMedicamento) {
+        if (temPermissao('farmacia', 'criar')) {
+            btnRegistrarMedicamento.style.display = '';
+        } else {
+            btnRegistrarMedicamento.style.display = 'none';
+        }
+    }
+    
+    // Configurações (Cargos/Usuários)
+    const btnNovoUsuario = document.querySelector('button[onclick="window.moduloConfig.openModalUsuario()"]');
+    if (btnNovoUsuario) {
+        if (temPermissao('cargo', 'criar')) {
+            btnNovoUsuario.style.display = '';
+        } else {
+            btnNovoUsuario.style.display = 'none';
+        }
+    }
+    
+    // Esconder botões de navegação na sidebar baseado em permissões
+    const btnPacientesSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
+        btn.textContent.includes('Pacientes') && btn.onclick.toString().includes('pacientes')
+    );
+    if (btnPacientesSidebar) {
+        if (temPermissao('paciente', 'visualizar')) {
+            btnPacientesSidebar.style.display = '';
+        } else {
+            btnPacientesSidebar.style.display = 'none';
+        }
+    }
+    
+    const btnConsultasSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
+        btn.textContent.includes('Consultas') && btn.onclick.toString().includes('consultas')
+    );
+    if (btnConsultasSidebar) {
+        if (temPermissao('consulta', 'visualizar')) {
+            btnConsultasSidebar.style.display = '';
+        } else {
+            btnConsultasSidebar.style.display = 'none';
+        }
+    }
+    
+    const btnExamesSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
+        btn.textContent.includes('Exames') && btn.onclick.toString().includes('exames')
+    );
+    if (btnExamesSidebar) {
+        if (temPermissao('exame', 'visualizar')) {
+            btnExamesSidebar.style.display = '';
+        } else {
+            btnExamesSidebar.style.display = 'none';
+        }
+    }
+    
+    const btnFarmaciaSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
+        btn.textContent.includes('Farmácia') && btn.onclick.toString().includes('farmacia')
+    );
+    if (btnFarmaciaSidebar) {
+        if (temPermissao('farmacia', 'visualizar')) {
+            btnFarmaciaSidebar.style.display = '';
+        } else {
+            btnFarmaciaSidebar.style.display = 'none';
+        }
+    }
+    
+    const btnConfiguracoesSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
+        btn.textContent.includes('Configurações') && btn.onclick.toString().includes('configuracoes')
+    );
+    if (btnConfiguracoesSidebar) {
+        if (temPermissao('cargo', 'visualizar')) {
+            btnConfiguracoesSidebar.style.display = '';
+        } else {
+            btnConfiguracoesSidebar.style.display = 'none';
+        }
+    }
+    
+    // Mostrar informações do usuário e cargo
+    const usuarioAtual = obterUsuarioAtual();
+    const cargoAtual = obterCargoAtual();
+    
+    if (usuarioAtual && cargoAtual) {
+        console.log(`👤 Usuário: ${usuarioAtual.nome}`);
+        console.log(`💼 Cargo: ${cargoAtual.nome}`);
+        console.log(`📋 Permissões: ${Object.keys(cargoAtual.permissoes || {}).join(', ')}`);
+    }
 }
 
 function atualizarInfoUsuario(user) {
@@ -111,6 +249,23 @@ function atualizarInfoUsuario(user) {
 // NAVEGAÇÃO E SECTIONS
 // ============================================
 function showSection(sectionId) {
+    // Verificar permissão antes de mostrar seção
+    const permissoesModulos = {
+        'pacientes': ['paciente', 'visualizar'],
+        'consultas': ['consulta', 'visualizar'],
+        'exames': ['exame', 'visualizar'],
+        'farmacia': ['farmacia', 'visualizar']
+    };
+    
+    // Se é um módulo que requer permissão
+    if (permissoesModulos[sectionId]) {
+        const [modulo, acao] = permissoesModulos[sectionId];
+        if (!temPermissao(modulo, acao)) {
+            mostrarNotificacao(`❌ Você não tem permissão para acessar ${sectionId}`, 'error');
+            return;
+        }
+    }
+    
     // Esconder todas as sections
     document.querySelectorAll('section').forEach(section => {
         section.classList.add('modal-hidden');

@@ -4,7 +4,7 @@
 
 import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/dialogs.js';
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
-
+import { temPermissao } from '../utils/permissoes.js';
 export let pacientes = [];
 
 export function init(dadosCarregados) {
@@ -40,6 +40,12 @@ function limparFormulario() {
 }
 
 export async function adicionarPaciente() {
+    // Verificar permissão
+    if (!temPermissao('paciente', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar pacientes');
+        return;
+    }
+    
     const id = document.getElementById('pacienteId').value;
     const nome = document.getElementById('pacienteNome').value;
     const idade = document.getElementById('pacienteIdade').value;
@@ -100,6 +106,12 @@ export function atualizarLista() {
 }
 
 export function deletar(id) {
+    // Verificar permissão
+    if (!temPermissao('paciente', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para deletar pacientes');
+        return;
+    }
+    
     mostrarConfirmacao(
         'Deletar Paciente',
         'Tem certeza que deseja deletar este paciente?',
@@ -111,6 +123,7 @@ export function deletar(id) {
         }
     );
 }
+        
 
 export function buscarPacientes(termo) {
     return pacientes.filter(p => 

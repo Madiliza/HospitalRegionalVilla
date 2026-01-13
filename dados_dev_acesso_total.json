@@ -1,0 +1,40 @@
+{
+  "cargos": {
+    "cargo_dev": {
+      "id": "cargo_dev",
+      "nome": "DEV",
+      "descricao": "Desenvolvedor - Acesso Total ao Sistema",
+      "permissoes": {
+        "paciente": ["criar", "visualizar", "editar", "apagar"],
+        "consulta": ["criar", "visualizar", "editar", "apagar"],
+        "exame": ["criar", "visualizar", "editar", "apagar"],
+        "farmacia": ["criar", "visualizar", "editar", "apagar"],
+        "cargo": ["criar", "visualizar", "editar", "apagar"]
+      },
+      "dataCriacao": "2026-01-13"
+    },
+    "cargo_diretor": {
+      "id": "cargo_diretor",
+      "nome": "Diretor",
+      "descricao": "Diretor - Acesso Total",
+      "permissoes": {
+        "paciente": ["criar", "visualizar", "editar", "apagar"],
+        "consulta": ["criar", "visualizar", "editar", "apagar"],
+        "exame": ["criar", "visualizar", "editar", "apagar"],
+        "farmacia": ["criar", "visualizar", "editar", "apagar"],
+        "cargo": ["criar", "visualizar", "editar", "apagar"]
+      },
+      "dataCriacao": "2026-01-13"
+    }
+  },
+  "usuarios": {
+    "2003": {
+      "id": "2003",
+      "nome": "Dev",
+      "email": "dev@hospital.com",
+      "senha": "DevLiza123!",
+      "cargo": "DEV",
+      "ativo": true
+    }
+  }
+}
