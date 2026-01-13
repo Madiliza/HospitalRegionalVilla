@@ -15,13 +15,14 @@ export let valoresAtendimentos = {
 export let medicamentosConfig = [];
 
 export function init(dadosCarregados) {
-    valoresAtendimentos = dadosCarregados.valoresAtendimentos || {
-        tratamentoInterno: 0,
-        atendimentoExternoSul: 0,
-        atendimentoExternoNorte: 0,
-        consulta: 0,
-        exame: 0
-    };
+    if (dadosCarregados.valoresAtendimentos) {
+        if (dadosCarregados.valoresAtendimentos.tratamentoInterno !== undefined) {
+            valoresAtendimentos = dadosCarregados.valoresAtendimentos;
+        }
+        else if (dadosCarregados.valoresAtendimentos.valoresAtendimentos) {
+            valoresAtendimentos = dadosCarregados.valoresAtendimentos.valoresAtendimentos;
+        }
+    }
     
     medicamentosConfig = dadosCarregados.medicamentosConfig || [];
 }

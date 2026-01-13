@@ -8,7 +8,7 @@ export async function carregarDadosFirebase() {
     try {
         
         // Carregar todas as coleções em paralelo
-        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro] = await Promise.all([
+        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro, valoresAtendimentos] = await Promise.all([
             lerDados('pacientes'),
             lerDados('consultas'),
             lerDados('exames'),
@@ -16,7 +16,8 @@ export async function carregarDadosFirebase() {
             lerDados('cargos'),
             lerDados('usuarios'),
             lerDados('medicamentosConfig'),
-            lerDados('solicitacoes_cadastro')
+            lerDados('solicitacoes_cadastro'),
+            lerDados('valoresAtendimentos')
         ]);
 
         // Converter objetos do Firebase para arrays
@@ -34,7 +35,8 @@ export async function carregarDadosFirebase() {
             cargos: converterParaArray(cargos),
             usuarios: converterParaArray(usuarios),
             medicamentosConfig: converterParaArray(medicamentosConfig),
-            solicitacoesCadastro: converterParaArray(solicitacoesCadastro)
+            solicitacoesCadastro: converterParaArray(solicitacoesCadastro),
+            valoresAtendimentos: valoresAtendimentos || {}
         };
 
 
@@ -48,7 +50,8 @@ export async function carregarDadosFirebase() {
             cargos: [],
             usuarios: [],
             medicamentosConfig: [],
-            solicitacoesCadastro: []
+            solicitacoesCadastro: [],
+            valoresAtendimentos: {}
         };
     }
 }
