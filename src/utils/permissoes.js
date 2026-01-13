@@ -12,6 +12,10 @@ let cargoAtual = null;
  * @param {object} cargos - Lista de cargos
  */
 export function inicializarPermissoes(usuarioId, usuarios, cargos) {
+    console.log('🔐 Inicializando permissões para usuário:', usuarioId);
+    console.log('📋 Total de usuários:', usuarios?.length || 0);
+    console.log('📋 Total de cargos:', cargos?.length || 0);
+    
     // Buscar usuário
     usuarioAtual = usuarios.find(u => u.id === usuarioId);
     
@@ -20,18 +24,31 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
         return false;
     }
     
+    console.log('👤 Usuário encontrado:', usuarioAtual.nome);
+    
+    // CORREÇÃO CRÍTICA: O campo pode ser 'cargoId' ou 'cargo' dependendo de como foi salvo
+    // Tentar ambos os campos para compatibilidade
+    const cargoDoUsuario = usuarioAtual.cargoId || usuarioAtual.cargo;
+    
+    console.log('🔍 Buscando cargo:', cargoDoUsuario);
+    
     // Buscar cargo do usuário
     // O cargo pode estar armazenado como nome (string) ou como ID
     // Primeiro tenta buscar por ID, depois por nome
-    cargoAtual = cargos.find(c => c.id === usuarioAtual.cargo || c.nome === usuarioAtual.cargo);
+    cargoAtual = cargos.find(c => 
+        c.id === cargoDoUsuario || 
+        c.nome === cargoDoUsuario
+    );
     
     if (!cargoAtual) {
-        console.error('❌ Cargo não encontrado:', usuarioAtual.cargo);
+        console.error('❌ Cargo não encontrado:', cargoDoUsuario);
+        console.log('📋 Cargos disponíveis:', cargos.map(c => `${c.id} (${c.nome})`).join(', '));
+        
         // Se nenhum cargo foi encontrado, criar um cargo padrão com acesso total (para DEV)
-        if (usuarioAtual.cargo === 'Desenvolvedor' || usuarioAtual.cargo === 'DEV' || usuarioAtual.cargo === 'Admin') {
+        if (cargoDoUsuario === 'Desenvolvedor' || cargoDoUsuario === 'DEV' || cargoDoUsuario === 'Admin') {
             cargoAtual = {
                 id: 'cargo_dev_temp',
-                nome: usuarioAtual.cargo,
+                nome: cargoDoUsuario,
                 permissoes: {
                     'paciente': ['criar', 'visualizar', 'editar', 'apagar'],
                     'consulta': ['criar', 'visualizar', 'editar', 'apagar'],
@@ -41,10 +58,11 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'usuario': ['criar', 'visualizar', 'editar', 'apagar']
                 }
             };
+            console.log('⚠️ Usando cargo temporário DEV com acesso total');
         } else {
             cargoAtual = {
                 id: 'cargo_padrao_temp',
-                nome: usuarioAtual.cargo || 'Padrão',
+                nome: cargoDoUsuario || 'Padrão',
                 permissoes: {
                     'paciente': ['visualizar'],
                     'consulta': ['visualizar'],
@@ -54,7 +72,11 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'cargo': []
                 }
             };
+            console.log('⚠️ Usando cargo temporário padrão (somente visualizar)');
         }
+    } else {
+        console.log('✅ Cargo encontrado:', cargoAtual.nome);
+        console.log('📋 Permissões do cargo:', JSON.stringify(cargoAtual.permissoes, null, 2));
     }
     
     return true;
@@ -264,6 +286,32 @@ export function executarComPermissao(modulo, acao, callback) {
     }
 }
 
+/**
+ * Debug: Exibir informações completas sobre o usuário e suas permissões
+ */
+export function debugPermissoes() {
+    console.log('='.repeat(60));
+    console.log('🔍 DEBUG DE PERMISSÕES');
+    console.log('='.repeat(60));
+    
+    console.log('📌 Usuário Atual:', usuarioAtual);
+    console.log('📌 Cargo Atual:', cargoAtual);
+    
+    if (cargoAtual && cargoAtual.permissoes) {
+        console.log('📌 Permissões do Cargo:', cargoAtual.permissoes);
+        
+        const modulos = Object.keys(cargoAtual.permissoes);
+        console.log(`\n📊 Módulos cadastrados: ${modulos.join(', ')}`);
+        
+        modulos.forEach(modulo => {
+            const perms = cargoAtual.permissoes[modulo];
+            console.log(`  • ${modulo}: ${Array.isArray(perms) && perms.length > 0 ? perms.join(', ') : '(sem permissões)'}`);
+        });
+    }
+    
+    console.log('='.repeat(60));
+}
+
 // Exportar para uso global
 window.permissoes = {
     inicializarPermissoes,
@@ -275,5 +323,6 @@ window.permissoes = {
     obterCargoAtual,
     exigirPermissao,
     aplicarControleDePermissoes,
-    executarComPermissao
+    executarComPermissao,
+    debugPermissoes
 };

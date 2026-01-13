@@ -6,7 +6,7 @@
 import { setAppReady, mostrarNotificacao } from './utils/dialogs.js';
 import { carregarDadosFirebase } from './utils/firebase.js';
 import { verificarAutenticacao, fazerLogout, alterarSenha, getUsuarioAtual } from '../config/firebase-config.js';
-import { inicializarPermissoes, temPermissao, controlarVisibilidade, controlarHabilitacao, obterUsuarioAtual, obterCargoAtual } from './utils/permissoes.js';
+import { inicializarPermissoes, temPermissao, controlarVisibilidade, controlarHabilitacao, obterUsuarioAtual, obterCargoAtual, debugPermissoes } from './utils/permissoes.js';
 
 // Importar módulos
 import * as moduloPacientes from './modules/pacientes.js';
@@ -101,12 +101,18 @@ async function inicializarSistema() {
     moduloFarmacia.init(dadosGlobais);
     moduloConfig.init(dadosGlobais);
     
+    // Aguardar um pouco mais para garantir que o DOM está completamente pronto
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     // Inicializar sistema de permissões
     const usuarioId = localStorage.getItem('usuarioLogado');
     if (usuarioId) {
         const permissoesOk = inicializarPermissoes(usuarioId, dadosGlobais.usuarios, dadosGlobais.cargos);
         
         if (permissoesOk) {
+            // Debug: mostrar permissões no console
+            debugPermissoes();
+            
             // Aplicar controle de permissões na interface
             aplicarPermissoesPorModulo(dadosGlobais);
             
@@ -128,115 +134,54 @@ async function inicializarSistema() {
 
 /**
  * Aplicar controle de permissões por módulo
+ * Usa IDs para seleção robusta de botões
  */
 function aplicarPermissoesPorModulo(dados) {
-    // Pacientes
-    const btnNovoPaciente = document.querySelector('button[onclick="window.moduloPacientes.openModal()"]');
-    if (btnNovoPaciente) {
-        if (temPermissao('paciente', 'criar')) {
-            btnNovoPaciente.style.display = '';
+    console.log('🔐 Iniciando aplicação de permissões na interface...');
+    
+    // Função auxiliar para controlar visibilidade de botões
+    function controlarBotao(id, modulo, acao, nomeAmigavel) {
+        const btn = document.getElementById(id);
+        if (btn) {
+            if (temPermissao(modulo, acao)) {
+                btn.style.display = '';
+                console.log(`✅ Botão "${nomeAmigavel}" visível`);
+            } else {
+                btn.style.display = 'none';
+                console.log(`❌ Botão "${nomeAmigavel}" oculto (sem permissão ${modulo}/${acao})`);
+            }
         } else {
-            btnNovoPaciente.style.display = 'none';
+            console.warn(`⚠️ Botão "${nomeAmigavel}" (id=${id}) não encontrado no DOM`);
         }
     }
     
-    // Consultas
-    const btnNovaConsulta = document.querySelector('button[onclick="window.moduloConsultas.openModal()"]');
-    if (btnNovaConsulta) {
-        if (temPermissao('consulta', 'criar')) {
-            btnNovaConsulta.style.display = '';
-        } else {
-            btnNovaConsulta.style.display = 'none';
-        }
-    }
+    // ============================================
+    // BOTÕES PRINCIPAIS POR MÓDULO
+    // ============================================
+    controlarBotao('btnNovoPaciente', 'paciente', 'criar', 'Novo Paciente');
+    controlarBotao('btnNovaConsulta', 'consulta', 'criar', 'Nova Consulta');
+    controlarBotao('btnNovoExame', 'exame', 'criar', 'Novo Exame');
+    controlarBotao('btnRegistrarAtendimento', 'farmacia', 'criar', 'Registrar Atendimento');
     
-    // Exames
-    const btnNovoExame = document.querySelector('button[onclick="window.moduloExames.openModal()"]');
-    if (btnNovoExame) {
-        if (temPermissao('exame', 'criar')) {
-            btnNovoExame.style.display = '';
-        } else {
-            btnNovoExame.style.display = 'none';
-        }
-    }
+    // ============================================
+    // CONFIGURAÇÕES
+    // ============================================
+    controlarBotao('btnNovoCargo', 'cargo', 'criar', 'Novo Cargo');
+    controlarBotao('btnNovoUsuario', 'usuario', 'criar', 'Novo Usuário');
+    controlarBotao('btnNovoMedicamento', 'farmacia', 'criar', 'Novo Medicamento');
     
-    // Farmácia
-    const btnRegistrarMedicamento = document.querySelector('button[onclick="window.moduloFarmacia.openModal()"]');
-    if (btnRegistrarMedicamento) {
-        if (temPermissao('farmacia', 'criar')) {
-            btnRegistrarMedicamento.style.display = '';
-        } else {
-            btnRegistrarMedicamento.style.display = 'none';
-        }
-    }
-    
-    // Configurações (Cargos/Usuários)
-    const btnNovoUsuario = document.querySelector('button[onclick="window.moduloConfig.openModalUsuario()"]');
-    if (btnNovoUsuario) {
-        if (temPermissao('cargo', 'criar')) {
-            btnNovoUsuario.style.display = '';
-        } else {
-            btnNovoUsuario.style.display = 'none';
-        }
-    }
-    
-    // Esconder botões de navegação na sidebar baseado em permissões
-    const btnPacientesSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
-        btn.textContent.includes('Pacientes') && btn.onclick.toString().includes('pacientes')
-    );
-    if (btnPacientesSidebar) {
-        if (temPermissao('paciente', 'visualizar')) {
-            btnPacientesSidebar.style.display = '';
-        } else {
-            btnPacientesSidebar.style.display = 'none';
-        }
-    }
-    
-    const btnConsultasSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
-        btn.textContent.includes('Consultas') && btn.onclick.toString().includes('consultas')
-    );
-    if (btnConsultasSidebar) {
-        if (temPermissao('consulta', 'visualizar')) {
-            btnConsultasSidebar.style.display = '';
-        } else {
-            btnConsultasSidebar.style.display = 'none';
-        }
-    }
-    
-    const btnExamesSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
-        btn.textContent.includes('Exames') && btn.onclick.toString().includes('exames')
-    );
-    if (btnExamesSidebar) {
-        if (temPermissao('exame', 'visualizar')) {
-            btnExamesSidebar.style.display = '';
-        } else {
-            btnExamesSidebar.style.display = 'none';
-        }
-    }
-    
-    const btnFarmaciaSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
-        btn.textContent.includes('Farmácia') && btn.onclick.toString().includes('farmacia')
-    );
-    if (btnFarmaciaSidebar) {
-        if (temPermissao('farmacia', 'visualizar')) {
-            btnFarmaciaSidebar.style.display = '';
-        } else {
-            btnFarmaciaSidebar.style.display = 'none';
-        }
-    }
-    
-    const btnConfiguracoesSidebar = Array.from(document.querySelectorAll('aside button')).find(btn => 
-        btn.textContent.includes('Configurações') && btn.onclick.toString().includes('configuracoes')
-    );
-    if (btnConfiguracoesSidebar) {
-        if (temPermissao('cargo', 'visualizar')) {
-            btnConfiguracoesSidebar.style.display = '';
-        } else {
-            btnConfiguracoesSidebar.style.display = 'none';
-        }
-    }
+    // ============================================
+    // SIDEBAR - Usando IDs para seleção robusta
+    // ============================================
+    controlarBotao('sidebarPacientes', 'paciente', 'visualizar', 'Sidebar Pacientes');
+    controlarBotao('sidebarConsultas', 'consulta', 'visualizar', 'Sidebar Consultas');
+    controlarBotao('sidebarExames', 'exame', 'visualizar', 'Sidebar Exames');
+    controlarBotao('sidebarFarmacia', 'farmacia', 'visualizar', 'Sidebar Farmácia');
+    controlarBotao('sidebarConfiguracoes', 'cargo', 'visualizar', 'Sidebar Configurações');
     
     // Mostrar informações do usuário e cargo
+    console.log('🔐 Permissões aplicadas com sucesso!');
+    
     const usuarioAtual = obterUsuarioAtual();
     const cargoAtual = obterCargoAtual();
     

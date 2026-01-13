@@ -5,6 +5,7 @@
 import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/dialogs.js';
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { buscarPacientes as buscarPacientesGlobal } from './pacientes.js';
+import { temPermissao } from '../utils/permissoes.js';
 
 export let consultas = [];
 
@@ -97,6 +98,12 @@ export function limparSelecaoPaciente() {
 }
 
 export async function adicionarConsulta() {
+    // Verificar permissão
+    if (!temPermissao('consulta', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar consultas');
+        return;
+    }
+    
     const pacienteId = document.getElementById('consultaPacienteId').value;
     const especialidade = document.getElementById('consultaEspecialidade').value;
     const data = document.getElementById('consultaData').value;
@@ -167,6 +174,12 @@ export function atualizarLista() {
 }
 
 export function deletar(id) {
+    // Verificar permissão
+    if (!temPermissao('consulta', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para deletar consultas');
+        return;
+    }
+    
     mostrarConfirmacao(
         'Cancelar Consulta',
         'Tem certeza que deseja cancelar esta consulta?',

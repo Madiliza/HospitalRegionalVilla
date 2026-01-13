@@ -27,77 +27,38 @@ export function init(dadosCarregados) {
 // Controlar visibilidade das abas baseado em permissões
 // IMPORTANTE: Cada aba verifica seu módulo específico, não todos usam 'cargo'
 export function aplicarPermissoesAbas() {
+    console.log('🔐 Aplicando permissões às abas de configurações...');
     
-    // ============================================
-    // ABA DE CARGOS - Verifica permissão do módulo 'cargo'
-    // ============================================
-    const btnCargos = document.querySelector('button[onclick="window.moduloConfig.mostrarAba(\'cargos\')"]');
-    const abaCargos = document.getElementById('aba-cargos');
-    if (btnCargos && abaCargos) {
-        // Correção: Usar 'cargo' para aba de Cargos (estava correto)
-        if (temPermissao('cargo', 'visualizar')) {
-            btnCargos.style.display = '';
-            abaCargos.style.display = '';
+    // Função auxiliar para controlar aba
+    function controlarAba(tabId, abaId, modulo, acao, nomeAba) {
+        const btnTab = document.getElementById(tabId);
+        const abaContent = document.getElementById(abaId);
+        
+        if (btnTab && abaContent) {
+            if (temPermissao(modulo, acao)) {
+                btnTab.style.display = '';
+                abaContent.style.display = '';
+                console.log(`✅ Aba "${nomeAba}" visível`);
+            } else {
+                btnTab.style.display = 'none';
+                abaContent.style.display = 'none';
+                console.log(`❌ Aba "${nomeAba}" oculta (sem permissão ${modulo}/${acao})`);
+            }
         } else {
-            btnCargos.style.display = 'none';
-            abaCargos.style.display = 'none';
+            console.warn(`⚠️ Elementos da aba "${nomeAba}" não encontrados (tabId=${tabId}, abaId=${abaId})`);
         }
     }
     
     // ============================================
-    // ABA DE USUÁRIOS - Verifica permissão do módulo 'usuario'
+    // APLICAR PERMISSÕES A CADA ABA
     // ============================================
-    // Nota: Criamos um módulo 'usuario' específico para controlar acesso a gerenciamento de usuários
-    // Se usar 'paciente', estaria misturando permissões de pacientes com usuários do sistema
-    const btnUsuarios = document.querySelector('button[onclick="window.moduloConfig.mostrarAba(\'usuarios\')"]');
-    const abaUsuarios = document.getElementById('aba-usuarios');
-    if (btnUsuarios && abaUsuarios) {
-        // CORREÇÃO: Mudado de 'cargo' para 'usuario' (módulo específico)
-        if (temPermissao('usuario', 'visualizar')) {
-            btnUsuarios.style.display = '';
-            abaUsuarios.style.display = '';
-        } else {
-            btnUsuarios.style.display = 'none';
-            abaUsuarios.style.display = 'none';
-        }
-    }
+    controlarAba('tabCargos', 'aba-cargos', 'cargo', 'visualizar', 'Cargos');
+    controlarAba('tabUsuarios', 'aba-usuarios', 'usuario', 'visualizar', 'Usuários');
+    controlarAba('tabMedicamentos', 'aba-medicamentos', 'farmacia', 'visualizar', 'Medicamentos');
+    // Solicitações usa permissão de cargo (função administrativa)
+    controlarAba('tabSolicitacoes', 'aba-solicitacoes', 'cargo', 'visualizar', 'Solicitações');
     
-    // ============================================
-    // ABA DE MEDICAMENTOS - Verifica permissão do módulo 'farmacia'
-    // ============================================
-    const btnMedicamentos = document.querySelector('button[onclick="window.moduloConfig.mostrarAba(\'medicamentos\')"]');
-    const abaMedicamentos = document.getElementById('aba-medicamentos');
-    if (btnMedicamentos && abaMedicamentos) {
-        // CORREÇÃO: Mudado de 'cargo' para 'farmacia'
-        if (temPermissao('farmacia', 'visualizar')) {
-            btnMedicamentos.style.display = '';
-            abaMedicamentos.style.display = '';
-        } else {
-            btnMedicamentos.style.display = 'none';
-            abaMedicamentos.style.display = 'none';
-        }
-    }
-    
-    // ============================================
-    // ABA DE SOLICITAÇÕES DE CADASTRO - Verifica permissão do módulo 'cargo'
-    // ============================================
-    // Nota: Gerenciar solicitações de cadastro é uma função administrativa
-    // como gerenciar cargos, então usa a mesma permissão
-    const btnSolicitacoes = document.querySelector('button[onclick="window.moduloConfig.mostrarAba(\'solicitacoes\')"]');
-    const abaSolicitacoes = document.getElementById('aba-solicitacoes');
-
-    
-    if (btnSolicitacoes && abaSolicitacoes) {
-        if (temPermissao('cargo', 'visualizar')) {
-            btnSolicitacoes.style.display = '';
-            abaSolicitacoes.style.display = '';
-        } else {
-            btnSolicitacoes.style.display = 'none';
-            abaSolicitacoes.style.display = 'none';
-        }
-    } else {
-        console.warn('⚠️ Elementos de Solicitações não encontrados no DOM');
-    }
+    console.log('🔐 Permissões das abas aplicadas!');
 }
 
 function configurarEventos() {
@@ -197,6 +158,12 @@ export function mostrarAba(aba) {
 // Estas verificações foram deixadas para que você escolha mostrar erro ou permitir/bloquear a ação
 
 export function openModalCargo() {
+    // Verificar permissão
+    if (!temPermissao('cargo', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar cargos');
+        return;
+    }
+    
     document.getElementById('modalCargo').classList.remove('modal-hidden');
     limparFormularioCargo();
 }
@@ -211,6 +178,12 @@ function limparFormularioCargo() {
 }
 
 export async function adicionarCargo() {
+    // Verificar permissão
+    if (!temPermissao('cargo', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar cargos');
+        return;
+    }
+    
     const nome = document.getElementById('cargoNome').value;
     const descricao = document.getElementById('cargoDescricao').value;
 
@@ -280,10 +253,22 @@ export function atualizarListaCargos() {
 }
 
 export function editarCargo(id) {
+    // Verificar permissão
+    if (!temPermissao('cargo', 'editar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para editar cargos');
+        return;
+    }
+    
     mostrarErro('Em Desenvolvimento', 'Função de edição será implementada em breve');
 }
 
 export function apagarCargo(id) {
+    // Verificar permissão
+    if (!temPermissao('cargo', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para apagar cargos');
+        return;
+    }
+    
     mostrarConfirmacao(
         'Apagar Cargo',
         'Tem certeza que deseja apagar este cargo?',
@@ -309,6 +294,12 @@ export function apagarCargo(id) {
 // Estas verificações foram deixadas para que você escolha mostrar erro ou permitir/bloquear a ação
 
 export function openModalUsuario() {
+    // Verificar permissão
+    if (!temPermissao('usuario', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar usuários');
+        return;
+    }
+    
     document.getElementById('modalUsuario').classList.remove('modal-hidden');
     limparFormularioUsuario();
     atualizarSelectCargoUsuario();
@@ -329,6 +320,12 @@ export function atualizarSelectCargoUsuario() {
 }
 
 export async function adicionarUsuario() {
+    // Verificar permissão
+    if (!temPermissao('usuario', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar usuários');
+        return;
+    }
+    
     const usuarioId = document.getElementById('usuarioId')?.value;
     const nome = document.getElementById('usuarioNome')?.value;
     const senha = document.getElementById('usuarioSenha')?.value;
@@ -594,6 +591,12 @@ export function ativarUsuario(id) {
 }
 
 export function apagarUsuario(id) {
+    // Verificar permissão
+    if (!temPermissao('usuario', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para apagar usuários');
+        return;
+    }
+    
     const usuario = usuarios.find(u => u.id === id);
     if (!usuario) {
         mostrarErro('Erro', 'Usuário não encontrado');
@@ -629,6 +632,12 @@ export function apagarUsuario(id) {
 // Estas verificações foram deixadas para que você escolha mostrar erro ou permitir/bloquear a ação
 
 export function openModalMedicamentoConfig() {
+    // Verificar permissão
+    if (!temPermissao('farmacia', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar medicamentos');
+        return;
+    }
+    
     document.getElementById('modalMedicamentoConfig').classList.remove('modal-hidden');
     limparFormularioMedicamentoConfig();
     document.getElementById('medicamentoConfigId').value = '';
@@ -644,6 +653,12 @@ function limparFormularioMedicamentoConfig() {
 }
 
 export async function adicionarMedicamentoConfig() {
+    // Verificar permissão
+    if (!temPermissao('farmacia', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar medicamentos');
+        return;
+    }
+    
     const id = document.getElementById('medicamentoConfigId').value;
     const nome = document.getElementById('medicamentoConfigNome').value;
     const preco = document.getElementById('medicamentoConfigPreco').value;
@@ -659,6 +674,11 @@ export async function adicionarMedicamentoConfig() {
 
     if (id) {
         // Editar
+        if (!temPermissao('farmacia', 'editar')) {
+            mostrarErro('Acesso Negado', 'Você não tem permissão para editar medicamentos');
+            return;
+        }
+        
         const medicamentoExistente = medicamentosConfig.find(m => m.id === id);
         if (medicamentoExistente) {
             medicamentoExistente.nome = nome;
@@ -724,6 +744,12 @@ export function atualizarListaMedicamentosConfig() {
 }
 
 export function editarMedicamentoConfig(id) {
+    // Verificar permissão
+    if (!temPermissao('farmacia', 'editar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para editar medicamentos');
+        return;
+    }
+    
     const medicamento = medicamentosConfig.find(m => m.id === id);
     if (medicamento) {
         document.getElementById('medicamentoConfigId').value = medicamento.id;
@@ -737,6 +763,12 @@ export function editarMedicamentoConfig(id) {
 }
 
 export function apagarMedicamentoConfig(id) {
+    // Verificar permissão
+    if (!temPermissao('farmacia', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para apagar medicamentos');
+        return;
+    }
+    
     mostrarConfirmacao(
         'Apagar Medicamento',
         'Tem certeza que deseja apagar este medicamento?',

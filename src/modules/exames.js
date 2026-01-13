@@ -5,6 +5,7 @@
 import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/dialogs.js';
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { buscarPacientes as buscarPacientesGlobal } from './pacientes.js';
+import { temPermissao } from '../utils/permissoes.js';
 
 export let exames = [];
 
@@ -97,6 +98,12 @@ export function limparSelecaoPaciente() {
 }
 
 export async function adicionarExame() {
+    // Verificar permissão
+    if (!temPermissao('exame', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar exames');
+        return;
+    }
+    
     const pacienteId = document.getElementById('examePacienteId').value;
     const tipo = document.getElementById('exameTipo').value;
     const data = document.getElementById('exameData').value;
@@ -167,6 +174,12 @@ export function atualizarLista() {
 }
 
 export function deletar(id) {
+    // Verificar permissão
+    if (!temPermissao('exame', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para deletar exames');
+        return;
+    }
+    
     mostrarConfirmacao(
         'Cancelar Exame',
         'Tem certeza que deseja cancelar este exame?',

@@ -5,6 +5,7 @@
 import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/dialogs.js';
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { buscarPacientes as buscarPacientesGlobal } from './pacientes.js';
+import { temPermissao } from '../utils/permissoes.js';
 
 export let medicamentos = [];
 export let medicamentosConfig = [];
@@ -394,6 +395,12 @@ export function atualizarResume() {
 }
 
 export async function adicionarMedicamento() {
+    // Verificar permissão
+    if (!temPermissao('farmacia', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para registrar medicamentos');
+        return;
+    }
+    
     const pacienteId = document.getElementById('medicamentoPacienteId').value;
     const isParceria = isAtendimentoParceria();
 
@@ -533,6 +540,12 @@ export function apagarAtendimento(pacienteId) {
 }
 
 export function deletar(id) {
+    // Verificar permissão
+    if (!temPermissao('farmacia', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para deletar medicamentos');
+        return;
+    }
+    
     mostrarConfirmacao(
         'Remover Medicamento',
         'Tem certeza que deseja remover este medicamento?',
