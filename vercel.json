@@ -2,31 +2,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "routes": [
-    {
-      "src": "^/login$",
-      "dest": "/login.html"
-    },
-    {
-      "src": "^/$",
-      "dest": "/index.html"
-    },
-    {
-      "src": "^/(?!.*\\.).*$",
-      "dest": "/"
-    },
-    {
-      "src": "^/(.*)",
-      "dest": "/$1"
-    }
-  ],
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/login",
       "destination": "/login.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "destination": "/$1"
     }
   ]
