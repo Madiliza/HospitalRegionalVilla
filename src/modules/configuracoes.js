@@ -161,18 +161,37 @@ export function openModalCargo() {
 
 export function closeModalCargo() {
     document.getElementById('modalCargo').classList.add('modal-hidden');
+    // Limpar campo de edição ao fechar
+    const campoEdicao = document.getElementById('cargoIdEdicao');
+    if (campoEdicao) campoEdicao.value = '';
 }
 
 function limparFormularioCargo() {
     document.getElementById('formCargo').reset();
     document.querySelectorAll('#formCargo input[type="checkbox"]').forEach(cb => cb.checked = false);
+    // Resetar título do modal
+    const titulo = document.getElementById('modalCargoTitulo');
+    if (titulo) titulo.textContent = 'Novo Cargo';
+    // Limpar campo de edição
+    const campoEdicao = document.getElementById('cargoIdEdicao');
+    if (campoEdicao) campoEdicao.value = '';
 }
 
 export async function adicionarCargo() {
-    // Verificar permissão
-    if (!temPermissao('cargo', 'criar')) {
-        mostrarErro('Acesso Negado', 'Você não tem permissão para criar cargos');
-        return;
+    const cargoIdEdicao = document.getElementById('cargoIdEdicao')?.value;
+    const isEdicao = !!cargoIdEdicao;
+    
+    // Verificar permissão apropriada
+    if (isEdicao) {
+        if (!temPermissao('cargo', 'editar')) {
+            mostrarErro('Acesso Negado', 'Você não tem permissão para editar cargos');
+            return;
+        }
+    } else {
+        if (!temPermissao('cargo', 'criar')) {
+            mostrarErro('Acesso Negado', 'Você não tem permissão para criar cargos');
+            return;
+        }
     }
     
     const nome = document.getElementById('cargoNome').value;
@@ -192,26 +211,55 @@ export async function adicionarCargo() {
         usuario: Array.from(document.querySelectorAll('input[name="permissaoUsuario"]:checked')).map(cb => cb.value)
     };
 
-    const novoCargo = {
-        id: Date.now().toString(),
-        nome,
-        descricao,
-        permissoes,
-        dataCriacao: new Date().toLocaleString('pt-BR')
-    };
+    if (isEdicao) {
+        // Atualizar cargo existente
+        const index = cargos.findIndex(c => c.id === cargoIdEdicao);
+        if (index !== -1) {
+            const cargoAtualizado = {
+                ...cargos[index],
+                nome,
+                descricao,
+                permissoes,
+                dataAtualizacao: new Date().toLocaleString('pt-BR')
+            };
+            cargos[index] = cargoAtualizado;
+            
+            try {
+                await salvarNoFirebase('cargos', cargoAtualizado);
+            } catch (erro) {
+                // Erro silencioso
+            }
+            
+            closeModalCargo();
+            atualizarListaCargos();
+            atualizarSelectCargoUsuario();
+            mostrarNotificacao('Cargo atualizado com sucesso!', 'success');
+        } else {
+            mostrarErro('Erro', 'Cargo não encontrado');
+        }
+    } else {
+        // Criar novo cargo
+        const novoCargo = {
+            id: Date.now().toString(),
+            nome,
+            descricao,
+            permissoes,
+            dataCriacao: new Date().toLocaleString('pt-BR')
+        };
 
-    cargos.push(novoCargo);
+        cargos.push(novoCargo);
 
-    try {
-        await salvarNoFirebase('cargos', novoCargo);
-    } catch (erro) {
-        // Erro silencioso
+        try {
+            await salvarNoFirebase('cargos', novoCargo);
+        } catch (erro) {
+            // Erro silencioso
+        }
+
+        closeModalCargo();
+        atualizarListaCargos();
+        atualizarSelectCargoUsuario();
+        mostrarNotificacao('Cargo criado com sucesso!', 'success');
     }
-
-    closeModalCargo();
-    atualizarListaCargos();
-    atualizarSelectCargoUsuario();
-    mostrarNotificacao('Cargo criado com sucesso!', 'success');
 }
 
 export function atualizarListaCargos() {
@@ -250,7 +298,76 @@ export function editarCargo(id) {
         return;
     }
     
-    mostrarErro('Em Desenvolvimento', 'Função de edição será implementada em breve');
+    // Buscar o cargo pelo ID
+    const cargo = cargos.find(c => c.id === id);
+    if (!cargo) {
+        mostrarErro('Erro', 'Cargo não encontrado');
+        return;
+    }
+    
+    // Abrir o modal
+    document.getElementById('modalCargo').classList.remove('modal-hidden');
+    
+    // Alterar título do modal para edição
+    const titulo = document.getElementById('modalCargoTitulo');
+    if (titulo) titulo.textContent = 'Editar Cargo';
+    
+    // Preencher campo hidden com ID do cargo em edição
+    const campoEdicao = document.getElementById('cargoIdEdicao');
+    if (campoEdicao) campoEdicao.value = id;
+    
+    // Preencher campos do formulário
+    document.getElementById('cargoNome').value = cargo.nome || '';
+    document.getElementById('cargoDescricao').value = cargo.descricao || '';
+    
+    // Limpar todas as permissões primeiro
+    document.querySelectorAll('#formCargo input[type="checkbox"]').forEach(cb => cb.checked = false);
+    
+    // Marcar as permissões do cargo
+    if (cargo.permissoes) {
+        // Paciente
+        if (cargo.permissoes.paciente) {
+            cargo.permissoes.paciente.forEach(perm => {
+                const checkbox = document.querySelector(`input[name="permissaoPaciente"][value="${perm}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+        // Consulta
+        if (cargo.permissoes.consulta) {
+            cargo.permissoes.consulta.forEach(perm => {
+                const checkbox = document.querySelector(`input[name="permissaoConsulta"][value="${perm}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+        // Exame
+        if (cargo.permissoes.exame) {
+            cargo.permissoes.exame.forEach(perm => {
+                const checkbox = document.querySelector(`input[name="permissaoExame"][value="${perm}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+        // Farmácia
+        if (cargo.permissoes.farmacia) {
+            cargo.permissoes.farmacia.forEach(perm => {
+                const checkbox = document.querySelector(`input[name="permissaoFarmacia"][value="${perm}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+        // Cargo
+        if (cargo.permissoes.cargo) {
+            cargo.permissoes.cargo.forEach(perm => {
+                const checkbox = document.querySelector(`input[name="permissaoCargo"][value="${perm}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+        // Usuário
+        if (cargo.permissoes.usuario) {
+            cargo.permissoes.usuario.forEach(perm => {
+                const checkbox = document.querySelector(`input[name="permissaoUsuario"][value="${perm}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+    }
 }
 
 export function apagarCargo(id) {

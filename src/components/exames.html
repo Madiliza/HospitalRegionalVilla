@@ -59,7 +59,83 @@
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Tipo de Exame</label>
-                <input type="text" id="exameTipo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ex: Ressonância Magnética" required>
+                <div class="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto bg-gray-50">
+                    <div class="grid grid-cols-1 gap-2">
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Audiometria" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Audiometria</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="COVID-19" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">COVID-19</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Colonoscopia" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Colonoscopia</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Colesterol" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Colesterol</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="DST / IST" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">DST / IST</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Ecocardiograma" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Ecocardiograma</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Eletrocardiograma (ECG)" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Eletrocardiograma (ECG)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Endoscopia Digestiva" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Endoscopia Digestiva</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Exame de Fezes" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Exame de Fezes</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Glicemia" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Glicemia</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Hemograma Completo" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Hemograma Completo</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Hepatite" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Hepatite</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="HIV" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">HIV</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Papanicolau" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Papanicolau</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Ultrassonografia Morfológica" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Ultrassonografia Morfológica</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Ultrassonografia Obstétrica" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Ultrassonografia Obstétrica</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Ultrassonografia Transvaginal" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Ultrassonografia Transvaginal</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+                            <input type="checkbox" name="exameTipo" value="Urina" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+                            <span class="text-gray-700 text-sm">Urina</span>
+                        </label>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Selecione um ou mais exames</p>
             </div>
 
             <div>

@@ -105,12 +105,13 @@ export async function adicionarExame() {
     }
     
     const pacienteId = document.getElementById('examePacienteId').value;
-    const tipo = document.getElementById('exameTipo').value;
+    const tiposSelecionados = Array.from(document.querySelectorAll('input[name="exameTipo"]:checked')).map(cb => cb.value);
+    const tipo = tiposSelecionados.join(', ');
     const data = document.getElementById('exameData').value;
     const hora = document.getElementById('exameHora').value;
 
-    if (!pacienteId || !tipo || !data || !hora) {
-        mostrarErro('Campos Obrigatórios', 'Por favor, preencha todos os campos');
+    if (!pacienteId || tiposSelecionados.length === 0 || !data || !hora) {
+        mostrarErro('Campos Obrigatórios', 'Por favor, preencha todos os campos e selecione pelo menos um tipo de exame');
         return;
     }
 
