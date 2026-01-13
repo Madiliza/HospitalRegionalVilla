@@ -4,6 +4,20 @@
 
 let appReady = false;
 
+/**
+ * Helper para acessar elementos de forma segura
+ * @param {string} id - ID do elemento
+ * @returns {HTMLElement|null}
+ */
+export function safeGetElement(id) {
+    const element = document.getElementById(id);
+    if (!element) {
+        console.warn(`⚠️ Elemento ${id} não encontrado`);
+        return null;
+    }
+    return element;
+}
+
 export function setAppReady(ready) {
     appReady = ready;
 }

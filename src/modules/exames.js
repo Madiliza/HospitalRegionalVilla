@@ -11,7 +11,13 @@ export let exames = [];
 export function init(dadosCarregados) {
     exames = dadosCarregados.exames || [];
     configurarEventos();
-    atualizarLista();
+    
+    // Chamar atualizarLista de forma assíncrona para garantir que o DOM está pronto
+    Promise.resolve().then(() => {
+        setTimeout(() => {
+            atualizarLista();
+        }, 50);
+    });
 }
 
 function configurarEventos() {

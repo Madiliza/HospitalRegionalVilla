@@ -54,8 +54,15 @@ async function carregarComponentes() {
         }
     }
     
-    // Aguardar um pouco para garantir que o DOM foi atualizado
-    return new Promise(resolve => setTimeout(resolve, 100));
+    // Aguardar várias frames para garantir que o DOM foi atualizado e renderizado
+    return new Promise(resolve => {
+        // Use requestAnimationFrame para aguardar a renderização
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                setTimeout(resolve, 200);
+            });
+        });
+    });
 }
 
 // Verificar autenticação antes de inicializar

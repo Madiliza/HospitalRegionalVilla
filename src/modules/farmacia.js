@@ -14,7 +14,13 @@ export function init(dadosCarregados) {
     medicamentos = dadosCarregados.medicamentos || [];
     medicamentosConfig = dadosCarregados.medicamentosConfig || [];
     configurarEventos();
-    atualizarLista();
+    
+    // Chamar atualizarLista de forma assíncrona para garantir que o DOM está pronto
+    Promise.resolve().then(() => {
+        setTimeout(() => {
+            atualizarLista();
+        }, 50);
+    });
 }
 
 function configurarEventos() {
@@ -30,36 +36,75 @@ function configurarEventos() {
 // ============================================
 // MODAL MEDICAMENTO
 // ============================================
+// HELPERS SEGUROS
+// ============================================
+function safeSetClass(id, operation, className) {
+    const elem = document.getElementById(id);
+    if (elem) {
+        if (operation === 'add') elem.classList.add(className);
+        else if (operation === 'remove') elem.classList.remove(className);
+    }
+}
+
+function safeSetHTML(id, html) {
+    const elem = document.getElementById(id);
+    if (elem) elem.innerHTML = html;
+}
+
+function safeSetValue(id, value) {
+    const elem = document.getElementById(id);
+    if (elem) elem.value = value;
+}
+
+function safeSetText(id, text) {
+    const elem = document.getElementById(id);
+    if (elem) elem.textContent = text;
+}
+
+function safeResetForm(id) {
+    const elem = document.getElementById(id);
+    if (elem && elem.reset) elem.reset();
+}
+
+// ============================================
 export function openModal() {
-    document.getElementById('modalMedicamento').classList.remove('modal-hidden');
+    safeSetClass('modalMedicamento', 'remove', 'modal-hidden');
     limparFormulario();
     atualizarListaMedicamentosNoModal();
 }
 
 export function closeModal() {
-    document.getElementById('modalMedicamento').classList.add('modal-hidden');
+    safeSetClass('modalMedicamento', 'add', 'modal-hidden');
 }
 
 function limparFormulario() {
-    document.getElementById('formMedicamento').reset();
-    document.getElementById('buscaPacienteId').value = '';
-    document.getElementById('medicamentoPacienteId').value = '';
-    document.getElementById('resumoMedicamentos').innerHTML = '<p class="text-gray-600">Nenhum medicamento selecionado</p>';
-    document.getElementById('totalItens').textContent = '0';
-    document.getElementById('valorTotal').textContent = '0.00';
-    document.getElementById('dadosPacienteDiv').classList.add('hidden');
-    document.getElementById('sugestoesPacientes').classList.add('hidden');
-    document.getElementById('secaoMedicamentosSelecionados').classList.add('hidden');
-    document.getElementById('atendimentoParceria').checked = false;
-    document.getElementById('tipoPrecoBadge').innerHTML = '<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">Preço Normal</span>';
+    safeResetForm('formMedicamento');
+    safeSetValue('buscaPacienteId', '');
+    safeSetValue('medicamentoPacienteId', '');
+    safeSetHTML('resumoMedicamentos', '<p class="text-gray-600">Nenhum medicamento selecionado</p>');
+    safeSetText('totalItens', '0');
+    safeSetText('valorTotal', '0.00');
+    safeSetClass('dadosPacienteDiv', 'add', 'hidden');
+    safeSetClass('sugestoesPacientes', 'add', 'hidden');
+    safeSetClass('secaoMedicamentosSelecionados', 'add', 'hidden');
+    const atendimento = document.getElementById('atendimentoParceria');
+    if (atendimento) atendimento.checked = false;
+    safeSetHTML('tipoPrecoBadge', '<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">Preço Normal</span>');
     medicamentosSelecionados = {};
 }
 
 // Busca de paciente
 export function buscarPacientes() {
-    const termo = document.getElementById('buscaPacienteId').value.toLowerCase().trim();
+    const buscaInput = document.getElementById('buscaPacienteId');
     const sugestoes = document.getElementById('sugestoesPacientes');
     const listaSugestoes = document.getElementById('listaSugestoes');
+    
+    if (!buscaInput || !sugestoes || !listaSugestoes) {
+        console.warn('⚠️ Elementos da busca não encontrados');
+        return;
+    }
+    
+    const termo = buscaInput.value.toLowerCase().trim();
 
     if (termo.length === 0) {
         sugestoes.classList.add('hidden');
@@ -325,10 +370,15 @@ export function atualizarResume() {
         return sum + (preco * med.quantidade);
     }, 0);
 
-    document.getElementById('totalItens').textContent = totalItens;
-    document.getElementById('valorTotal').textContent = valorTotal.toFixed(2);
+    safeSetText('totalItens', totalItens);
+    safeSetText('valorTotal', valorTotal.toFixed(2));
 
     const resumo = document.getElementById('resumoMedicamentos');
+    if (!resumo) {
+        console.warn('⚠️ Elemento resumoMedicamentos não encontrado');
+        return;
+    }
+    
     if (medicatmentosArray.length === 0) {
         resumo.innerHTML = '<p class="text-gray-600">Nenhum medicamento selecionado</p>';
     } else {
