@@ -161,7 +161,13 @@ function getQuantidadeDispensadaHoje(pacienteId, medicamentoId) {
 // Função para obter o limite máximo de um medicamento
 function getLimiteMedicamento(medicamentoId) {
     const config = medicamentosConfig.find(m => m.id === medicamentoId);
-    return config ? parseInt(config.qtdMax) || 999 : 999;
+    if (!config) return 999;
+    
+    const isParceria = isAtendimentoParceria();
+    if (isParceria && config.qtdMaxParceria) {
+        return parseInt(config.qtdMaxParceria) || 999;
+    }
+    return parseInt(config.qtdMax) || 999;
 }
 
 // Função para verificar se é atendimento com parceria
@@ -223,7 +229,9 @@ export function atualizarListaMedicamentosNoModal() {
     }
 
     lista.innerHTML = medicamentosConfig.map(med => {
-        const qtdMax = parseInt(med.qtdMax) || 999;
+        // Usar limite de parceria se marcado, senão limite normal
+        const qtdMaxAplicavel = isParceria && med.qtdMaxParceria ? parseInt(med.qtdMaxParceria) : parseInt(med.qtdMax);
+        const qtdMax = qtdMaxAplicavel || 999;
         const jaDispensado = pacienteIdValue ? getQuantidadeDispensadaHoje(pacienteIdValue, med.id) : 0;
         const disponivel = qtdMax - jaDispensado;
         const desabilitado = disponivel <= 0;
@@ -239,7 +247,7 @@ export function atualizarListaMedicamentosNoModal() {
                     <span class="${!isParceria ? 'text-orange-600 font-bold' : 'text-gray-400 line-through'}">R$ ${precoNormal.toFixed(2)}</span>
                     <span class="${isParceria ? 'text-green-600 font-bold' : 'text-gray-400'}"><i class="fas fa-handshake mr-1"></i>R$ ${precoParceria.toFixed(2)}</span>
                 </div>
-                <p class="text-xs ${desabilitado ? 'text-red-600 font-bold' : 'text-gray-500'}">Limite diário: ${qtdMax} | Disponível: ${disponivel > 0 ? disponivel : 0}</p>
+                <p class="text-xs ${desabilitado ? 'text-red-600 font-bold' : 'text-gray-500'}">Limite diário: ${qtdMax} | Dispensado hoje: ${jaDispensado} | Disponível: ${disponivel > 0 ? disponivel : 0}</p>
             </div>
             <button type="button" 
                 onclick="window.moduloFarmacia.selecionarMedicamento('${med.id}', '${med.nome}', ${precoAtual}, ${qtdMax}, ${precoParceria})" 
@@ -308,7 +316,8 @@ export function atualizarQuantidadeMedicamento(id, novaQuantidade) {
     const jaDispensadoHoje = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, id) : 0;
     const limiteDisponivel = limiteMax - jaDispensadoHoje;
 
-    if (quantidade > limiteDisponivel) {
+    // Validação considerando soma com o que já foi dispensado hoje
+    if (jaDispensadoHoje + quantidade > limiteMax) {
         mostrarErro('Limite Excedido', `Quantidade máxima disponível para hoje: ${limiteDisponivel}. Já dispensado: ${jaDispensadoHoje}, Limite diário: ${limiteMax}`);
         medicamentosSelecionados[id].quantidade = limiteDisponivel > 0 ? limiteDisponivel : 1;
         atualizarListaMedicamentosSelecionados();

@@ -766,8 +766,9 @@ export async function adicionarMedicamentoConfig() {
     const preco = document.getElementById('medicamentoConfigPreco').value;
     const precoParceria = document.getElementById('medicamentoConfigPrecoParceria').value;
     const qtdMax = document.getElementById('medicamentoConfigQtdMax').value;
+    const qtdMaxParceria = document.getElementById('medicamentoConfigQtdMaxParceria').value;
 
-    if (!nome || !preco || !precoParceria || !qtdMax) {
+    if (!nome || !preco || !precoParceria || !qtdMax || !qtdMaxParceria) {
         mostrarErro('Campos Obrigatórios', 'Por favor, preencha todos os campos');
         return;
     }
@@ -787,6 +788,7 @@ export async function adicionarMedicamentoConfig() {
             medicamentoExistente.preco = preco;
             medicamentoExistente.precoParceria = precoParceria;
             medicamentoExistente.qtdMax = qtdMax;
+            medicamentoExistente.qtdMaxParceria = qtdMaxParceria;
             medicamentoParaSalvar = medicamentoExistente;
         }
     } else {
@@ -797,6 +799,7 @@ export async function adicionarMedicamentoConfig() {
             preco,
             precoParceria,
             qtdMax,
+            qtdMaxParceria,
             dataCriacao: new Date().toLocaleString('pt-BR')
         };
         medicamentosConfig.push(novoMedicamento);
@@ -829,7 +832,8 @@ export function atualizarListaMedicamentosConfig() {
                     <h3 class="text-lg font-bold text-gray-800">${med.nome}</h3>
                     <p class="text-sm text-gray-600"><i class="fas fa-tag text-orange-500 mr-1"></i>Preço Normal: R$ ${parseFloat(med.preco).toFixed(2)}</p>
                     <p class="text-sm text-green-600"><i class="fas fa-handshake text-green-500 mr-1"></i>Preço Parceria: R$ ${parseFloat(med.precoParceria || 0).toFixed(2)}</p>
-                    <p class="text-sm text-gray-600"><i class="fas fa-boxes text-blue-500 mr-1"></i>Qtd. Máxima: ${med.qtdMax}</p>
+                    <p class="text-sm text-gray-600"><i class="fas fa-boxes text-blue-500 mr-1"></i>Qtd. Máxima (Normal): ${med.qtdMax}</p>
+                    <p class="text-sm text-green-600"><i class="fas fa-handshake text-green-600 mr-1"></i>Qtd. Máxima (Parceria): ${med.qtdMaxParceria || med.qtdMax}</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="window.moduloConfig.editarMedicamentoConfig('${med.id}')" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
@@ -859,6 +863,7 @@ export function editarMedicamentoConfig(id) {
         document.getElementById('medicamentoConfigPreco').value = medicamento.preco;
         document.getElementById('medicamentoConfigPrecoParceria').value = medicamento.precoParceria || 0;
         document.getElementById('medicamentoConfigQtdMax').value = medicamento.qtdMax;
+        document.getElementById('medicamentoConfigQtdMaxParceria').value = medicamento.qtdMaxParceria || medicamento.qtdMax;
         document.getElementById('modalMedicamentoConfigTitle').textContent = 'Editar Medicamento';
         document.getElementById('modalMedicamentoConfig').classList.remove('modal-hidden');
     }
