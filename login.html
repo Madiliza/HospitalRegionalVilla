@@ -411,6 +411,11 @@
                 
                 const usuario = snapshot.val();
                 
+                // Verificar se o usuário está ativo
+                if (usuario.ativo === false) {
+                    throw new Error('Usuário inativado. Entre em contato com o administrador do sistema');
+                }
+                
                 // Verificar senha (em produção, isso deve ser criptografado)
                 if (usuario.senha !== senha) {
                     throw new Error('Senha incorreta');

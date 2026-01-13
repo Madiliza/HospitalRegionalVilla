@@ -224,7 +224,8 @@ export async function adicionarCargo() {
         consulta: Array.from(document.querySelectorAll('input[name="permissaoConsulta"]:checked')).map(cb => cb.value),
         exame: Array.from(document.querySelectorAll('input[name="permissaoExame"]:checked')).map(cb => cb.value),
         farmacia: Array.from(document.querySelectorAll('input[name="permissaoFarmacia"]:checked')).map(cb => cb.value),
-        cargo: Array.from(document.querySelectorAll('input[name="permissaoCargo"]:checked')).map(cb => cb.value)
+        cargo: Array.from(document.querySelectorAll('input[name="permissaoCargo"]:checked')).map(cb => cb.value),
+        usuario: Array.from(document.querySelectorAll('input[name="permissaoUsuario"]:checked')).map(cb => cb.value)
     };
 
     const novoCargo = {
