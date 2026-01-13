@@ -133,6 +133,11 @@ export async function adicionarExame() {
 export function atualizarLista() {
     const lista = document.getElementById('examesList');
 
+    if (!lista) {
+        console.warn('⚠️ Elemento examesList não encontrado ainda');
+        return;
+    }
+
     if (exames.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum exame agendado</p>';
         return;

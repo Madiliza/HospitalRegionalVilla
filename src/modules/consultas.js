@@ -133,6 +133,11 @@ export async function adicionarConsulta() {
 export function atualizarLista() {
     const lista = document.getElementById('consultasList');
 
+    if (!lista) {
+        console.warn('⚠️ Elemento consultasList não encontrado ainda');
+        return;
+    }
+
     if (consultas.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhuma consulta agendada</p>';
         return;

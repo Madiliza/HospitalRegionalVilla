@@ -35,6 +35,12 @@ async function carregarComponentes() {
     const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes'];
     const containerComponentes = document.getElementById('componentes');
     
+    // Aguardar que o container exista
+    if (!containerComponentes) {
+        console.error('❌ Container de componentes não encontrado');
+        return;
+    }
+    
     for (const nome of componentes) {
         try {
             const response = await fetch(`./src/components/${nome}.html`);
@@ -42,10 +48,14 @@ async function carregarComponentes() {
             const div = document.createElement('div');
             div.innerHTML = html;
             containerComponentes.appendChild(div);
+            console.log(`✅ Componente ${nome} carregado`);
         } catch (error) {
-            console.error(`Erro ao carregar componente ${nome}:`, error);
+            console.error(`❌ Erro ao carregar componente ${nome}:`, error);
         }
     }
+    
+    // Aguardar um pouco para garantir que o DOM foi atualizado
+    return new Promise(resolve => setTimeout(resolve, 100));
 }
 
 // Verificar autenticação antes de inicializar

@@ -163,7 +163,14 @@ export function toggleParceria() {
 
 export function atualizarListaMedicamentosNoModal() {
     const lista = document.getElementById('listaMedicamentosDisponiveis');
-    const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    const pacienteId = document.getElementById('medicamentoPacienteId');
+    
+    if (!lista || !pacienteId) {
+        console.warn('⚠️ Elementos do modal de medicamentos não encontrados ainda');
+        return;
+    }
+    
+    const pacienteIdValue = pacienteId.value;
     const isParceria = isAtendimentoParceria();
 
     if (medicamentosConfig.length === 0) {
@@ -173,7 +180,7 @@ export function atualizarListaMedicamentosNoModal() {
 
     lista.innerHTML = medicamentosConfig.map(med => {
         const qtdMax = parseInt(med.qtdMax) || 999;
-        const jaDispensado = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, med.id) : 0;
+        const jaDispensado = pacienteIdValue ? getQuantidadeDispensadaHoje(pacienteIdValue, med.id) : 0;
         const disponivel = qtdMax - jaDispensado;
         const desabilitado = disponivel <= 0;
         const precoNormal = parseFloat(med.preco) || 0;
@@ -271,13 +278,19 @@ export function atualizarQuantidadeMedicamento(id, novaQuantidade) {
 
 export function atualizarListaMedicamentosSelecionados() {
     const div = document.getElementById('medicamentosSelecionadosDiv');
+    const pacienteIdElement = document.getElementById('medicamentoPacienteId');
+
+    if (!div || !pacienteIdElement) {
+        console.warn('⚠️ Elementos do modal não encontrados ainda');
+        return;
+    }
 
     if (Object.keys(medicamentosSelecionados).length === 0) {
         div.innerHTML = '<p class="text-gray-500 text-sm">Nenhum medicamento selecionado</p>';
         return;
     }
 
-    const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    const pacienteId = pacienteIdElement.value;
     const isParceria = isAtendimentoParceria();
     
     div.innerHTML = Object.entries(medicamentosSelecionados).map(([id, med]) => {
@@ -395,6 +408,11 @@ export async function adicionarMedicamento() {
 
 export function atualizarLista() {
     const lista = document.getElementById('farmaciaList');
+
+    if (!lista) {
+        console.warn('⚠️ Elemento farmaciaList não encontrado ainda');
+        return;
+    }
 
     if (medicamentos.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum atendimento registrado</p>';

@@ -17,6 +17,7 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
     
     if (!usuarioAtual) {
         console.error('❌ Usuário não encontrado:', usuarioId);
+        console.log('📋 Usuários disponíveis:', usuarios.map(u => `${u.nome} (${u.id})`).join(', '));
         return false;
     }
     
@@ -29,8 +30,8 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
         console.error('❌ Cargo não encontrado:', usuarioAtual.cargo);
         console.log('Cargos disponíveis:', cargos.map(c => `${c.nome} (${c.id})`).join(', '));
         // Se nenhum cargo foi encontrado, criar um cargo padrão com acesso total (para DEV)
-        if (usuarioAtual.cargo === 'Desenvolvedor' || usuarioAtual.cargo === 'DEV') {
-            console.log('⚠️ Criando cargo DEV padrão com acesso total...');
+        if (usuarioAtual.cargo === 'Desenvolvedor' || usuarioAtual.cargo === 'DEV' || usuarioAtual.cargo === 'Admin') {
+            console.log('⚠️ Criando cargo padrão com acesso total...');
             cargoAtual = {
                 id: 'cargo_dev_temp',
                 nome: usuarioAtual.cargo,
@@ -43,7 +44,18 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                 }
             };
         } else {
-            return false;
+            console.log('⚠️ Cargo não encontrado e usuário não é DEV. Usando permissões mínimas...');
+            cargoAtual = {
+                id: 'cargo_padrao_temp',
+                nome: usuarioAtual.cargo || 'Padrão',
+                permissoes: {
+                    'paciente': ['visualizar'],
+                    'consulta': ['visualizar'],
+                    'exame': ['visualizar'],
+                    'farmacia': ['visualizar'],
+                    'cargo': []
+                }
+            };
         }
     }
     

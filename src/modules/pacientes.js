@@ -82,6 +82,11 @@ export async function adicionarPaciente() {
 export function atualizarLista() {
     const lista = document.getElementById('pacientesList');
 
+    if (!lista) {
+        console.warn('⚠️ Elemento pacientesList não encontrado ainda');
+        return;
+    }
+
     if (pacientes.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum paciente cadastrado</p>';
         return;
