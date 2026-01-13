@@ -50,6 +50,8 @@ function limparFormulario() {
     document.getElementById('dadosPacienteDiv').classList.add('hidden');
     document.getElementById('sugestoesPacientes').classList.add('hidden');
     document.getElementById('secaoMedicamentosSelecionados').classList.add('hidden');
+    document.getElementById('atendimentoParceria').checked = false;
+    document.getElementById('tipoPrecoBadge').innerHTML = '<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">Preço Normal</span>';
     medicamentosSelecionados = {};
 }
 
@@ -117,9 +119,52 @@ function getLimiteMedicamento(medicamentoId) {
     return config ? parseInt(config.qtdMax) || 999 : 999;
 }
 
+// Função para verificar se é atendimento com parceria
+function isAtendimentoParceria() {
+    const checkbox = document.getElementById('atendimentoParceria');
+    return checkbox ? checkbox.checked : false;
+}
+
+// Função para obter o preço correto (normal ou parceria)
+function getPrecoMedicamento(medicamentoId) {
+    const config = medicamentosConfig.find(m => m.id === medicamentoId);
+    if (!config) return 0;
+    
+    if (isAtendimentoParceria()) {
+        return parseFloat(config.precoParceria) || parseFloat(config.preco) || 0;
+    }
+    return parseFloat(config.preco) || 0;
+}
+
+// Função para toggle de parceria - atualiza preços
+export function toggleParceria() {
+    const isParceria = isAtendimentoParceria();
+    const badge = document.getElementById('tipoPrecoBadge');
+    
+    if (isParceria) {
+        badge.innerHTML = '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold"><i class="fas fa-handshake mr-1"></i>Preço Parceria</span>';
+    } else {
+        badge.innerHTML = '<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">Preço Normal</span>';
+    }
+    
+    // Atualizar preços dos medicamentos já selecionados
+    Object.keys(medicamentosSelecionados).forEach(id => {
+        const config = medicamentosConfig.find(m => m.id === id);
+        if (config) {
+            medicamentosSelecionados[id].preco = getPrecoMedicamento(id);
+            medicamentosSelecionados[id].precoParceria = parseFloat(config.precoParceria) || 0;
+        }
+    });
+    
+    atualizarListaMedicamentosNoModal();
+    atualizarListaMedicamentosSelecionados();
+    atualizarResume();
+}
+
 export function atualizarListaMedicamentosNoModal() {
     const lista = document.getElementById('listaMedicamentosDisponiveis');
     const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    const isParceria = isAtendimentoParceria();
 
     if (medicamentosConfig.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhum medicamento configurado</p>';
@@ -131,16 +176,22 @@ export function atualizarListaMedicamentosNoModal() {
         const jaDispensado = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, med.id) : 0;
         const disponivel = qtdMax - jaDispensado;
         const desabilitado = disponivel <= 0;
+        const precoNormal = parseFloat(med.preco) || 0;
+        const precoParceria = parseFloat(med.precoParceria) || 0;
+        const precoAtual = isParceria ? precoParceria : precoNormal;
         
         return `
         <div class="p-4 bg-white rounded-lg border border-gray-200 flex items-center justify-between ${desabilitado ? 'opacity-50' : ''}">
             <div>
                 <h5 class="font-semibold text-gray-800">${med.nome}</h5>
-                <p class="text-sm text-gray-600">R$ ${parseFloat(med.preco).toFixed(2)}</p>
+                <div class="flex gap-3 text-sm">
+                    <span class="${!isParceria ? 'text-orange-600 font-bold' : 'text-gray-400 line-through'}">R$ ${precoNormal.toFixed(2)}</span>
+                    <span class="${isParceria ? 'text-green-600 font-bold' : 'text-gray-400'}"><i class="fas fa-handshake mr-1"></i>R$ ${precoParceria.toFixed(2)}</span>
+                </div>
                 <p class="text-xs ${desabilitado ? 'text-red-600 font-bold' : 'text-gray-500'}">Limite diário: ${qtdMax} | Disponível: ${disponivel > 0 ? disponivel : 0}</p>
             </div>
             <button type="button" 
-                onclick="window.moduloFarmacia.selecionarMedicamento('${med.id}', '${med.nome}', ${med.preco}, ${qtdMax})" 
+                onclick="window.moduloFarmacia.selecionarMedicamento('${med.id}', '${med.nome}', ${precoAtual}, ${qtdMax}, ${precoParceria})" 
                 class="px-4 py-2 ${desabilitado ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-700'} text-white rounded-lg transition"
                 ${desabilitado ? 'disabled' : ''}>
                 ${desabilitado ? 'Limite atingido' : 'Adicionar'}
@@ -149,7 +200,7 @@ export function atualizarListaMedicamentosNoModal() {
     `}).join('');
 }
 
-export function selecionarMedicamento(id, nome, preco, qtdMax) {
+export function selecionarMedicamento(id, nome, preco, qtdMax, precoParceria) {
     const pacienteId = document.getElementById('medicamentoPacienteId').value;
     const limiteMax = qtdMax || getLimiteMedicamento(id);
     const jaDispensadoHoje = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, id) : 0;
@@ -161,11 +212,17 @@ export function selecionarMedicamento(id, nome, preco, qtdMax) {
         return;
     }
 
+    const config = medicamentosConfig.find(m => m.id === id);
+    const precoNormal = config ? parseFloat(config.preco) : parseFloat(preco);
+    const precoParceriaVal = config ? parseFloat(config.precoParceria) || 0 : (precoParceria || 0);
+
     if (!medicamentosSelecionados[id]) {
         medicamentosSelecionados[id] = {
             id,
             nome,
-            preco: parseFloat(preco),
+            preco: isAtendimentoParceria() ? precoParceriaVal : precoNormal,
+            precoNormal: precoNormal,
+            precoParceria: precoParceriaVal,
             quantidade: 1,
             qtdMax: limiteMax
         };
@@ -221,17 +278,19 @@ export function atualizarListaMedicamentosSelecionados() {
     }
 
     const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    const isParceria = isAtendimentoParceria();
     
     div.innerHTML = Object.entries(medicamentosSelecionados).map(([id, med]) => {
         const limiteMax = med.qtdMax || getLimiteMedicamento(id);
         const jaDispensadoHoje = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, id) : 0;
         const limiteDisponivel = limiteMax - jaDispensadoHoje;
+        const precoAtual = isParceria ? (med.precoParceria || med.preco) : (med.precoNormal || med.preco);
         
         return `
         <div class="p-3 bg-gray-50 rounded-lg flex items-center justify-between border border-gray-200">
             <div class="flex-1">
                 <p class="font-semibold text-gray-800">${med.nome}</p>
-                <p class="text-sm text-gray-600">R$ ${med.preco.toFixed(2)}</p>
+                <p class="text-sm ${isParceria ? 'text-green-600' : 'text-orange-600'}">R$ ${precoAtual.toFixed(2)} ${isParceria ? '<i class="fas fa-handshake ml-1"></i>' : ''}</p>
                 <p class="text-xs text-gray-500">Limite: ${limiteMax} | Já dispensado hoje: ${jaDispensadoHoje} | Máx disponível: ${limiteDisponivel}</p>
             </div>
             <div class="flex items-center space-x-2">
@@ -246,8 +305,12 @@ export function atualizarListaMedicamentosSelecionados() {
 
 export function atualizarResume() {
     const medicatmentosArray = Object.values(medicamentosSelecionados);
+    const isParceria = isAtendimentoParceria();
     const totalItens = medicatmentosArray.reduce((sum, med) => sum + med.quantidade, 0);
-    const valorTotal = medicatmentosArray.reduce((sum, med) => sum + (med.preco * med.quantidade), 0);
+    const valorTotal = medicatmentosArray.reduce((sum, med) => {
+        const preco = isParceria ? (med.precoParceria || med.preco) : (med.precoNormal || med.preco);
+        return sum + (preco * med.quantidade);
+    }, 0);
 
     document.getElementById('totalItens').textContent = totalItens;
     document.getElementById('valorTotal').textContent = valorTotal.toFixed(2);
@@ -256,17 +319,20 @@ export function atualizarResume() {
     if (medicatmentosArray.length === 0) {
         resumo.innerHTML = '<p class="text-gray-600">Nenhum medicamento selecionado</p>';
     } else {
-        resumo.innerHTML = medicatmentosArray.map(med => `
+        resumo.innerHTML = medicatmentosArray.map(med => {
+            const preco = isParceria ? (med.precoParceria || med.preco) : (med.precoNormal || med.preco);
+            return `
             <div class="flex justify-between text-sm text-gray-700">
                 <span>${med.nome} x${med.quantidade}</span>
-                <span>R$ ${(med.preco * med.quantidade).toFixed(2)}</span>
+                <span>R$ ${(preco * med.quantidade).toFixed(2)}</span>
             </div>
-        `).join('');
+        `}).join('');
     }
 }
 
 export async function adicionarMedicamento() {
     const pacienteId = document.getElementById('medicamentoPacienteId').value;
+    const isParceria = isAtendimentoParceria();
 
     if (!pacienteId) {
         mostrarErro('Paciente Obrigatório', 'Selecione um paciente');
@@ -279,7 +345,13 @@ export async function adicionarMedicamento() {
     }
 
     // Validar limites antes de salvar
-    const medicamentosArray = Object.values(medicamentosSelecionados);
+    const medicamentosArray = Object.values(medicamentosSelecionados).map(med => {
+        const preco = isParceria ? (med.precoParceria || med.preco) : (med.precoNormal || med.preco);
+        return {
+            ...med,
+            preco: preco
+        };
+    });
     const errosLimite = [];
     
     for (const med of medicamentosArray) {
@@ -303,7 +375,8 @@ export async function adicionarMedicamento() {
         medicamentos: medicamentosArray,
         dataAtendimento: new Date().toLocaleDateString('pt-BR'),
         horaAtendimento: new Date().toLocaleTimeString('pt-BR'),
-        valorTotal: medicamentosArray.reduce((sum, med) => sum + (med.preco * med.quantidade), 0)
+        valorTotal: medicamentosArray.reduce((sum, med) => sum + (med.preco * med.quantidade), 0),
+        isParceria: isParceria
     };
 
     medicamentos.push(novoAtendimento);
@@ -338,13 +411,15 @@ export function atualizarLista() {
     lista.innerHTML = atendimentosOrdenados.map(atendimento => {
         const meds = atendimento.medicamentos || [];
         const totalMedicamentos = meds.reduce((sum, m) => sum + (m.quantidade || 0), 0);
+        const isParceria = atendimento.isParceria || false;
         
         return `
-            <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-lg border-l-4 border-orange-600">
+            <div class="bg-gradient-to-r ${isParceria ? 'from-green-50 to-green-100 border-green-600' : 'from-orange-50 to-orange-100 border-orange-600'} p-6 rounded-lg border-l-4">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
                         <div class="flex items-center gap-3 mb-2">
-                            <span class="bg-orange-600 text-white text-xs px-2 py-1 rounded">${atendimento.id}</span>
+                            <span class="${isParceria ? 'bg-green-600' : 'bg-orange-600'} text-white text-xs px-2 py-1 rounded">${atendimento.id}</span>
+                            ${isParceria ? '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded"><i class="fas fa-handshake mr-1"></i>Parceria</span>' : ''}
                             <span class="text-sm text-gray-500">${atendimento.dataAtendimento || ''} às ${atendimento.horaAtendimento || ''}</span>
                         </div>
                         <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-user mr-2"></i>Paciente: ${atendimento.pacienteId}</h3>
@@ -412,6 +487,7 @@ window.moduloFarmacia = {
     selecionarMedicamento,
     removerMedicamentoSelecionado,
     atualizarQuantidadeMedicamento,
+    toggleParceria,
     deletar,
     apagarAtendimento,
     atualizarLista

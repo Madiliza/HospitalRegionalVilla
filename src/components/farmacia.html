@@ -11,13 +11,6 @@
             </button>
         </div>
 
-        <!-- Medicamentos Disponíveis -->
-        <div class="mb-8">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Medicamentos Disponíveis</h3>
-            <div id="medicamentosDisponiveis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <p class="text-gray-500 text-center col-span-3 py-8">Nenhum medicamento configurado</p>
-            </div>
-        </div>
 
         <!-- Histórico de Atendimentos -->
         <div class="border-t pt-8">
@@ -74,6 +67,17 @@
                 </div>
             </div>
 
+            <!-- Opção de Parceria -->
+            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                    <input type="checkbox" id="atendimentoParceria" onchange="window.moduloFarmacia.toggleParceria()" class="w-5 h-5 text-green-600 rounded focus:ring-green-500">
+                    <div>
+                        <span class="font-semibold text-gray-800">Atendimento com Parceiro</span>
+                        <p class="text-xs text-gray-600">Marque para aplicar valores de parceria</p>
+                    </div>
+                </label>
+            </div>
+
             <!-- Medicamentos -->
             <div class="space-y-4 border-t pt-4">
                 <h4 class="font-semibold text-gray-700 mb-4">Medicamentos Disponíveis</h4>
@@ -95,6 +99,9 @@
             <!-- Resumo Total -->
             <div class="border-t pt-4 bg-red-50 p-4 rounded-lg">
                 <h4 class="font-semibold text-gray-700 mb-3">Resumo do Atendimento</h4>
+                <div id="tipoPrecoBadge" class="mb-3">
+                    <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">Preço Normal</span>
+                </div>
                 <div id="resumoMedicamentos" class="space-y-2 text-sm">
                     <p class="text-gray-600">Nenhum medicamento selecionado</p>
                 </div>
