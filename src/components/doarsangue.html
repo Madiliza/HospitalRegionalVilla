@@ -1,16 +1,15 @@
 <!-- ============================================
      COMPONENTE DE DOAÇÕES DE SANGUE
      ============================================ -->
-
 <section id="doarSangue" class="space-y-6 modal-hidden">
-    <div class="container-geral" style="max-width: 100%;">
-        <div class="header-container">
-            <h1>Doações de Sangue</h1>
+    <div class="bg-white rounded-xl shadow-lg p-4 md:p-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
+                 <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Doações de Sangue</h2>
+            </button>
         </div>
-
     <!-- SEÇÃO DE REGISTRO -->
     <div class="section-doacao">
-        <h2>Registrar Nova Doação</h2>
+        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Registrar Nova Doação</h3>
         <div class="form-registro-doacao">
             <div class="input-group">
                 <label for="doadorPacienteId">ID do Doador (Passaporte):</label>
@@ -71,13 +70,13 @@
                 ></textarea>
             </div>
 
-            <button id="btnRegistrarDoacao" class="btn-primary">Registrar Doação</button>
+            <button id="btnRegistrarDoacao" class="btn-primary ">Registrar Doação</button>
         </div>
     </div>
 
     <!-- SEÇÃO DE GRÁFICO SEMANAL -->
     <div class="section-grafico">
-        <h2>Ranking Semanal - Top Doadores</h2>
+        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Ranking Semanal - Top Doadores</h3>
         <div class="info-semana">
             <p>Semana de <span id="dataInicioSemana"></span> até <span id="dataFimSemana"></span></p>
             <button id="btnResetarSemana" class="btn-secondary" style="display: none;">Resetar Semana (Admin)</button>
@@ -88,7 +87,7 @@
         </div>
 
         <div id="tabelaDoadoresSemanais" class="tabela-doadores">
-            <h3>Doações desta Semana</h3>
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Doações desta Semana</h3>
             <table>
                 <thead>
                     <tr>
@@ -110,7 +109,7 @@
 
     <!-- SEÇÃO DE HISTÓRICO -->
     <div class="section-historico">
-        <h2>Histórico de Doações</h2>
+        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Histórico de Doações</h3>
         <div class="filtros-historico">
             <input 
                 type="text" 

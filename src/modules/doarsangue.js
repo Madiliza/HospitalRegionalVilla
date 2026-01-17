@@ -25,15 +25,8 @@ export async function init(dadosCarregados) {
         doacoes = [];
     }
     
-    console.log('✅ Iniciando módulo de doações. Dados recebidos:', {
-        pacientes: pacientes.length,
-        doacoes: doacoes.length,
-        tipoDoacoes: Array.isArray(doacoes) ? 'array' : typeof doacoes
-    });
-    
     // Aguardar o DOM estar pronto antes de configurar eventos
     setTimeout(async () => {
-        console.log('⏱️ DOM pronto, configurando módulo de doações...');
         configurarEventos();
         preencherDataAtual();
         preencherListaPacientes();
@@ -285,9 +278,7 @@ function atualizarTabelaDoacoes() {
 
     // Ordenar por data (mais recente primeiro)
     doadoesFiltradas.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-    console.log(`📊 Doações para renderizar: ${doadoesFiltradas.length}`, doadoesFiltradas);
-
+    
     // Atualizar tabela
     if (doadoesFiltradas.length === 0) {
         bodyTabela.innerHTML = '<tr><td colspan="7" class="sem-dados">Nenhuma doação registrada</td></tr>';
@@ -324,7 +315,6 @@ async function atualizarGraficoSemanal() {
         const { dataInicio, dataFim } = obterIntervaloSemanaSemanal();
         const doadoresSemanais = getDoadoresSemanais(dataInicio, dataFim);
         
-        console.log(`📅 Atualizando gráfico semanal: ${dataInicio} até ${dataFim}. Doadores: ${doadoresSemanais.length}`);
         
         // Validar e atualizar elementos do DOM
         const dataInicioEl = document.getElementById('dataInicioSemana');
@@ -373,12 +363,9 @@ function getDoadoresSemanais(dataInicio, dataFim) {
     
     // Validar array de doações
     if (!Array.isArray(doacoes)) {
-        console.warn('⚠️ doacoes não é um array em getDoadoresSemanais. Tipo:', typeof doacoes);
-        console.warn('Convertendo para array:', Object.values(doacoes || {}));
         doacoes = Object.values(doacoes || {});
     }
     
-    console.log(`🔍 Processando ${doacoes.length} doações no intervalo ${dataInicio} - ${dataFim}`);
     
     doacoes.forEach(doacao => {
         // Validar estrutura mínima
@@ -407,7 +394,7 @@ function getDoadoresSemanais(dataInicio, dataFim) {
         .sort((a, b) => b.totalMl - a.totalMl)
         .slice(0, 10); // Top 10
     
-    console.log(`✅ ${resultado.length} doadores encontrados na semana`, resultado);
+ 
     return resultado;
 }
 
