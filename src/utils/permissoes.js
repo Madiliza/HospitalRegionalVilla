@@ -43,7 +43,8 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'exame': ['criar', 'visualizar', 'editar', 'apagar'],
                     'farmacia': ['criar', 'visualizar', 'editar', 'apagar'],
                     'cargo': ['criar', 'visualizar', 'editar', 'apagar'],
-                    'usuario': ['criar', 'visualizar', 'editar', 'apagar']
+                    'usuario': ['criar', 'visualizar', 'editar', 'apagar'],
+                    'doacao': ['criar', 'visualizar', 'editar', 'apagar']
                 }
             };
         } else {
@@ -56,7 +57,8 @@ export function inicializarPermissoes(usuarioId, usuarios, cargos) {
                     'exame': ['visualizar'],
                     'farmacia': ['visualizar'],
                     'usuario': ['visualizar'],
-                    'cargo': []
+                    'cargo': [],
+                    'doacao': ['visualizar']
                 }
             };
         }

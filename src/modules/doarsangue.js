@@ -2,7 +2,7 @@
 // MÓDULO DE DOAÇÕES DE SANGUE
 // ============================================
 
-import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/dialogs.js';
+import { mostrarNotificacao, mostrarConfirmacaoPromise, mostrarErro } from '../utils/dialogs.js';
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { temPermissao } from '../utils/permissoes.js';
 import { lerDados } from '../../config/firebase-config.js';
@@ -577,7 +577,7 @@ async function resetarSemanaDoacoes(automatico = false) {
     }
 
     if (!automatico) {
-        const confirmado = await mostrarConfirmacao(
+        const confirmado = await mostrarConfirmacaoPromise(
             'Confirmar Reset',
             'Tem certeza que deseja resetar as doações da semana anterior?'
         );
@@ -598,12 +598,12 @@ async function resetarSemanaDoacoes(automatico = false) {
 // ============================================
 
 export async function excluirDoacao(idDoacao) {
-    if (!temPermissao('doacao', 'deletar')) {
-        mostrarErro('Acesso Negado', 'Você não tem permissão para deletar doações');
+    if (!temPermissao('doacao', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para apagar doações');
         return;
     }
 
-    const confirmado = await mostrarConfirmacao(
+    const confirmado = await mostrarConfirmacaoPromise(
         'Confirmar Exclusão',
         'Tem certeza que deseja excluir esta doação?'
     );

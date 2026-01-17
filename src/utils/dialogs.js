@@ -155,6 +155,43 @@ export function mostrarConfirmacao(titulo, mensagem, callbackSim, callbackNao = 
     mostrarDialog(titulo, mensagem, 'question', botoesConfirmacao);
 }
 
+/**
+ * Versão Promise de mostrarConfirmacao
+ * Permite usar com await
+ * 
+ * @param {string} titulo - Título do diálogo
+ * @param {string} mensagem - Mensagem do diálogo
+ * @returns {Promise<boolean>} true se clicou em "Sim", false se clicou em "Não"
+ * 
+ * @example
+ * const confirmado = await mostrarConfirmacaoPromise('Excluir?', 'Tem certeza?');
+ * if (confirmado) {
+ *   // Fazer algo
+ * }
+ */
+export function mostrarConfirmacaoPromise(titulo, mensagem) {
+    return new Promise((resolve) => {
+        const botoesConfirmacao = [
+            {
+                texto: 'Sim',
+                tipo: 'primary',
+                callback: () => {
+                    resolve(true);
+                }
+            },
+            {
+                texto: 'Não',
+                tipo: 'secondary',
+                callback: () => {
+                    resolve(false);
+                }
+            }
+        ];
+        
+        mostrarDialog(titulo, mensagem, 'question', botoesConfirmacao);
+    });
+}
+
 // ============================================
 // NOTIFICAÇÕES
 // ============================================
