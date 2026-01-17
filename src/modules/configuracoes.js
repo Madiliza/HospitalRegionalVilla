@@ -214,7 +214,8 @@ export async function adicionarCargo() {
         exame: Array.from(document.querySelectorAll('input[name="permissaoExame"]:checked')).map(cb => cb.value),
         farmacia: Array.from(document.querySelectorAll('input[name="permissaoFarmacia"]:checked')).map(cb => cb.value),
         cargo: Array.from(document.querySelectorAll('input[name="permissaoCargo"]:checked')).map(cb => cb.value),
-        usuario: Array.from(document.querySelectorAll('input[name="permissaoUsuario"]:checked')).map(cb => cb.value)
+        usuario: Array.from(document.querySelectorAll('input[name="permissaoUsuario"]:checked')).map(cb => cb.value),
+        doacao: Array.from(document.querySelectorAll('input[name="permissaoDoacao"]:checked')).map(cb => cb.value)
     };
 
     if (isEdicao) {
@@ -370,6 +371,13 @@ export function editarCargo(id) {
         if (cargo.permissoes.usuario) {
             cargo.permissoes.usuario.forEach(perm => {
                 const checkbox = document.querySelector(`input[name="permissaoUsuario"][value="${perm}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+        // Doação de Sangue
+        if (cargo.permissoes.doacao) {
+            cargo.permissoes.doacao.forEach(perm => {
+                const checkbox = document.querySelector(`input[name="permissaoDoacao"][value="${perm}"]`);
                 if (checkbox) checkbox.checked = true;
             });
         }

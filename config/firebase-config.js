@@ -22,9 +22,14 @@ const auth = getAuth(app);
 // Função para salvar dados no Realtime Database
 export async function salvarDados(caminho, dados) {
   try {
-    await set(ref(database, caminho), dados);
+    // Sanitizar dados para remover undefined
+    const dadosSanitizados = JSON.parse(JSON.stringify(dados));
+    
+    await set(ref(database, caminho), dadosSanitizados);
+    console.log('✅ Dados salvos com sucesso em:', caminho);
   } catch (erro) {
-    // Erro silencioso
+    console.error('❌ Erro ao salvar dados em', caminho, ':', erro);
+    throw erro;
   }
 }
 
@@ -46,8 +51,10 @@ export async function lerDados(caminho) {
 export async function deletarDados(caminho) {
   try {
     await set(ref(database, caminho), null);
+    console.log('✅ Dados deletados com sucesso em:', caminho);
   } catch (erro) {
-    // Erro silencioso
+    console.error('❌ Erro ao deletar dados em', caminho, ':', erro);
+    throw erro;
   }
 }
 

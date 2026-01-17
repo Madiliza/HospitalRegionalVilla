@@ -15,6 +15,7 @@ import * as moduloExames from './modules/exames.js';
 import * as moduloFarmacia from './modules/farmacia.js';
 import * as moduloConfig from './modules/configuracoes.js';
 import * as moduloCalculadora from './modules/calculadora.js';
+import * as moduloDoacao from './modules/doarsangue.js';
 
 // ============================================
 // INICIALIZAÇÃO
@@ -34,7 +35,7 @@ let usuarioLogado = null;
 
 // Carregador de componentes HTML
 async function carregarComponentes() {
-    const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes', 'calculadora'];
+    const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes', 'calculadora', 'doarsangue'];
     const containerComponentes = document.getElementById('componentes');
     
     // Aguardar que o container exista
@@ -101,6 +102,7 @@ async function inicializarSistema() {
     moduloFarmacia.init(dadosGlobais);
     moduloConfig.init(dadosGlobais);
     moduloCalculadora.init(dadosGlobais);
+    moduloDoacao.init(dadosGlobais);
     
     // Aguardar um pouco mais para garantir que o DOM está completamente pronto
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -196,7 +198,8 @@ function showSection(sectionId) {
         'consultas': ['consulta', 'visualizar'],
         'exames': ['exame', 'visualizar'],
         'farmacia': ['farmacia', 'visualizar'],
-        'calculadora': ['cargo', 'visualizar']
+        'calculadora': ['cargo', 'visualizar'],
+        'doarSangue': ['doacao', 'visualizar']
     };
     
     // Se é um módulo que requer permissão
@@ -396,6 +399,7 @@ window.moduloConsultas = moduloConsultas;
 window.moduloExames = moduloExames;
 window.moduloFarmacia = moduloFarmacia;
 window.moduloConfig = moduloConfig;
+window.moduloDoacao = moduloDoacao;
 
 // Inicializar dropdown após DOM carregar
 document.addEventListener('DOMContentLoaded', () => {

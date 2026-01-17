@@ -7,7 +7,7 @@ import { salvarDados, lerDados, deletarDados } from '../../config/firebase-confi
 export async function carregarDadosFirebase() {
     try {
         
-        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro, valoresAtendimentos] = await Promise.all([
+        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro, valoresAtendimentos, doacoesSangue] = await Promise.all([
             lerDados('pacientes'),
             lerDados('consultas'),
             lerDados('exames'),
@@ -16,7 +16,8 @@ export async function carregarDadosFirebase() {
             lerDados('usuarios'),
             lerDados('medicamentosConfig'),
             lerDados('solicitacoes_cadastro'),
-            lerDados('valoresAtendimentos')
+            lerDados('valoresAtendimentos'),
+            lerDados('doacoesSangue')
         ]);
 
         const converterParaArray = (dados) => {
@@ -34,7 +35,8 @@ export async function carregarDadosFirebase() {
             usuarios: converterParaArray(usuarios),
             medicamentosConfig: converterParaArray(medicamentosConfig),
             solicitacoesCadastro: converterParaArray(solicitacoesCadastro),
-            valoresAtendimentos: valoresAtendimentos?.valoresAtendimentos || valoresAtendimentos || {}
+            valoresAtendimentos: valoresAtendimentos?.valoresAtendimentos || valoresAtendimentos || {},
+            doacoesSangue: converterParaArray(doacoesSangue)
         };
 
 
@@ -49,25 +51,36 @@ export async function carregarDadosFirebase() {
             usuarios: [],
             medicamentosConfig: [],
             solicitacoesCadastro: [],
-            valoresAtendimentos: {}
+            valoresAtendimentos: {},
+            doacoesSangue: []
         };
     }
 }
 
 export async function salvarNoFirebase(colecao, dados) {
     try {
+        if (!dados || !dados.id) {
+            throw new Error('Dados inválidos: ID é obrigatório para salvamento');
+        }
+        console.log(`📝 Salvando ${colecao}:`, dados);
         await salvarDados(`${colecao}/${dados.id}`, dados);
-
+        console.log(`✅ ${colecao} salvo com sucesso:`, dados.id);
     } catch (erro) {
+        console.error(`❌ Erro ao salvar ${colecao}:`, erro);
         throw erro;
     }
 }
 
 export async function deletarDoFirebase(colecao, id) {
     try {
+        if (!id) {
+            throw new Error('ID é obrigatório para deletar');
+        }
+        console.log(`🗑️ Deletando ${colecao}:`, id);
         await deletarDados(`${colecao}/${id}`);
-
+        console.log(`✅ ${colecao} deletado com sucesso:`, id);
     } catch (erro) {
+        console.error(`❌ Erro ao deletar ${colecao}:`, erro);
         throw erro;
     }
 }

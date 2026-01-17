@@ -10,7 +10,7 @@ const copyComponentsPlugin = () => ({
     // Copiar componentes HTML para dist
     try {
       mkdirSync('dist/src/components', { recursive: true });
-      const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes', 'calculadora'];
+      const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes', 'calculadora', 'doarsangue'];
       
       for (const componente of componentes) {
         const src = `src/components/${componente}.html`;
