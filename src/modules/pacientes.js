@@ -184,7 +184,7 @@ export function atualizarLista() {
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h3 class="text-lg font-bold text-gray-800">${paciente.nome}</h3>
-                    <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>ID: ${paciente.id}</p>
+                    <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>Passaporte: ${paciente.id}</p>
                     <p class="text-gray-600"><i class="fas fa-birthday-cake mr-2"></i>Idade: ${paciente.idade} anos</p>
                     <p class="text-gray-600"><i class="fas fa-droplet mr-2"></i>Tipo Sanguíneo: <strong>${paciente.tipoSanguineo}</strong></p>
                     <p class="text-gray-600"><i class="fas fa-calendar mr-2"></i>Cadastro: ${paciente.dataCriacao}</p>
