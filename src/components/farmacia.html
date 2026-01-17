@@ -35,7 +35,7 @@
         <form id="formMedicamento" class="space-y-4 md:space-y-6">
             <!-- Busca de Paciente -->
             <div>
-                <label class="block text-gray-700 font-semibold mb-2 text-sm md:text-base">Buscar Paciente por ID</label>
+                <label class="block text-gray-700 font-semibold mb-2 text-sm md:text-base">Buscar Paciente por Passaporte</label>
                 <div class="relative">
                     <input type="text" id="buscaPacienteId" class="w-full px-3 md:px-4 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Digite o Passaporte do paciente..." onkeyup="window.moduloFarmacia.buscarPacientes()" autocomplete="off">
                     
@@ -57,7 +57,7 @@
             <div id="dadosPacienteDiv" class="p-3 md:p-4 bg-red-50 rounded-lg hidden border border-red-200">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div>
-                        <p class="text-gray-700 text-sm md:text-base"><strong>ID:</strong> <span id="idPacienteExibicao"></span></p>
+                        <p class="text-gray-700 text-sm md:text-base"><strong>Passaporte:</strong> <span id="idPacienteExibicao"></span></p>
                         <p class="text-gray-700 text-sm md:text-base"><strong>Nome:</strong> <span id="nomePacienteExibicao"></span></p>
                         <p class="text-gray-700 text-sm md:text-base"><strong>Idade:</strong> <span id="idadePacienteExibicao"></span> anos</p>
                     </div>

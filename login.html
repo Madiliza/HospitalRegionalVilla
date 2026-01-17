@@ -257,7 +257,7 @@
                         id="usuarioId" 
                         required
                         class="input-field w-full px-3 md:px-3.5 lg:px-4 py-2.5 md:py-2.5 lg:py-3 text-xs md:text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        placeholder="Digite seu ID de usuário"
+                        placeholder="Digite seu Passaporte"
                         autocomplete="off"
                     >
                 </div>
@@ -338,7 +338,7 @@
                     <i class="fas fa-key text-yellow-600 text-lg md:text-xl"></i>
                 </div>
                 <h3 class="text-lg md:text-xl lg:text-2xl font-bold text-gray-800">Recuperar Senha</h3>
-                <p class="text-gray-500 mt-1 md:mt-1.5 lg:mt-2 text-xs md:text-sm">Digite seu ID para receber ajuda</p>
+                <p class="text-gray-500 mt-1 md:mt-1.5 lg:mt-2 text-xs md:text-sm">Digite seu Passaporte para receber ajuda</p>
             </div>
             <form id="formEsqueciSenha">
                 <div class="mb-4 md:mb-5">
@@ -349,7 +349,7 @@
                             id="usuarioIdRecuperacao" 
                             required
                             class="input-field w-full px-3 md:px-3.5 lg:px-4 py-2.5 md:py-2.5 lg:py-3 text-xs md:text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Digite seu ID de usuário"
+                            placeholder="Digite seu Passaporte"
                         >
                     </div>
                 </div>
@@ -387,7 +387,7 @@
 
             <form id="formRegistro" class="space-y-2.5 md:space-y-3 lg:space-y-4">
                 <div>
-                    <label class="block text-xs md:text-xs lg:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">ID de Usuário</label>
+                    <label class="block text-xs md:text-xs lg:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">Passaporte</label>
                     <div class="relative">
                         <i class="fas fa-id-badge input-icon"></i>
                         <input 
@@ -662,7 +662,7 @@
                 const snapshotUsuario = await get(child(dbRef, `usuarios/${usuarioId}`));
                 
                 if (snapshotUsuario.exists()) {
-                    mostrarToast('Este ID de usuário já existe', 'error');
+                    mostrarToast('Este Passaporte já existe', 'error');
                     return;
                 }
                 
@@ -738,10 +738,10 @@
                         window.location.href = '/index.html';
                     }, 1000);
                 } else {
-                    mostrarToast('ID ou senha incorretos', 'error');
+                    mostrarToast('Passaporte ou senha incorretos', 'error');
                 }
             } catch (error) {
-                mostrarToast(error.message || 'ID ou senha incorretos', 'error');
+                mostrarToast(error.message || 'Passaporte ou senha incorretos', 'error');
             } finally {
                 // Desativar loading
                 btnLogin.classList.remove('btn-loading');
