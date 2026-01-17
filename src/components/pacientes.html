@@ -29,7 +29,7 @@
 
         <form id="formPaciente" class="space-y-4">
             <div>
-                <label class="block text-gray-700 font-semibold mb-2">ID do Paciente</label>
+                <label class="block text-gray-700 font-semibold mb-2">Passaporte Paciente</label>
                 <input type="text" id="pacienteId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="ID único" required>
             </div>
 
@@ -41,6 +41,21 @@
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Idade</label>
                 <input type="number" id="pacienteIdade" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Idade" required>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">Tipo Sanguíneo</label>
+                <select id="pacienteTipoSanguineo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                    <option value="">Selecione o tipo sanguíneo</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                </select>
             </div>
 
             <div>

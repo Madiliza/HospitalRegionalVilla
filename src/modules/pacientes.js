@@ -55,10 +55,11 @@ export async function adicionarPaciente() {
     const id = document.getElementById('pacienteId').value;
     const nome = document.getElementById('pacienteNome').value;
     const idade = document.getElementById('pacienteIdade').value;
+    const tipoSanguineo = document.getElementById('pacienteTipoSanguineo').value;
     const observacao = document.getElementById('pacienteObservacao').value;
 
-    if (!id || !nome || !idade) {
-        mostrarErro('Campos Obrigatórios', 'Por favor, preencha ID, Nome e Idade');
+    if (!id || !nome || !idade || !tipoSanguineo) {
+        mostrarErro('Campos Obrigatórios', 'Por favor, preencha ID, Nome, Idade e Tipo Sanguíneo');
         return;
     }
 
@@ -66,6 +67,7 @@ export async function adicionarPaciente() {
         id,
         nome,
         idade: parseInt(idade),
+        tipoSanguineo,
         observacao,
         dataCriacao: new Date().toLocaleDateString('pt-BR')
     };
@@ -104,6 +106,7 @@ export function atualizarLista() {
                     <h3 class="text-lg font-bold text-gray-800">${paciente.nome}</h3>
                     <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>ID: ${paciente.id}</p>
                     <p class="text-gray-600"><i class="fas fa-birthday-cake mr-2"></i>Idade: ${paciente.idade} anos</p>
+                    <p class="text-gray-600"><i class="fas fa-droplet mr-2"></i>Tipo Sanguíneo: <strong>${paciente.tipoSanguineo}</strong></p>
                     <p class="text-gray-600"><i class="fas fa-calendar mr-2"></i>Cadastro: ${paciente.dataCriacao}</p>
                     ${paciente.observacao ? `<p class="text-gray-700 mt-2"><i class="fas fa-sticky-note mr-2"></i><strong>Observação:</strong> ${paciente.observacao}</p>` : ''}
                 </div>
