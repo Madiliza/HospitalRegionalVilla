@@ -203,6 +203,66 @@ export function atualizarLista() {
     `).join('');
 }
 
+export function pesquisarPacientes() {
+    const termoPesquisa = document.getElementById('pesquisaPaciente').value.trim().toLowerCase();
+    const lista = document.getElementById('pacientesList');
+    const resultadoDiv = document.getElementById('resultadoPesquisa');
+
+    if (!lista) return;
+
+    // Se campo vazio, mostrar todos
+    if (!termoPesquisa) {
+        resultadoDiv.classList.add('hidden');
+        atualizarLista();
+        return;
+    }
+
+    // Filtrar pacientes
+    const pacientesFiltrados = pacientes.filter(paciente =>
+        paciente.id.toLowerCase().includes(termoPesquisa) ||
+        paciente.nome.toLowerCase().includes(termoPesquisa)
+    );
+
+    // Mostrar resultado da pesquisa
+    resultadoDiv.classList.remove('hidden');
+    document.getElementById('totalResultados').textContent = pacientesFiltrados.length;
+
+    if (pacientesFiltrados.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum paciente encontrado com os critérios de busca</p>';
+        return;
+    }
+
+    // Renderizar pacientes filtrados
+    lista.innerHTML = pacientesFiltrados.map(paciente => `
+        <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-lg border-l-4 border-red-600">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-800">${paciente.nome}</h3>
+                    <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>Passaporte: ${paciente.id}</p>
+                    <p class="text-gray-600"><i class="fas fa-birthday-cake mr-2"></i>Idade: ${paciente.idade} anos</p>
+                    <p class="text-gray-600"><i class="fas fa-droplet mr-2"></i>Tipo Sanguíneo: <strong>${paciente.tipoSanguineo}</strong></p>
+                    <p class="text-gray-600"><i class="fas fa-calendar mr-2"></i>Cadastro: ${paciente.dataCriacao}</p>
+                    ${paciente.observacao ? `<p class="text-gray-700 mt-2"><i class="fas fa-sticky-note mr-2"></i><strong>Observação:</strong> ${paciente.observacao}</p>` : ''}
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.moduloPacientes.openEditModal('${paciente.id}')" class="text-blue-600 hover:text-blue-800 transition" title="Editar">
+                        <i class="fas fa-edit text-xl"></i>
+                    </button>
+                    <button onclick="window.moduloPacientes.deletar('${paciente.id}')" class="text-red-600 hover:text-red-800 transition" title="Deletar">
+                        <i class="fas fa-trash text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+export function limparPesquisa() {
+    document.getElementById('pesquisaPaciente').value = '';
+    document.getElementById('resultadoPesquisa').classList.add('hidden');
+    atualizarLista();
+}
+
 export function deletar(id) {
     // Verificar permissão
     if (!temPermissao('paciente', 'apagar')) {
