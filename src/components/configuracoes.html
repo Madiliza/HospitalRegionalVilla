@@ -2,28 +2,28 @@
      SEÇÃO DE CONFIGURAÇÕES
      ============================================ -->
 <section id="configuracoes" class="space-y-6 modal-hidden">
-    <div class="bg-white rounded-xl shadow-lg p-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-8">Configurações do Sistema</h2>
+    <div class="bg-white rounded-xl shadow-lg p-4 md:p-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Configurações do Sistema</h2>
         
         <!-- Abas de Configurações -->
-        <div class="flex space-x-4 mb-8 border-b">
-            <button id="tabCargos" onclick="window.moduloConfig.mostrarAba('cargos')" class="tab-btn-config px-6 py-3 border-b-2 border-blue-600 text-blue-600 font-semibold transition flex items-center space-x-2">
+        <div class="flex flex-wrap gap-2 md:gap-4 mb-6 md:mb-8 border-b overflow-x-auto">
+            <button id="tabCargos" onclick="window.moduloConfig.mostrarAba('cargos')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-blue-600 text-blue-600 font-semibold transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-briefcase"></i>
                 <span>Cargos</span>
             </button>
-            <button id="tabUsuarios" onclick="window.moduloConfig.mostrarAba('usuarios')" class="tab-btn-config px-6 py-3 border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-2">
+            <button id="tabUsuarios" onclick="window.moduloConfig.mostrarAba('usuarios')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-users"></i>
                 <span>Usuários</span>
             </button>
-            <button id="tabSolicitacoes" onclick="window.moduloConfig.mostrarAba('solicitacoes')" class="tab-btn-config px-6 py-3 border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-2">
+            <button id="tabSolicitacoes" onclick="window.moduloConfig.mostrarAba('solicitacoes')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-inbox"></i>
                 <span>Solicitações</span>
             </button>
-            <button id="tabMedicamentos" onclick="window.moduloConfig.mostrarAba('medicamentos')" class="tab-btn-config px-6 py-3 border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-2">
+            <button id="tabMedicamentos" onclick="window.moduloConfig.mostrarAba('medicamentos')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-pills"></i>
                 <span>Medicamentos</span>
             </button>
-            <button id="tabAtendimentos" onclick="window.moduloConfig.mostrarAba('atendimentos')" class="tab-btn-config px-6 py-3 border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-2">
+            <button id="tabAtendimentos" onclick="window.moduloConfig.mostrarAba('atendimentos')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-stethoscope"></i>
                 <span>Valores de Atendimento</span>
             </button>
@@ -31,9 +31,9 @@
 
         <!-- Aba: Cargos -->
         <div id="aba-cargos" class="space-y-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Gerenciar Cargos</h3>
-                <button id="btnNovoCargo" onclick="window.moduloConfig.openModalCargo()" class="btn-modern px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center space-x-2">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800">Gerenciar Cargos</h3>
+                <button id="btnNovoCargo" onclick="window.moduloConfig.openModalCargo()" class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center justify-center md:justify-start space-x-2">
                     <i class="fas fa-plus"></i>
                     <span>Novo Cargo</span>
                 </button>
@@ -45,9 +45,9 @@
 
         <!-- Aba: Usuários -->
         <div id="aba-usuarios" class="space-y-6 hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Gerenciar Usuários</h3>
-                <button id="btnNovoUsuario" onclick="window.moduloConfig.openModalUsuario()" class="btn-modern px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center space-x-2">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800">Gerenciar Usuários</h3>
+                <button id="btnNovoUsuario" onclick="window.moduloConfig.openModalUsuario()" class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center md:justify-start space-x-2">
                     <i class="fas fa-plus"></i>
                     <span>Novo Usuário</span>
                 </button>
@@ -59,8 +59,8 @@
 
         <!-- Aba: Solicitações de Cadastro -->
         <div id="aba-solicitacoes" class="space-y-6 hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Solicitações de Acesso</h3>
+            <div class="flex flex-col gap-2 mb-6">
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800">Solicitações de Acesso</h3>
                 <p class="text-sm text-gray-600">Analise e aceite ou rejeite solicitações de novas contas</p>
             </div>
             <div id="solicitacoesList" class="space-y-4">
@@ -70,9 +70,9 @@
 
         <!-- Aba: Medicamentos -->
         <div id="aba-medicamentos" class="space-y-6 hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Gerenciar Medicamentos</h3>
-                <button id="btnNovoMedicamento" onclick="window.moduloConfig.openModalMedicamentoConfig()" class="btn-modern px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center space-x-2">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800">Gerenciar Medicamentos</h3>
+                <button id="btnNovoMedicamento" onclick="window.moduloConfig.openModalMedicamentoConfig()" class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center justify-center md:justify-start space-x-2">
                     <i class="fas fa-plus"></i>
                     <span>Novo Medicamento</span>
                 </button>
@@ -84,8 +84,8 @@
 
         <!-- Aba: Valores de Atendimento -->
         <div id="aba-atendimentos" class="space-y-6 hidden">
-            <h3 class="text-2xl font-bold text-gray-800 mb-6">Configurar Valores de Atendimento</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">Configurar Valores de Atendimento</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <!-- Tratamento Interno -->
                 <div class="bg-white p-6 rounded-lg border border-purple-200">
                     <label class="block text-gray-700 font-semibold mb-3">
@@ -132,7 +132,7 @@
                 </div>
             </div>
 
-            <button onclick="window.moduloConfig.salvarValoresAtendimentos()" class="btn-modern w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition mt-6">
+            <button onclick="window.moduloConfig.salvarValoresAtendimentos()" class="btn-modern w-full bg-purple-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-purple-700 transition mt-6">
                 <i class="fas fa-save mr-2"></i>
                 Salvar Valores
             </button>
@@ -144,9 +144,9 @@
      MODAL DE CARGO
      ============================================ -->
 <div id="modalCargo" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
-    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full mx-4 fade-in max-h-96 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-2xl w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6 sticky top-0 bg-white pb-4">
-            <h3 id="modalCargoTitulo" class="text-2xl font-bold text-gray-800">Novo Cargo</h3>
+            <h3 id="modalCargoTitulo" class="text-xl md:text-2xl font-bold text-gray-800">Novo Cargo</h3>
             <button onclick="window.moduloConfig.closeModalCargo()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
@@ -168,9 +168,8 @@
                 <h4 class="font-semibold text-gray-800 mb-4">Permissões</h4>
                 
                 <div class="space-y-4">
-                    <!-- Pacientes -->
-                    <div class="p-4 bg-red-50 rounded-lg border border-red-200">
-                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2 text-sm md:text-base">
                             <i class="fas fa-users text-red-600"></i>
                             <span>Pacientes</span>
                         </h5>
@@ -196,7 +195,7 @@
 
                     <!-- Consultas -->
                     <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2 text-sm md:text-base">
                             <i class="fas fa-calendar-check text-green-600"></i>
                             <span>Consultas</span>
                         </h5>
@@ -222,7 +221,7 @@
 
                     <!-- Exames -->
                     <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2 text-sm md:text-base">
                             <i class="fas fa-flask text-purple-600"></i>
                             <span>Exames</span>
                         </h5>
@@ -248,7 +247,7 @@
 
                     <!-- Farmácia -->
                     <div class="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2 text-sm md:text-base">
                             <i class="fas fa-pills text-orange-600"></i>
                             <span>Farmácia</span>
                         </h5>
@@ -274,7 +273,7 @@
 
                     <!-- Cargos -->
                     <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2 text-sm md:text-base">
                             <i class="fas fa-briefcase text-blue-600"></i>
                             <span>Cargos</span>
                         </h5>
@@ -300,7 +299,7 @@
 
                     <!-- Usuários -->
                     <div class="p-4 bg-teal-50 rounded-lg border border-teal-200">
-                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+                        <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2 text-sm md:text-base">
                             <i class="fas fa-user-tie text-teal-600"></i>
                             <span>Usuários</span>
                         </h5>
@@ -326,7 +325,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-modern w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
+            <button type="submit" class="btn-modern w-full bg-blue-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-blue-700 transition">
                 Salvar Cargo
             </button>
         </form>
@@ -337,9 +336,9 @@
      MODAL DE USUÁRIO
      ============================================ -->
 <div id="modalUsuario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
-    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-gray-800">Novo Usuário</h3>
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800">Novo Usuário</h3>
             <button onclick="window.moduloConfig.closeModalUsuario()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
@@ -366,7 +365,7 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn-modern w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700 transition">
+            <button type="submit" class="btn-modern w-full bg-purple-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-purple-700 transition">
                 Criar Usuário
             </button>
         </form>
@@ -377,9 +376,9 @@
      MODAL DE EDITAR SENHA
      ============================================ -->
 <div id="modalEditarSenha" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
-    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-gray-800">Editar Senha</h3>
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800">Editar Senha</h3>
             <button onclick="window.moduloConfig.fecharModalEditarSenha()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
@@ -406,11 +405,11 @@
                 <input type="password" id="confirmarSenha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Repita a senha" required>
             </div>
 
-            <div class="flex gap-3 pt-4">
-                <button type="submit" class="btn-modern flex-1 bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition">
+            <div class="flex flex-col md:flex-row gap-3 pt-4">
+                <button type="submit" class="btn-modern flex-1 bg-blue-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-blue-700 transition">
                     Salvar Senha
                 </button>
-                <button type="button" onclick="window.moduloConfig.fecharModalEditarSenha()" class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 rounded-lg hover:bg-gray-500 transition">
+                <button type="button" onclick="window.moduloConfig.fecharModalEditarSenha()" class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-gray-500 transition">
                     Cancelar
                 </button>
             </div>
@@ -422,9 +421,9 @@
      MODAL DE EDITAR CARGO DO USUÁRIO
      ============================================ -->
 <div id="modalEditarCargoUsuario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
-    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-gray-800">Alterar Cargo</h3>
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800">Alterar Cargo</h3>
             <button onclick="window.moduloConfig.fecharModalEditarCargoUsuario()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
@@ -443,11 +442,11 @@
                 </select>
             </div>
 
-            <div class="flex gap-3 pt-4">
-                <button type="submit" class="btn-modern flex-1 bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition">
+            <div class="flex flex-col md:flex-row gap-3 pt-4">
+                <button type="submit" class="btn-modern flex-1 bg-green-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-green-700 transition">
                     Salvar Cargo
                 </button>
-                <button type="button" onclick="window.moduloConfig.fecharModalEditarCargoUsuario()" class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 rounded-lg hover:bg-gray-500 transition">
+                <button type="button" onclick="window.moduloConfig.fecharModalEditarCargoUsuario()" class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-gray-500 transition">
                     Cancelar
                 </button>
             </div>
@@ -459,9 +458,9 @@
      MODAL DE MEDICAMENTO CONFIG
      ============================================ -->
 <div id="modalMedicamentoConfig" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
-    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h3 id="modalMedicamentoConfigTitle" class="text-2xl font-bold text-gray-800">Novo Medicamento</h3>
+            <h3 id="modalMedicamentoConfigTitle" class="text-xl md:text-2xl font-bold text-gray-800">Novo Medicamento</h3>
             <button onclick="window.moduloConfig.closeModalMedicamentoConfig()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
@@ -495,7 +494,7 @@
                 <p class="text-xs text-gray-500 mt-1">Limite diferenciado para atendimentos com parceria</p>
             </div>
 
-            <button type="submit" class="btn-modern w-full bg-orange-600 text-white font-bold py-3 rounded-lg hover:bg-orange-700 transition">
+            <button type="submit" class="btn-modern w-full bg-orange-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-orange-700 transition">
                 Salvar Medicamento
             </button>
         </form>

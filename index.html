@@ -75,9 +75,9 @@
 <body>
     <!-- Modal Alterar Senha -->
     <div id="modalAlterarSenha" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden" style="z-index: 99998;">
-        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-2xl font-bold text-gray-800"><i class="fas fa-key text-red-600 mr-2"></i>Alterar Senha</h3>
+        <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start md:items-center mb-6">
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800"><i class="fas fa-key text-red-600 mr-2"></i>Alterar Senha</h3>
                 <button onclick="window.fecharModalAlterarSenha()" class="text-gray-400 hover:text-gray-600 text-2xl">
                     <i class="fas fa-times"></i>
                 </button>
@@ -110,11 +110,11 @@
                         </button>
                     </div>
                 </div>
-                <div class="flex gap-3 pt-4">
-                    <button type="button" onclick="window.fecharModalAlterarSenha()" class="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                <div class="flex gap-3 pt-4 flex-col md:flex-row">
+                    <button type="button" onclick="window.fecharModalAlterarSenha()" class="flex-1 px-4 py-2 md:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium text-sm md:text-base">
                         Cancelar
                     </button>
-                    <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                    <button type="submit" class="flex-1 px-4 py-2 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm md:text-base">
                         <i class="fas fa-save mr-2"></i>Salvar
                     </button>
                 </div>
@@ -124,7 +124,7 @@
 
     <!-- Dialog Customizado -->
     <div id="customDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden" style="z-index: 99999;">
-        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+        <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
             <div class="mb-6">
                 <div id="dialogIcon" class="text-5xl mb-4 text-center"></div>
                 <h3 id="dialogTitle" class="text-2xl font-bold text-gray-800 text-center mb-2"></h3>
@@ -137,15 +137,15 @@
     <div class="min-h-screen bg-gradient-to-br from-white-50 to-blue-50">
         <!-- Navbar -->
         <nav class="bg-white shadow-lg sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <img src="./public/image.png" alt="Logo Hospital" class="w-12 h-12">
-                    <h1 class="text-2xl font-bold text-gray-800">Hospital Regional Villa</h1>
+            <div class="max-w-7xl mx-auto px-3 md:px-4 py-3 md:py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2 md:space-x-2 flex-shrink-0">
+                    <img src="./public/image.png" alt="Logo Hospital" class="w-10 md:w-12 h-10 md:h-12">
+                    <h1 class="text-lg md:text-2xl font-bold text-gray-800 hidden sm:inline">Hospital Regional Villa</h1>
                 </div>
-                <div class="flex items-center space-x-4 relative">
-                    <button id="userBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center">
-                        <i class="fas fa-user-circle mr-2"></i>Meu Perfil
-                        <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                <div class="flex items-center space-x-2 md:space-x-4 relative">
+                    <button id="userBtn" class="px-3 md:px-4 py-2 md:py-2 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-1 md:space-x-2">
+                        <i class="fas fa-user-circle mr-1 md:mr-2"></i><span class="hidden sm:inline">Meu Perfil</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
                     </button>
                     <div id="profileDropdown" class="dropdown-menu">
                         <div class="dropdown-item" onclick="window.abrirModalAlterarSenha()">
@@ -162,83 +162,83 @@
         </nav>
 
         <!-- Sidebar + Main Content -->
-        <div class="flex max-w-7xl mx-auto gap-6 p-6">
+        <div class="flex flex-col lg:flex-row max-w-7xl mx-auto gap-4 md:gap-6 p-3 md:p-6">
             <!-- Sidebar -->
-            <aside class="w-64 bg-white rounded-xl shadow-lg p-6 sticky top-20 h-fit">
-                <h2 class="text-xl font-bold text-gray-800 mb-6">Menu Principal</h2>
-                <nav class="space-y-3">
-                    <button id="sidebarDashboard" onclick="window.showSection('dashboard')" class="w-full text-left px-4 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition flex items-center space-x-3">
-                        <i class="fas fa-chart-line"></i>
+            <aside class="w-full lg:w-64 bg-white rounded-xl shadow-lg p-4 md:p-6 lg:sticky lg:top-20 lg:h-fit">
+                <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6">Menu Principal</h2>
+                <nav class="space-y-2 md:space-y-3 grid grid-cols-2 lg:grid-cols-1 gap-2 md:gap-3">
+                    <button id="sidebarDashboard" onclick="window.showSection('dashboard')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-sm md:text-base rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition flex items-center space-x-2 md:space-x-3">
+                        <i class="fas fa-chart-line flex-shrink-0"></i>
                         <span>Dashboard</span>
                     </button>
-                    <button id="sidebarPacientes" onclick="window.showSection('pacientes')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
-                        <i class="fas fa-users"></i>
+                    <button id="sidebarPacientes" onclick="window.showSection('pacientes')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-sm md:text-base rounded-lg hover:bg-gray-100 transition flex items-center space-x-2 md:space-x-3 text-gray-700">
+                        <i class="fas fa-users flex-shrink-0"></i>
                         <span>Pacientes</span>
                     </button>
-                    <button id="sidebarConsultas" onclick="window.showSection('consultas')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
-                        <i class="fas fa-calendar-check"></i>
+                    <button id="sidebarConsultas" onclick="window.showSection('consultas')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-sm md:text-base rounded-lg hover:bg-gray-100 transition flex items-center space-x-2 md:space-x-3 text-gray-700">
+                        <i class="fas fa-calendar-check flex-shrink-0"></i>
                         <span>Consultas</span>
                     </button>
-                    <button id="sidebarExames" onclick="window.showSection('exames')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
-                        <i class="fas fa-flask"></i>
+                    <button id="sidebarExames" onclick="window.showSection('exames')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-sm md:text-base rounded-lg hover:bg-gray-100 transition flex items-center space-x-2 md:space-x-3 text-gray-700">
+                        <i class="fas fa-flask flex-shrink-0"></i>
                         <span>Exames</span>
                     </button>
-                    <button id="sidebarFarmacia" onclick="window.showSection('farmacia')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
-                        <i class="fas fa-pills"></i>
+                    <button id="sidebarFarmacia" onclick="window.showSection('farmacia')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-sm md:text-base rounded-lg hover:bg-gray-100 transition flex items-center space-x-2 md:space-x-3 text-gray-700">
+                        <i class="fas fa-pills flex-shrink-0"></i>
                         <span>Farmácia</span>
                     </button>
-                    <button id="sidebarCalculadora" onclick="window.showSection('calculadora')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
-                        <i class="fas fa-calculator"></i>
+                    <button id="sidebarCalculadora" onclick="window.showSection('calculadora')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-sm md:text-base rounded-lg hover:bg-gray-100 transition flex items-center space-x-2 md:space-x-3 text-gray-700">
+                        <i class="fas fa-calculator flex-shrink-0"></i>
                         <span>Calculadora</span>
                     </button>
-                    <button id="sidebarConfiguracoes" onclick="window.showSection('configuracoes')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition flex items-center space-x-3 text-gray-700">
-                        <i class="fas fa-cog"></i>
+                    <button id="sidebarConfiguracoes" onclick="window.showSection('configuracoes')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-sm md:text-base rounded-lg hover:bg-gray-100 transition flex items-center space-x-2 md:space-x-3 text-gray-700">
+                        <i class="fas fa-cog flex-shrink-0"></i>
                         <span>Configurações</span>
                     </button>
                 </nav>
             </aside>
 
             <!-- Main Content -->
-            <main class="flex-1">
+            <main class="flex-1 w-full">
                 <!-- Dashboard Section -->
                 <section id="dashboard" class="space-y-6">
-                    <div class="bg-white rounded-xl shadow-lg p-8">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-8">Bem-vindo ao Sistema</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div class="card-hover bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="window.showSection('pacientes')">
-                                <div class="flex items-center justify-between">
+                    <div class="bg-white rounded-xl shadow-lg p-4 md:p-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Bem-vindo ao Sistema</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                            <div class="card-hover bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-4 md:p-6 text-white cursor-pointer transition" onclick="window.showSection('pacientes')">
+                                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                                     <div>
-                                        <h3 class="text-lg font-semibold mb-2">Pacientes</h3>
-                                        <p id="totalPacientes" class="text-3xl font-bold">0</p>
+                                        <h3 class="text-base md:text-lg font-semibold mb-1 md:mb-2">Pacientes</h3>
+                                        <p id="totalPacientes" class="text-2xl md:text-3xl font-bold">0</p>
                                     </div>
-                                    <i class="fas fa-users text-4xl opacity-30"></i>
+                                    <i class="fas fa-users text-3xl md:text-4xl opacity-30"></i>
                                 </div>
                             </div>
-                            <div class="card-hover bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="window.showSection('consultas')">
-                                <div class="flex items-center justify-between">
+                            <div class="card-hover bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-4 md:p-6 text-white cursor-pointer transition" onclick="window.showSection('consultas')">
+                                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                                     <div>
-                                        <h3 class="text-lg font-semibold mb-2">Consultas</h3>
-                                        <p id="totalConsultas" class="text-3xl font-bold">0</p>
+                                        <h3 class="text-base md:text-lg font-semibold mb-1 md:mb-2">Consultas</h3>
+                                        <p id="totalConsultas" class="text-2xl md:text-3xl font-bold">0</p>
                                     </div>
-                                    <i class="fas fa-calendar-check text-4xl opacity-30"></i>
+                                    <i class="fas fa-calendar-check text-3xl md:text-4xl opacity-30"></i>
                                 </div>
                             </div>
-                            <div class="card-hover bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="window.showSection('exames')">
-                                <div class="flex items-center justify-between">
+                            <div class="card-hover bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-4 md:p-6 text-white cursor-pointer transition" onclick="window.showSection('exames')">
+                                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                                     <div>
-                                        <h3 class="text-lg font-semibold mb-2">Exames</h3>
-                                        <p id="totalExames" class="text-3xl font-bold">0</p>
+                                        <h3 class="text-base md:text-lg font-semibold mb-1 md:mb-2">Exames</h3>
+                                        <p id="totalExames" class="text-2xl md:text-3xl font-bold">0</p>
                                     </div>
-                                    <i class="fas fa-flask text-4xl opacity-30"></i>
+                                    <i class="fas fa-flask text-3xl md:text-4xl opacity-30"></i>
                                 </div>
                             </div>
-                            <div class="card-hover bg-linear-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white cursor-pointer transition" onclick="window.showSection('farmacia')">
-                                <div class="flex items-center justify-between">
+                            <div class="card-hover bg-linear-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-4 md:p-6 text-white cursor-pointer transition" onclick="window.showSection('farmacia')">
+                                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                                     <div>
-                                        <h3 class="text-lg font-semibold mb-2">Farmácia</h3>
-                                        <p id="totalMedicamentos" class="text-3xl font-bold">0</p>
+                                        <h3 class="text-base md:text-lg font-semibold mb-1 md:mb-2">Farmácia</h3>
+                                        <p id="totalMedicamentos" class="text-2xl md:text-3xl font-bold">0</p>
                                     </div>
-                                    <i class="fas fa-pills text-4xl opacity-30"></i>
+                                    <i class="fas fa-pills text-3xl md:text-4xl opacity-30"></i>
                                 </div>
                             </div>
                         </div>
