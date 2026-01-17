@@ -31,7 +31,13 @@ export async function init(dadosCarregados) {
         preencherDataAtual();
         preencherListaPacientes();
         atualizarTabelaDoacoes();
-        atualizarGraficoSemanal();
+        
+        // Só renderizar gráfico se a seção estiver visível
+        const secaoDoarSangue = document.getElementById('doarSangue');
+        if (secaoDoarSangue && !secaoDoarSangue.classList.contains('modal-hidden')) {
+            atualizarGraficoSemanal();
+        }
+        
         inicializarSemanasResetadas();
         
         // Carregar dados do Firebase após renderização inicial
@@ -71,6 +77,21 @@ function configurarEventos() {
     if (btnReset && temPermissao('admin', 'gerenciar')) {
         btnReset.style.display = 'inline-block';
         btnReset.addEventListener('click', resetarSemanaDoacoes);
+    }
+
+    // Observar quando a seção de doações fica visível para renderizar gráfico
+    const secaoDoarSangue = document.getElementById('doarSangue');
+    if (secaoDoarSangue) {
+        const observer = new MutationObserver(() => {
+            // Se a seção ficou visível (removeu modal-hidden), renderizar gráfico
+            if (!secaoDoarSangue.classList.contains('modal-hidden')) {
+                // Renderizar gráfico com os dados atuais
+                setTimeout(() => atualizarGraficoSemanal(), 100);
+                // Parar de observar após primeira renderização
+                observer.disconnect();
+            }
+        });
+        observer.observe(secaoDoarSangue, { attributes: true, attributeFilter: ['class'] });
     }
 }
 
@@ -278,7 +299,7 @@ function atualizarTabelaDoacoes() {
 
     // Ordenar por data (mais recente primeiro)
     doadoesFiltradas.sort((a, b) => new Date(b.data) - new Date(a.data));
-    
+
     // Atualizar tabela
     if (doadoesFiltradas.length === 0) {
         bodyTabela.innerHTML = '<tr><td colspan="7" class="sem-dados">Nenhuma doação registrada</td></tr>';
@@ -428,6 +449,14 @@ function atualizarTabelaDoadoresSemanais(doadores) {
 }
 
 function desenharGrafico(doadores) {
+    // Verificar se a seção de doações está visível
+    const secaoDoarSangue = document.getElementById('doarSangue');
+    if (secaoDoarSangue && secaoDoarSangue.classList.contains('modal-hidden')) {
+        // Seção oculta - é normal não ter canvas disponível
+        // O gráfico será renderizado quando a seção ficar visível
+        return;
+    }
+
     const ctx = document.getElementById('graficoDoadores');
     if (!ctx) {
         console.warn('⚠️ Canvas graficoDoadores não encontrado no DOM');
