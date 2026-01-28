@@ -4,146 +4,114 @@
 <section id="doarSangue" class="space-y-6 modal-hidden">
     <div class="bg-white rounded-xl shadow-lg p-4 md:p-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
-                 <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Doações de Sangue</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Doações de Sangue</h2>
             </button>
         </div>
 
-        <div class="border-t pt-6 md:pt-8">     </div>
-    <!-- SEÇÃO DE REGISTRO -->
-    <div class="section-doacao">
-        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Registrar Nova Doação</h3>
-        <div class="form-registro-doacao">
-            <div class="input-group">
-                <label for="doadorPacienteId">Passaporte do Doador:</label>
-                <input 
-                    type="text" 
-                    id="doadorPacienteId" 
-                    placeholder="Digite o Passaporte do paciente"
-                    list="listaPacientesDoacao"
-                >
-                <datalist id="listaPacientesDoacao"></datalist>
+        <div class="border-t pt-6 md:pt-8"> </div>
+        <!-- SEÇÃO DE REGISTRO -->
+        <div class="section-doacao">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Registrar Nova Doação</h3>
+            <div class="form-registro-doacao">
+                <div class="input-group">
+                    <label for="doadorPacienteId">Passaporte do Doador:</label>
+                    <input type="text" id="doadorPacienteId" placeholder="Digite o Passaporte do paciente"
+                        list="listaPacientesDoacao">
+                    <datalist id="listaPacientesDoacao"></datalist>
+                </div>
+
+                <div class="input-group">
+                    <label for="doadorNome" readonly>Nome do Doador:</label>
+                    <input type="text" id="doadorNome" placeholder="Será preenchido automaticamente" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label for="doadorTipoSanguineo" readonly>Tipo Sanguíneo:</label>
+                    <input type="text" id="doadorTipoSanguineo" placeholder="Será preenchido automaticamente" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label for="doadorQuantidade">Quantidade (ml):</label>
+                    <input type="number" id="doadorQuantidade" placeholder="Ex: 450" min="1" value="450">
+                </div>
+
+                <div class="input-group">
+                    <label for="doadorData">Data da Doação:</label>
+                    <input type="date" id="doadorData">
+                </div>
+
+                <div class="input-group">
+                    <label for="doadorObservacao">Observações:</label>
+                    <textarea id="doadorObservacao" placeholder="Observações sobre a doação (opcional)"
+                        rows="3"></textarea>
+                </div>
+
+                <button id="btnRegistrarDoacao" class="btn-primary ">Registrar Doação</button>
             </div>
-
-            <div class="input-group">
-                <label for="doadorNome" readonly>Nome do Doador:</label>
-                <input 
-                    type="text" 
-                    id="doadorNome" 
-                    placeholder="Será preenchido automaticamente"
-                    readonly
-                >
-            </div>
-
-            <div class="input-group">
-                <label for="doadorTipoSanguineo" readonly>Tipo Sanguíneo:</label>
-                <input 
-                    type="text" 
-                    id="doadorTipoSanguineo" 
-                    placeholder="Será preenchido automaticamente"
-                    readonly
-                >
-            </div>
-
-            <div class="input-group">
-                <label for="doadorQuantidade">Quantidade (ml):</label>
-                <input 
-                    type="number" 
-                    id="doadorQuantidade" 
-                    placeholder="Ex: 450"
-                    min="1"
-                    value="450"
-                >
-            </div>
-
-            <div class="input-group">
-                <label for="doadorData">Data da Doação:</label>
-                <input 
-                    type="date" 
-                    id="doadorData"
-                >
-            </div>
-
-            <div class="input-group">
-                <label for="doadorObservacao">Observações:</label>
-                <textarea 
-                    id="doadorObservacao" 
-                    placeholder="Observações sobre a doação (opcional)"
-                    rows="3"
-                ></textarea>
-            </div>
-
-            <button id="btnRegistrarDoacao" class="btn-primary ">Registrar Doação</button>
-        </div>
-    </div>
-
-    <!-- SEÇÃO DE GRÁFICO SEMANAL -->
-    <div class="section-grafico">
-        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Ranking Semanal - Top Doadores</h3>
-        <div class="info-semana">
-            <p>Semana de <span id="dataInicioSemana"></span> até <span id="dataFimSemana"></span></p>
-            <button id="btnResetarSemana" class="btn-secondary" style="display: none;">Resetar Semana (Admin)</button>
         </div>
 
-        <div id="containerGrafico">
-            <canvas id="graficoDoadores"></canvas>
+        <!-- SEÇÃO DE GRÁFICO SEMANAL -->
+        <div class="section-grafico">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Ranking Semanal - Top Doadores</h3>
+            <div class="info-semana">
+                <p>Semana de <span id="dataInicioSemana"></span> até <span id="dataFimSemana"></span></p>
+                <button id="btnResetarSemana" class="btn-secondary" style="display: none;">Resetar Semana
+                    (Admin)</button>
+            </div>
+
+            <div id="containerGrafico">
+                <canvas id="graficoDoadores"></canvas>
+            </div>
+
+            <div id="tabelaDoadoresSemanais" class="tabela-doadores">
+                <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Doações desta Semana</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Nome</th>
+                            <th>Passaporte</th>
+                            <th>Total (ml)</th>
+                            <th>Número de Doações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTabelaDoadoresSemanais">
+                        <tr>
+                            <td colspan="5" class="sem-dados">Nenhuma doação registrada nesta semana</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div id="tabelaDoadoresSemanais" class="tabela-doadores">
-            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Doações desta Semana</h3>
-            <table>
+        <!-- SEÇÃO DE HISTÓRICO -->
+        <div class="section-historico">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Histórico de Doações</h3>
+            <div class="filtros-historico">
+                <input type="text" id="filtroIdHistorico" placeholder="Filtrar por Passaporte do doador">
+                <input type="month" id="filtroMesHistorico">
+                <button id="btnLimparFiltrosHistorico" class="btn-secondary">Limpar Filtros</button>
+            </div>
+
+            <table id="tabelaDoacoes" class="tabela-historico">
                 <thead>
                     <tr>
-                        <th>Posição</th>
-                        <th>Nome</th>
+                        <th>Data</th>
+                        <th>Nome do Doador</th>
                         <th>Passaporte</th>
-                        <th>Total (ml)</th>
-                        <th>Número de Doações</th>
+                        <th>Tipo Sanguíneo</th>
+                        <th>Quantidade (ml)</th>
+                        <th>Observações</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="bodyTabelaDoadoresSemanais">
+                <tbody id="bodyTabelaDoacoes">
                     <tr>
-                        <td colspan="5" class="sem-dados">Nenhuma doação registrada nesta semana</td>
+                        <td colspan="7" class="sem-dados">Nenhuma doação registrada</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-    </div>
-
-    <!-- SEÇÃO DE HISTÓRICO -->
-    <div class="section-historico">
-        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Histórico de Doações</h3>
-        <div class="filtros-historico">
-            <input 
-                type="text" 
-                id="filtroIdHistorico" 
-                placeholder="Filtrar por Passaporte do doador"
-            >
-            <input 
-                type="month" 
-                id="filtroMesHistorico"
-            >
-            <button id="btnLimparFiltrosHistorico" class="btn-secondary">Limpar Filtros</button>
-        </div>
-
-        <table id="tabelaDoacoes" class="tabela-historico">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Nome do Doador</th>
-                    <th>Passaporte</th>
-                    <th>Tipo Sanguíneo</th>
-                    <th>Quantidade (ml)</th>
-                    <th>Observações</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="bodyTabelaDoacoes">
-                <tr>
-                    <td colspan="7" class="sem-dados">Nenhuma doação registrada</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
 </section>
 
 <style>

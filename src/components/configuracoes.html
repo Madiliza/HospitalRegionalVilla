@@ -4,26 +4,36 @@
 <section id="configuracoes" class="space-y-6 modal-hidden">
     <div class="bg-white rounded-xl shadow-lg p-4 md:p-8">
         <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Configurações do Sistema</h2>
-        <div class="border-t pt-6 md:pt-8">     </div>
+        <div class="border-t pt-6 md:pt-8"> </div>
         <!-- Abas de Configurações -->
         <div class="flex flex-wrap gap-2 md:gap-4 mb-6 md:mb-8 border-b overflow-x-auto">
-            <button id="tabCargos" onclick="window.moduloConfig.mostrarAba('cargos')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-blue-600 text-blue-600 font-semibold transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
+            <button id="tabCargos" onclick="window.moduloConfig.mostrarAba('cargos')"
+                class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-blue-600 text-blue-600 font-semibold transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-briefcase"></i>
                 <span>Cargos</span>
             </button>
-            <button id="tabUsuarios" onclick="window.moduloConfig.mostrarAba('usuarios')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
+            <button id="tabUsuarios" onclick="window.moduloConfig.mostrarAba('usuarios')"
+                class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-users"></i>
                 <span>Usuários</span>
             </button>
-            <button id="tabSolicitacoes" onclick="window.moduloConfig.mostrarAba('solicitacoes')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
+            <button id="tabSolicitacoes" onclick="window.moduloConfig.mostrarAba('solicitacoes')"
+                class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-inbox"></i>
                 <span>Solicitações</span>
             </button>
-            <button id="tabMedicamentos" onclick="window.moduloConfig.mostrarAba('medicamentos')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
+            <button id="tabMedicamentos" onclick="window.moduloConfig.mostrarAba('medicamentos')"
+                class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-pills"></i>
                 <span>Medicamentos</span>
             </button>
-            <button id="tabAtendimentos" onclick="window.moduloConfig.mostrarAba('atendimentos')" class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
+            <button id="tabExamesConfig" onclick="window.moduloConfig.mostrarAba('examesConfig')"
+                class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
+                <i class="fas fa-microscope"></i>
+                <span>Tipos de Exame</span>
+            </button>
+            <button id="tabAtendimentos" onclick="window.moduloConfig.mostrarAba('atendimentos')"
+                class="tab-btn-config px-3 md:px-6 py-2 md:py-3 text-sm md:text-base border-b-2 border-gray-300 text-gray-600 font-semibold hover:text-gray-800 transition flex items-center space-x-1 md:space-x-2 whitespace-nowrap">
                 <i class="fas fa-stethoscope"></i>
                 <span>Valores de Atendimento</span>
             </button>
@@ -33,7 +43,8 @@
         <div id="aba-cargos" class="space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <h3 class="text-xl md:text-2xl font-bold text-gray-800">Gerenciar Cargos</h3>
-                <button id="btnNovoCargo" onclick="window.moduloConfig.openModalCargo()" class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center justify-center md:justify-start space-x-2">
+                <button id="btnNovoCargo" onclick="window.moduloConfig.openModalCargo()"
+                    class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center justify-center md:justify-start space-x-2">
                     <i class="fas fa-plus"></i>
                     <span>Novo Cargo</span>
                 </button>
@@ -47,7 +58,8 @@
         <div id="aba-usuarios" class="space-y-6 hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <h3 class="text-xl md:text-2xl font-bold text-gray-800">Gerenciar Usuários</h3>
-                <button id="btnNovoUsuario" onclick="window.moduloConfig.openModalUsuario()" class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center md:justify-start space-x-2">
+                <button id="btnNovoUsuario" onclick="window.moduloConfig.openModalUsuario()"
+                    class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center md:justify-start space-x-2">
                     <i class="fas fa-plus"></i>
                     <span>Novo Usuário</span>
                 </button>
@@ -72,13 +84,29 @@
         <div id="aba-medicamentos" class="space-y-6 hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <h3 class="text-xl md:text-2xl font-bold text-gray-800">Gerenciar Medicamentos</h3>
-                <button id="btnNovoMedicamento" onclick="window.moduloConfig.openModalMedicamentoConfig()" class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center justify-center md:justify-start space-x-2">
+                <button id="btnNovoMedicamento" onclick="window.moduloConfig.openModalMedicamentoConfig()"
+                    class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center justify-center md:justify-start space-x-2">
                     <i class="fas fa-plus"></i>
                     <span>Novo Medicamento</span>
                 </button>
             </div>
             <div id="medicamentosList" class="space-y-4">
                 <p class="text-gray-500 text-center py-8">Nenhum medicamento configurado</p>
+            </div>
+        </div>
+
+        <!-- Aba: Tipos de Exame -->
+        <div id="aba-examesConfig" class="space-y-6 hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800">Gerenciar Tipos de Exame</h3>
+                <button id="btnNovoExameConfig" onclick="window.moduloConfig.openModalExameConfig()"
+                    class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center md:justify-start space-x-2">
+                    <i class="fas fa-plus"></i>
+                    <span>Novo Tipo de Exame</span>
+                </button>
+            </div>
+            <div id="examesConfigList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <p class="text-gray-500 text-center py-8 col-span-full">Nenhum tipo de exame configurado</p>
             </div>
         </div>
 
@@ -92,7 +120,9 @@
                         <i class="fas fa-clinic-medical text-purple-600 mr-2"></i>
                         Tratamento Interno
                     </label>
-                    <input type="number" id="config-tratamento-interno" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="0.00" step="0.01" min="0">
+                    <input type="number" id="config-tratamento-interno"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="0.00" step="0.01" min="0">
                 </div>
 
                 <!-- Atendimento Externo (Sul) -->
@@ -101,7 +131,9 @@
                         <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
                         Atendimento Externo (Sul)
                     </label>
-                    <input type="number" id="config-externo-sul" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="0.00" step="0.01" min="0">
+                    <input type="number" id="config-externo-sul"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="0.00" step="0.01" min="0">
                 </div>
 
                 <!-- Atendimento Externo (Norte) -->
@@ -110,7 +142,9 @@
                         <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>
                         Atendimento Externo (Norte)
                     </label>
-                    <input type="number" id="config-externo-norte" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="0.00" step="0.01" min="0">
+                    <input type="number" id="config-externo-norte"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="0.00" step="0.01" min="0">
                 </div>
 
                 <!-- Consulta -->
@@ -119,7 +153,9 @@
                         <i class="fas fa-comments text-blue-600 mr-2"></i>
                         Consulta
                     </label>
-                    <input type="number" id="config-consulta" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01" min="0">
+                    <input type="number" id="config-consulta"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="0.00" step="0.01" min="0">
                 </div>
 
                 <!-- Exame -->
@@ -128,11 +164,14 @@
                         <i class="fas fa-flask text-green-600 mr-2"></i>
                         Exame
                     </label>
-                    <input type="number" id="config-exame" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="0.00" step="0.01" min="0">
+                    <input type="number" id="config-exame"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="0.00" step="0.01" min="0">
                 </div>
             </div>
 
-            <button onclick="window.moduloConfig.salvarValoresAtendimentos()" class="btn-modern w-full bg-purple-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-purple-700 transition mt-6">
+            <button onclick="window.moduloConfig.salvarValoresAtendimentos()"
+                class="btn-modern w-full bg-purple-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-purple-700 transition mt-6">
                 <i class="fas fa-save mr-2"></i>
                 Salvar Valores
             </button>
@@ -147,28 +186,33 @@
     <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-2xl w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6 sticky top-0 bg-white pb-4">
             <h3 id="modalCargoTitulo" class="text-xl md:text-2xl font-bold text-gray-800">Novo Cargo</h3>
-            <button onclick="window.moduloConfig.closeModalCargo()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            <button onclick="window.moduloConfig.closeModalCargo()"
+                class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
         <form id="formCargo" class="space-y-6">
             <!-- Campo hidden para ID do cargo em edição -->
             <input type="hidden" id="cargoIdEdicao" value="">
-            
+
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Nome do Cargo</label>
-                <input type="text" id="cargoNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Médico, Enfermeiro, Administrador" required>
+                <input type="text" id="cargoNome"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ex: Médico, Enfermeiro, Administrador" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Descrição</label>
-                <textarea id="cargoDescricao" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Descrição do cargo" rows="3"></textarea>
+                <textarea id="cargoDescricao"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Descrição do cargo" rows="3"></textarea>
             </div>
 
             <div class="border-t pt-6">
                 <h4 class="font-semibold text-gray-800 mb-4">Permissões</h4>
-                
+
                 <div class="space-y-4">
-                <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                    <div class="p-4 bg-red-50 rounded-lg border border-red-200">
                         <h5 class="font-semibold text-gray-700 mb-3 flex items-center space-x-2 text-sm md:text-base">
                             <i class="fas fa-users text-red-600"></i>
                             <span>Pacientes</span>
@@ -351,7 +395,8 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-modern w-full bg-blue-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-blue-700 transition">
+            <button type="submit"
+                class="btn-modern w-full bg-blue-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-blue-700 transition">
                 Salvar Cargo
             </button>
         </form>
@@ -365,33 +410,43 @@
     <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl md:text-2xl font-bold text-gray-800">Novo Usuário</h3>
-            <button onclick="window.moduloConfig.closeModalUsuario()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            <button onclick="window.moduloConfig.closeModalUsuario()"
+                class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
         <form id="formUsuario" class="space-y-4">
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Passaporte</label>
-                <input type="text" id="usuarioId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Passaporte do usuário" required>
+                <input type="text" id="usuarioId"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Passaporte do usuário" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Nome</label>
-                <input type="text" id="usuarioNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Nome completo" required>
+                <input type="text" id="usuarioNome"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Nome completo" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Senha</label>
-                <input type="password" id="usuarioSenha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Senha" required>
+                <input type="password" id="usuarioSenha"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Senha" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Cargo</label>
-                <select id="usuarioCargo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                <select id="usuarioCargo"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required>
                     <option value="">Selecione um cargo</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn-modern w-full bg-purple-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-purple-700 transition">
+            <button type="submit"
+                class="btn-modern w-full bg-purple-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-purple-700 transition">
                 Criar Usuário
             </button>
         </form>
@@ -401,41 +456,52 @@
 <!-- ============================================
      MODAL DE EDITAR SENHA
      ============================================ -->
-<div id="modalEditarSenha" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+<div id="modalEditarSenha"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
     <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl md:text-2xl font-bold text-gray-800">Editar Senha</h3>
-            <button onclick="window.moduloConfig.fecharModalEditarSenha()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            <button onclick="window.moduloConfig.fecharModalEditarSenha()"
+                class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
-        <form id="formEditarSenha" onsubmit="event.preventDefault(); window.moduloConfig.salvarNovaSenha();" class="space-y-4">
+        <form id="formEditarSenha" onsubmit="event.preventDefault(); window.moduloConfig.salvarNovaSenha();"
+            class="space-y-4">
             <input type="hidden" id="usuarioIdSenha">
-            
+
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Usuário</label>
-                <p id="usuarioNomeSenha" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">-</p>
+                <p id="usuarioNomeSenha" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">-
+                </p>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Cargo</label>
-                <p id="usuarioCargoSenha" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">-</p>
+                <p id="usuarioCargoSenha" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">-
+                </p>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Nova Senha</label>
-                <input type="password" id="novaSenha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Mínimo 6 caracteres" required>
+                <input type="password" id="novaSenha"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Mínimo 6 caracteres" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Confirmar Senha</label>
-                <input type="password" id="confirmarSenha" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Repita a senha" required>
+                <input type="password" id="confirmarSenha"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Repita a senha" required>
             </div>
 
             <div class="flex flex-col md:flex-row gap-3 pt-4">
-                <button type="submit" class="btn-modern flex-1 bg-blue-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-blue-700 transition">
+                <button type="submit"
+                    class="btn-modern flex-1 bg-blue-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-blue-700 transition">
                     Salvar Senha
                 </button>
-                <button type="button" onclick="window.moduloConfig.fecharModalEditarSenha()" class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-gray-500 transition">
+                <button type="button" onclick="window.moduloConfig.fecharModalEditarSenha()"
+                    class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-gray-500 transition">
                     Cancelar
                 </button>
             </div>
@@ -446,33 +512,41 @@
 <!-- ============================================
      MODAL DE EDITAR CARGO DO USUÁRIO
      ============================================ -->
-<div id="modalEditarCargoUsuario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+<div id="modalEditarCargoUsuario"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
     <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl md:text-2xl font-bold text-gray-800">Alterar Cargo</h3>
-            <button onclick="window.moduloConfig.fecharModalEditarCargoUsuario()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            <button onclick="window.moduloConfig.fecharModalEditarCargoUsuario()"
+                class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
-        <form id="formEditarCargoUsuario" onsubmit="event.preventDefault(); window.moduloConfig.salvarNovoCargoUsuario();" class="space-y-4">
+        <form id="formEditarCargoUsuario"
+            onsubmit="event.preventDefault(); window.moduloConfig.salvarNovoCargoUsuario();" class="space-y-4">
             <input type="hidden" id="usuarioIdCargo">
-            
+
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Usuário</label>
-                <p id="usuarioNomeCargo" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">-</p>
+                <p id="usuarioNomeCargo" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">-
+                </p>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Novo Cargo</label>
-                <select id="novoCargo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <select id="novoCargo"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required>
                     <option value="">Selecione um cargo</option>
                 </select>
             </div>
 
             <div class="flex flex-col md:flex-row gap-3 pt-4">
-                <button type="submit" class="btn-modern flex-1 bg-green-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-green-700 transition">
+                <button type="submit"
+                    class="btn-modern flex-1 bg-green-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-green-700 transition">
                     Salvar Cargo
                 </button>
-                <button type="button" onclick="window.moduloConfig.fecharModalEditarCargoUsuario()" class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-gray-500 transition">
+                <button type="button" onclick="window.moduloConfig.fecharModalEditarCargoUsuario()"
+                    class="btn-modern flex-1 bg-gray-400 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-gray-500 transition">
                     Cancelar
                 </button>
             </div>
@@ -483,45 +557,89 @@
 <!-- ============================================
      MODAL DE MEDICAMENTO CONFIG
      ============================================ -->
-<div id="modalMedicamentoConfig" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+<div id="modalMedicamentoConfig"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
     <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-            <h3 id="modalMedicamentoConfigTitle" class="text-xl md:text-2xl font-bold text-gray-800">Novo Medicamento</h3>
-            <button onclick="window.moduloConfig.closeModalMedicamentoConfig()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            <h3 id="modalMedicamentoConfigTitle" class="text-xl md:text-2xl font-bold text-gray-800">Novo Medicamento
+            </h3>
+            <button onclick="window.moduloConfig.closeModalMedicamentoConfig()"
+                class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
 
         <form id="formMedicamentoConfig" class="space-y-4">
             <input type="hidden" id="medicamentoConfigId">
-            
+
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Nome do Medicamento</label>
-                <input type="text" id="medicamentoConfigNome" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Ex: Dipirona 500mg" required>
+                <input type="text" id="medicamentoConfigNome"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="Ex: Dipirona 500mg" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Preço Normal (R$)</label>
-                <input type="number" id="medicamentoConfigPreco" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="0.00" step="0.01" min="0" required>
+                <input type="number" id="medicamentoConfigPreco"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="0.00" step="0.01" min="0" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Preço Parceria (R$)</label>
-                <input type="number" id="medicamentoConfigPrecoParceria" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="0.00" step="0.01" min="0" required>
+                <input type="number" id="medicamentoConfigPrecoParceria"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0.00" step="0.01" min="0" required>
                 <p class="text-xs text-gray-500 mt-1">Valor aplicado para atendimentos com parceiros</p>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Quantidade Máxima por Paciente</label>
-                <input type="number" id="medicamentoConfigQtdMax" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Ex: 5" min="1" required>
+                <input type="number" id="medicamentoConfigQtdMax"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    placeholder="Ex: 5" min="1" required>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">Quantidade Máxima por Paciente (Parceria)</label>
-                <input type="number" id="medicamentoConfigQtdMaxParceria" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Ex: 10" min="1" required>
+                <input type="number" id="medicamentoConfigQtdMaxParceria"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Ex: 10" min="1" required>
                 <p class="text-xs text-gray-500 mt-1">Limite diferenciado para atendimentos com parceria</p>
             </div>
 
-            <button type="submit" class="btn-modern w-full bg-orange-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-orange-700 transition">
+            <button type="submit"
+                class="btn-modern w-full bg-orange-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-orange-700 transition">
                 Salvar Medicamento
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================
+     MODAL DE TIPO DE EXAME
+     ============================================ -->
+<div id="modalExameConfig"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal-hidden z-50">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-md w-full mx-4 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h3 id="modalExameConfigTitle" class="text-xl md:text-2xl font-bold text-gray-800">Novo Tipo de Exame</h3>
+            <button onclick="window.moduloConfig.closeModalExameConfig()"
+                class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+        </div>
+
+        <form id="formExameConfig" class="space-y-4">
+            <input type="hidden" id="exameConfigId">
+
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">Nome do Exame</label>
+                <input type="text" id="exameConfigNome"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Ex: Hemograma Completo" required>
+            </div>
+
+            <button type="submit"
+                class="btn-modern w-full bg-purple-600 text-white font-bold py-2 md:py-3 rounded-lg hover:bg-purple-700 transition">
+                Salvar Tipo de Exame
             </button>
         </form>
     </div>

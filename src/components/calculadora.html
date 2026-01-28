@@ -5,12 +5,13 @@
     <div class="bg-white rounded-xl shadow-lg p-4 md:p-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
             <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Calculadora de Atendimento</h2>
-            <button onclick="window.moduloCalculadora.limparTudo()" class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center justify-center md:justify-start space-x-2">
+            <button onclick="window.moduloCalculadora.limparTudo()"
+                class="btn-modern w-full md:w-auto px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center justify-center md:justify-start space-x-2">
                 <i class="fas fa-trash"></i>
                 <span>Limpar Tudo</span>
             </button>
         </div>
-        <div class="border-t pt-6 md:pt-8">     </div>
+        <div class="border-t pt-6 md:pt-8"> </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             <!-- Coluna Esquerda: Medicamentos e Parcerias -->
             <div class="space-y-4 md:space-y-6">
@@ -46,53 +47,83 @@
                         <span>Atendimentos</span>
                     </h3>
                     <div class="space-y-2 md:space-y-3">
-                        <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
+                        <div
+                            class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
                             <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="atend-interno" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <input type="checkbox" id="atend-interno"
+                                    onchange="window.moduloCalculadora.calcularTotal()"
+                                    class="w-4 h-4 text-purple-600 rounded">
                                 <span class="text-gray-700 text-sm md:text-base">Tratamento Interno</span>
                             </label>
                             <div class="flex items-center gap-1 w-full md:w-auto">
-                                <input type="number" id="atend-interno-qtd" class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                                <input type="number" id="atend-interno-qtd"
+                                    class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                                    placeholder="0" min="0" value="0"
+                                    onchange="window.moduloCalculadora.calcularTotal()">
                                 <span class="text-gray-500 text-xs md:text-sm">un.</span>
                             </div>
                         </div>
-                        <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
+                        <div
+                            class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
                             <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="atend-externo-sul" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <input type="checkbox" id="atend-externo-sul"
+                                    onchange="window.moduloCalculadora.calcularTotal()"
+                                    class="w-4 h-4 text-purple-600 rounded">
                                 <span class="text-gray-700 text-sm md:text-base">Atendimento Externo (Sul)</span>
                             </label>
                             <div class="flex items-center gap-1 w-full md:w-auto">
-                                <input type="number" id="atend-externo-sul-qtd" class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                                <input type="number" id="atend-externo-sul-qtd"
+                                    class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                                    placeholder="0" min="0" value="0"
+                                    onchange="window.moduloCalculadora.calcularTotal()">
                                 <span class="text-gray-500 text-xs md:text-sm">un.</span>
                             </div>
                         </div>
-                        <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
+                        <div
+                            class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
                             <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="atend-externo-norte" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <input type="checkbox" id="atend-externo-norte"
+                                    onchange="window.moduloCalculadora.calcularTotal()"
+                                    class="w-4 h-4 text-purple-600 rounded">
                                 <span class="text-gray-700 text-sm md:text-base">Atendimento Externo (Norte)</span>
                             </label>
                             <div class="flex items-center gap-1 w-full md:w-auto">
-                                <input type="number" id="atend-externo-norte-qtd" class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                                <input type="number" id="atend-externo-norte-qtd"
+                                    class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                                    placeholder="0" min="0" value="0"
+                                    onchange="window.moduloCalculadora.calcularTotal()">
                                 <span class="text-gray-500 text-xs md:text-sm">un.</span>
                             </div>
                         </div>
-                        <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
+                        <div
+                            class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
                             <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="atend-consulta" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <input type="checkbox" id="atend-consulta"
+                                    onchange="window.moduloCalculadora.calcularTotal()"
+                                    class="w-4 h-4 text-purple-600 rounded">
                                 <span class="text-gray-700 text-sm md:text-base">Consulta</span>
                             </label>
                             <div class="flex items-center gap-1 w-full md:w-auto">
-                                <input type="number" id="atend-consulta-qtd" class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                                <input type="number" id="atend-consulta-qtd"
+                                    class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                                    placeholder="0" min="0" value="0"
+                                    onchange="window.moduloCalculadora.calcularTotal()">
                                 <span class="text-gray-500 text-xs md:text-sm">un.</span>
                             </div>
                         </div>
-                        <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
+                        <div
+                            class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 md:justify-between">
                             <label class="flex items-center space-x-2 flex-1">
-                                <input type="checkbox" id="atend-exame" onchange="window.moduloCalculadora.calcularTotal()" class="w-4 h-4 text-purple-600 rounded">
+                                <input type="checkbox" id="atend-exame"
+                                    onchange="window.moduloCalculadora.calcularTotal()"
+                                    class="w-4 h-4 text-purple-600 rounded">
                                 <span class="text-gray-700 text-sm md:text-base">Exame</span>
                             </label>
                             <div class="flex items-center gap-1 w-full md:w-auto">
-                                <input type="number" id="atend-exame-qtd" class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm" placeholder="0" min="0" value="0" onchange="window.moduloCalculadora.calcularTotal()">
+                                <input type="number" id="atend-exame-qtd"
+                                    class="w-12 md:w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                                    placeholder="0" min="0" value="0"
+                                    onchange="window.moduloCalculadora.calcularTotal()">
                                 <span class="text-gray-500 text-xs md:text-sm">un.</span>
                             </div>
                         </div>
@@ -102,26 +133,33 @@
         </div>
 
         <!-- Resumo Total -->
-        <div class="mt-6 md:mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 md:p-8 border-2 border-blue-300">
+        <div
+            class="mt-6 md:mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 md:p-8 border-2 border-blue-300">
             <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">Resumo do Atendimento</h3>
-            
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                 <!-- Total Medicamentos -->
                 <div class="bg-white p-3 md:p-4 rounded-lg border border-blue-200">
-                    <p class="text-xs md:text-sm text-gray-600 font-semibold mb-2"><i class="fas fa-pills text-blue-600 mr-2"></i>Total Medicamentos</p>
-                    <p class="text-lg md:text-2xl font-bold text-blue-600">R$ <span id="total-medicamentos">0.00</span></p>
+                    <p class="text-xs md:text-sm text-gray-600 font-semibold mb-2"><i
+                            class="fas fa-pills text-blue-600 mr-2"></i>Total Medicamentos</p>
+                    <p class="text-lg md:text-2xl font-bold text-blue-600">R$ <span id="total-medicamentos">0.00</span>
+                    </p>
                 </div>
 
                 <!-- Total Parcerias -->
                 <div class="bg-white p-3 md:p-4 rounded-lg border border-green-200">
-                    <p class="text-xs md:text-sm text-gray-600 font-semibold mb-2"><i class="fas fa-handshake text-green-600 mr-2"></i>Total Parcerias</p>
-                    <p class="text-lg md:text-2xl font-bold text-green-600">R$ <span id="total-parcerias">0.00</span></p>
+                    <p class="text-xs md:text-sm text-gray-600 font-semibold mb-2"><i
+                            class="fas fa-handshake text-green-600 mr-2"></i>Total Parcerias</p>
+                    <p class="text-lg md:text-2xl font-bold text-green-600">R$ <span id="total-parcerias">0.00</span>
+                    </p>
                 </div>
 
                 <!-- Total Atendimentos -->
                 <div class="bg-white p-3 md:p-4 rounded-lg border border-purple-200">
-                    <p class="text-xs md:text-sm text-gray-600 font-semibold mb-2"><i class="fas fa-stethoscope text-purple-600 mr-2"></i>Total Atendimentos</p>
-                    <p class="text-lg md:text-2xl font-bold text-purple-600">R$ <span id="total-atendimentos">0.00</span></p>
+                    <p class="text-xs md:text-sm text-gray-600 font-semibold mb-2"><i
+                            class="fas fa-stethoscope text-purple-600 mr-2"></i>Total Atendimentos</p>
+                    <p class="text-lg md:text-2xl font-bold text-purple-600">R$ <span
+                            id="total-atendimentos">0.00</span></p>
                 </div>
             </div>
 

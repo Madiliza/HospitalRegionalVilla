@@ -9,18 +9,21 @@ import { temPermissao } from '../utils/permissoes.js';
 export let cargos = [];
 export let usuarios = [];
 export let medicamentosConfig = [];
+export let examesConfig = [];
 export let solicitacoesCadastro = [];
 
 export function init(dadosCarregados) {
     cargos = dadosCarregados.cargos || [];
     usuarios = dadosCarregados.usuarios || [];
     medicamentosConfig = dadosCarregados.medicamentosConfig || [];
+    examesConfig = dadosCarregados.examesConfig || [];
     solicitacoesCadastro = dadosCarregados.solicitacoesCadastro || [];
     configurarEventos();
     aplicarPermissoesAbas(); // Aplicar permissões às abas
     atualizarListaCargos();
     atualizarListaUsuarios();
     atualizarListaMedicamentosConfig();
+    atualizarListaExamesConfig();
     atualizarListaSolicitacoes();
 }
 
@@ -31,7 +34,7 @@ export function aplicarPermissoesAbas() {
     function controlarAba(tabId, abaId, modulo, acao, nomeAba) {
         const btnTab = document.getElementById(tabId);
         const abaContent = document.getElementById(abaId);
-        
+
         if (btnTab && abaContent) {
             if (temPermissao(modulo, acao)) {
                 btnTab.style.display = '';
@@ -42,13 +45,14 @@ export function aplicarPermissoesAbas() {
             }
         }
     }
-    
+
     // ============================================
     // APLICAR PERMISSÕES A CADA ABA
     // ============================================
     controlarAba('tabCargos', 'aba-cargos', 'cargo', 'visualizar', 'Cargos');
     controlarAba('tabUsuarios', 'aba-usuarios', 'usuario', 'visualizar', 'Usuários');
     controlarAba('tabMedicamentos', 'aba-medicamentos', 'farmacia', 'visualizar', 'Medicamentos');
+    controlarAba('tabExamesConfig', 'aba-examesConfig', 'exame', 'visualizar', 'Tipos de Exame');
     controlarAba('tabSolicitacoes', 'aba-solicitacoes', 'cargo', 'visualizar', 'Solicitações');
     controlarAba('tabAtendimentos', 'aba-atendimentos', 'cargo', 'visualizar', 'Valores de Atendimento');
 }
@@ -77,6 +81,14 @@ function configurarEventos() {
             adicionarMedicamentoConfig();
         });
     }
+
+    const formExameConfig = document.getElementById('formExameConfig');
+    if (formExameConfig) {
+        formExameConfig.addEventListener('submit', (e) => {
+            e.preventDefault();
+            adicionarExameConfig();
+        });
+    }
 }
 
 // ============================================
@@ -85,12 +97,12 @@ function configurarEventos() {
 // IMPORTANTE: Cada aba deve verificar a permissão de seu módulo específico
 export function mostrarAba(aba) {
     // Normalizar nome da aba para minúsculas
-    const abaNormalizada = (aba || '').toLowerCase().trim();
-    
+    const abaNormalizada = (aba || '').trim();
+
     // Verificar permissão baseada na aba escolhida
     // Cada aba tem seu módulo específico
     let temAcessoAba = false;
-    
+
     switch (abaNormalizada) {
         case 'cargos':
             // Aba de Cargos verifica permissão 'cargo'
@@ -108,6 +120,10 @@ export function mostrarAba(aba) {
             // Aba de Medicamentos verifica permissão 'farmacia'
             temAcessoAba = temPermissao('farmacia', 'visualizar');
             break;
+        case 'examesConfig':
+            // Aba de Exam Types verifica permissão 'exame'
+            temAcessoAba = temPermissao('exame', 'visualizar');
+            break;
         case 'atendimentos':
             // Aba de Valores de Atendimento verifica permissão 'cargo' (função administrativa)
             temAcessoAba = temPermissao('cargo', 'visualizar');
@@ -116,18 +132,19 @@ export function mostrarAba(aba) {
         default:
             temAcessoAba = false;
     }
-    
+
     // Se não tem acesso, mostrar erro e retornar
     if (!temAcessoAba) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para acessar esta aba');
         return;
     }
-    
+
     // Ocultar todas as abas
     document.getElementById('aba-cargos').classList.add('hidden');
     document.getElementById('aba-usuarios').classList.add('hidden');
     document.getElementById('aba-solicitacoes').classList.add('hidden');
     document.getElementById('aba-medicamentos').classList.add('hidden');
+    document.getElementById('aba-examesConfig').classList.add('hidden');
     document.getElementById('aba-atendimentos').classList.add('hidden');
 
     // Mostrar aba selecionada
@@ -160,7 +177,7 @@ export function openModalCargo() {
         mostrarErro('Acesso Negado', 'Você não tem permissão para criar cargos');
         return;
     }
-    
+
     document.getElementById('modalCargo').classList.remove('modal-hidden');
     limparFormularioCargo();
 }
@@ -186,7 +203,7 @@ function limparFormularioCargo() {
 export async function adicionarCargo() {
     const cargoIdEdicao = document.getElementById('cargoIdEdicao')?.value;
     const isEdicao = !!cargoIdEdicao;
-    
+
     // Verificar permissão apropriada
     if (isEdicao) {
         if (!temPermissao('cargo', 'editar')) {
@@ -199,7 +216,7 @@ export async function adicionarCargo() {
             return;
         }
     }
-    
+
     const nome = document.getElementById('cargoNome').value;
     const descricao = document.getElementById('cargoDescricao').value;
 
@@ -230,13 +247,13 @@ export async function adicionarCargo() {
                 dataAtualizacao: new Date().toLocaleString('pt-BR')
             };
             cargos[index] = cargoAtualizado;
-            
+
             try {
                 await salvarNoFirebase('cargos', cargoAtualizado);
             } catch (erro) {
                 // Erro silencioso
             }
-            
+
             closeModalCargo();
             atualizarListaCargos();
             atualizarSelectCargoUsuario();
@@ -271,7 +288,7 @@ export async function adicionarCargo() {
 
 export function atualizarListaCargos() {
     const lista = document.getElementById('cargosList');
-    
+
     if (cargos.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum cargo configurado</p>';
         return;
@@ -304,32 +321,32 @@ export function editarCargo(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para editar cargos');
         return;
     }
-    
+
     // Buscar o cargo pelo ID
     const cargo = cargos.find(c => c.id === id);
     if (!cargo) {
         mostrarErro('Erro', 'Cargo não encontrado');
         return;
     }
-    
+
     // Abrir o modal
     document.getElementById('modalCargo').classList.remove('modal-hidden');
-    
+
     // Alterar título do modal para edição
     const titulo = document.getElementById('modalCargoTitulo');
     if (titulo) titulo.textContent = 'Editar Cargo';
-    
+
     // Preencher campo hidden com ID do cargo em edição
     const campoEdicao = document.getElementById('cargoIdEdicao');
     if (campoEdicao) campoEdicao.value = id;
-    
+
     // Preencher campos do formulário
     document.getElementById('cargoNome').value = cargo.nome || '';
     document.getElementById('cargoDescricao').value = cargo.descricao || '';
-    
+
     // Limpar todas as permissões primeiro
     document.querySelectorAll('#formCargo input[type="checkbox"]').forEach(cb => cb.checked = false);
-    
+
     // Marcar as permissões do cargo
     if (cargo.permissoes) {
         // Paciente
@@ -390,7 +407,7 @@ export function apagarCargo(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para apagar cargos');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Apagar Cargo',
         'Tem certeza que deseja apagar este cargo?',
@@ -421,7 +438,7 @@ export function openModalUsuario() {
         mostrarErro('Acesso Negado', 'Você não tem permissão para criar usuários');
         return;
     }
-    
+
     document.getElementById('modalUsuario').classList.remove('modal-hidden');
     limparFormularioUsuario();
     atualizarSelectCargoUsuario();
@@ -437,7 +454,7 @@ function limparFormularioUsuario() {
 
 export function atualizarSelectCargoUsuario() {
     const select = document.getElementById('usuarioCargo');
-    select.innerHTML = '<option value="">Selecione um cargo</option>' + 
+    select.innerHTML = '<option value="">Selecione um cargo</option>' +
         cargos.map(cargo => `<option value="${cargo.id}">${cargo.nome}</option>`).join('');
 }
 
@@ -447,7 +464,7 @@ export async function adicionarUsuario() {
         mostrarErro('Acesso Negado', 'Você não tem permissão para criar usuários');
         return;
     }
-    
+
     const usuarioId = document.getElementById('usuarioId')?.value;
     const nome = document.getElementById('usuarioNome')?.value;
     const senha = document.getElementById('usuarioSenha')?.value;
@@ -483,7 +500,7 @@ export async function adicionarUsuario() {
 
 export function atualizarListaUsuarios() {
     const lista = document.getElementById('usuariosList');
-    
+
     if (usuarios.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum usuário cadastrado</p>';
         return;
@@ -491,10 +508,10 @@ export function atualizarListaUsuarios() {
 
     lista.innerHTML = usuarios.map(usuario => {
         const cargo = cargos.find(c => c.id === usuario.cargoId);
-        const statusBadge = usuario.ativo 
+        const statusBadge = usuario.ativo
             ? '<span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-semibold">Ativo</span>'
             : '<span class="inline-block px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-semibold">Inativo</span>';
-        
+
         return `
             <div class="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition">
                 <div class="flex justify-between items-start mb-4">
@@ -514,14 +531,14 @@ export function atualizarListaUsuarios() {
                         <button onclick="window.moduloConfig.abrirModalEditarCargoUsuario('${usuario.id}')" class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm">
                             <i class="fas fa-briefcase mr-1"></i>Alterar Cargo
                         </button>
-                        ${usuario.ativo 
-                            ? `<button onclick="window.moduloConfig.inativarUsuario('${usuario.id}')" class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm">
+                        ${usuario.ativo
+                ? `<button onclick="window.moduloConfig.inativarUsuario('${usuario.id}')" class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm">
                                 <i class="fas fa-ban mr-1"></i>Inativar
                             </button>`
-                            : `<button onclick="window.moduloConfig.ativarUsuario('${usuario.id}')" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
+                : `<button onclick="window.moduloConfig.ativarUsuario('${usuario.id}')" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
                                 <i class="fas fa-check mr-1"></i>Ativar
                             </button>`
-                        }
+            }
                         <button onclick="window.moduloConfig.apagarUsuario('${usuario.id}')" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
                             <i class="fas fa-trash mr-1"></i>Excluir
                         </button>
@@ -539,9 +556,9 @@ export function abrirModalEditarSenha(id) {
         mostrarErro('Erro', 'Usuário não encontrado');
         return;
     }
-    
+
     const cargo = cargos.find(c => c.id === usuario.cargoId);
-    
+
     document.getElementById('modalEditarSenha').classList.remove('modal-hidden');
     document.getElementById('usuarioIdSenha').value = id;
     document.getElementById('usuarioNomeSenha').textContent = usuario.nome;
@@ -561,7 +578,7 @@ export function abrirModalEditarCargoUsuario(id) {
         mostrarErro('Erro', 'Usuário não encontrado');
         return;
     }
-    
+
     document.getElementById('modalEditarCargoUsuario').classList.remove('modal-hidden');
     document.getElementById('usuarioIdCargo').value = id;
     document.getElementById('usuarioNomeCargo').textContent = usuario.nome;
@@ -575,28 +592,28 @@ export function fecharModalEditarCargoUsuario() {
 
 export function atualizarSelectCargoEditarUsuario() {
     const select = document.getElementById('novoCargo');
-    select.innerHTML = '<option value="">Selecione um cargo</option>' + 
+    select.innerHTML = '<option value="">Selecione um cargo</option>' +
         cargos.map(cargo => `<option value="${cargo.id}">${cargo.nome}</option>`).join('');
 }
 
 export async function salvarNovoCargoUsuario() {
     const usuarioId = document.getElementById('usuarioIdCargo').value;
     const novoCargoId = document.getElementById('novoCargo').value;
-    
+
     if (!novoCargoId) {
         mostrarErro('Erro', 'Selecione um cargo');
         return;
     }
-    
+
     const usuario = usuarios.find(u => u.id === usuarioId);
     if (!usuario) {
         mostrarErro('Erro', 'Usuário não encontrado');
         return;
     }
-    
+
     const cargo = cargos.find(c => c.id === novoCargoId);
     const cargoAnterior = cargos.find(c => c.id === usuario.cargoId);
-    
+
     mostrarConfirmacao(
         'Alterar Cargo',
         `Deseja alterar o cargo de ${usuario.nome} de "${cargoAnterior ? cargoAnterior.nome : 'N/A'}" para "${cargo ? cargo.nome : 'N/A'}"?`,
@@ -618,28 +635,28 @@ export async function salvarNovaSenha() {
     const usuarioId = document.getElementById('usuarioIdSenha').value;
     const novaSenha = document.getElementById('novaSenha').value;
     const confirmarSenha = document.getElementById('confirmarSenha').value;
-    
+
     if (!novaSenha || !confirmarSenha) {
         mostrarErro('Erro', 'Preencha todos os campos');
         return;
     }
-    
+
     if (novaSenha !== confirmarSenha) {
         mostrarErro('Erro', 'As senhas não conferem');
         return;
     }
-    
+
     if (novaSenha.length < 6) {
         mostrarErro('Erro', 'A senha deve ter no mínimo 6 caracteres');
         return;
     }
-    
+
     const usuario = usuarios.find(u => u.id === usuarioId);
     if (!usuario) {
         mostrarErro('Erro', 'Usuário não encontrado');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Alterar Senha',
         `Deseja alterar a senha de ${usuario.nome}?`,
@@ -667,7 +684,7 @@ export function inativarUsuario(id) {
         mostrarErro('Erro', 'Usuário não encontrado');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Inativar Usuário',
         `Deseja inativar ${usuario.nome}? Este usuário não poderá mais fazer login.`,
@@ -690,7 +707,7 @@ export function ativarUsuario(id) {
         mostrarErro('Erro', 'Usuário não encontrado');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Ativar Usuário',
         `Deseja ativar ${usuario.nome}? Este usuário poderá fazer login novamente.`,
@@ -713,13 +730,13 @@ export function apagarUsuario(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para apagar usuários');
         return;
     }
-    
+
     const usuario = usuarios.find(u => u.id === id);
     if (!usuario) {
         mostrarErro('Erro', 'Usuário não encontrado');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Excluir Usuário',
         `Deseja excluir permanentemente ${usuario.nome}? Esta ação não pode ser desfeita.`,
@@ -753,7 +770,7 @@ export function openModalMedicamentoConfig() {
         mostrarErro('Acesso Negado', 'Você não tem permissão para criar medicamentos');
         return;
     }
-    
+
     document.getElementById('modalMedicamentoConfig').classList.remove('modal-hidden');
     limparFormularioMedicamentoConfig();
     document.getElementById('medicamentoConfigId').value = '';
@@ -774,7 +791,7 @@ export async function adicionarMedicamentoConfig() {
         mostrarErro('Acesso Negado', 'Você não tem permissão para criar medicamentos');
         return;
     }
-    
+
     const id = document.getElementById('medicamentoConfigId').value;
     const nome = document.getElementById('medicamentoConfigNome').value;
     const preco = document.getElementById('medicamentoConfigPreco').value;
@@ -795,7 +812,7 @@ export async function adicionarMedicamentoConfig() {
             mostrarErro('Acesso Negado', 'Você não tem permissão para editar medicamentos');
             return;
         }
-        
+
         const medicamentoExistente = medicamentosConfig.find(m => m.id === id);
         if (medicamentoExistente) {
             medicamentoExistente.nome = nome;
@@ -833,7 +850,7 @@ export async function adicionarMedicamentoConfig() {
 
 export function atualizarListaMedicamentosConfig() {
     const lista = document.getElementById('medicamentosList');
-    
+
     if (medicamentosConfig.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum medicamento configurado</p>';
         return;
@@ -869,7 +886,7 @@ export function editarMedicamentoConfig(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para editar medicamentos');
         return;
     }
-    
+
     const medicamento = medicamentosConfig.find(m => m.id === id);
     if (medicamento) {
         document.getElementById('medicamentoConfigId').value = medicamento.id;
@@ -889,7 +906,7 @@ export function apagarMedicamentoConfig(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para apagar medicamentos');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Apagar Medicamento',
         'Tem certeza que deseja apagar este medicamento?',
@@ -903,13 +920,155 @@ export function apagarMedicamentoConfig(id) {
 }
 
 // ============================================
+// TIPOS DE EXAME CONFIGURAÇÃO
+// ============================================
+export function openModalExameConfig() {
+    // Verificar permissão
+    if (!temPermissao('exame', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar tipos de exame');
+        return;
+    }
+
+    document.getElementById('modalExameConfig').classList.remove('modal-hidden');
+    limparFormularioExameConfig();
+    document.getElementById('exameConfigId').value = '';
+    document.getElementById('modalExameConfigTitle').textContent = 'Novo Tipo de Exame';
+}
+
+export function closeModalExameConfig() {
+    document.getElementById('modalExameConfig').classList.add('modal-hidden');
+}
+
+function limparFormularioExameConfig() {
+    document.getElementById('formExameConfig').reset();
+}
+
+export async function adicionarExameConfig() {
+    // Verificar permissão
+    if (!temPermissao('exame', 'criar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para criar tipos de exame');
+        return;
+    }
+
+    const id = document.getElementById('exameConfigId').value;
+    const nome = document.getElementById('exameConfigNome').value;
+
+    if (!nome) {
+        mostrarErro('Campos Obrigatórios', 'Por favor, preencha o nome do exame');
+        return;
+    }
+
+    let exameParaSalvar;
+
+    if (id) {
+        // Editar
+        if (!temPermissao('exame', 'editar')) {
+            mostrarErro('Acesso Negado', 'Você não tem permissão para editar tipos de exame');
+            return;
+        }
+
+        const exameExistente = examesConfig.find(e => e.id === id);
+        if (exameExistente) {
+            exameExistente.nome = nome;
+            exameParaSalvar = exameExistente;
+        }
+    } else {
+        // Criar novo
+        const novoExame = {
+            id: Date.now().toString(),
+            nome,
+            dataCriacao: new Date().toLocaleString('pt-BR')
+        };
+        examesConfig.push(novoExame);
+        exameParaSalvar = novoExame;
+    }
+
+    try {
+        await salvarNoFirebase('examesConfig', exameParaSalvar);
+        mostrarNotificacao('Tipo de exame salvo com sucesso!', 'success');
+    } catch (erro) {
+        console.error(erro);
+        mostrarErro('Erro', 'Erro ao salvar tipo de exame');
+    }
+
+    closeModalExameConfig();
+    atualizarListaExamesConfig();
+}
+
+export function atualizarListaExamesConfig() {
+    const lista = document.getElementById('examesConfigList');
+
+    if (!lista) return;
+
+    if (examesConfig.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8 col-span-full">Nenhum tipo de exame configurado</p>';
+        return;
+    }
+
+    lista.innerHTML = examesConfig.map(exame => `
+        <div class="bg-white p-6 rounded-lg border border-purple-200 hover:shadow-lg transition">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-800">${exame.nome}</h3>
+                    <p class="text-xs text-gray-500 mt-2">ID: ${exame.id}</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.moduloConfig.editarExameConfig('${exame.id}')" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="window.moduloConfig.apagarExameConfig('${exame.id}')" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="text-xs text-gray-500">${exame.dataCriacao}</div>
+        </div>
+    `).join('');
+}
+
+export function editarExameConfig(id) {
+    // Verificar permissão
+    if (!temPermissao('exame', 'editar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para editar tipos de exame');
+        return;
+    }
+
+    const exame = examesConfig.find(e => e.id === id);
+    if (exame) {
+        document.getElementById('exameConfigId').value = exame.id;
+        document.getElementById('exameConfigNome').value = exame.nome;
+        document.getElementById('modalExameConfigTitle').textContent = 'Editar Tipo de Exame';
+        document.getElementById('modalExameConfig').classList.remove('modal-hidden');
+    }
+}
+
+export function apagarExameConfig(id) {
+    // Verificar permissão
+    if (!temPermissao('exame', 'apagar')) {
+        mostrarErro('Acesso Negado', 'Você não tem permissão para apagar tipos de exame');
+        return;
+    }
+
+    mostrarConfirmacao(
+        'Apagar Tipo de Exame',
+        'Tem certeza que deseja apagar este tipo de exame?',
+        async () => {
+            examesConfig = examesConfig.filter(e => e.id !== id);
+            await deletarDoFirebase('examesConfig', id);
+            atualizarListaExamesConfig();
+            mostrarNotificacao('Tipo de exame apagado com sucesso!', 'success');
+        }
+    );
+}
+
+// ============================================
 // SOLICITAÇÕES DE CADASTRO
 // ============================================
 export function atualizarListaSolicitacoes() {
     const lista = document.getElementById('solicitacoesList');
-    
+
     if (!lista) return; // Se elemento não existe, não atualiza
-    
+
     if (solicitacoesCadastro.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhuma solicitação pendente</p>';
         return;
@@ -940,12 +1099,12 @@ export function atualizarListaSolicitacoes() {
 
 export function aceitarSolicitacao(id) {
     const solicitacao = solicitacoesCadastro.find(s => s.id === id);
-    
+
     if (!solicitacao) {
         mostrarErro('Erro', 'Solicitação não encontrada');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Aceitar Solicitação',
         `Deseja aceitar a solicitação de ${solicitacao.nome}?`,
@@ -960,15 +1119,15 @@ export function aceitarSolicitacao(id) {
                     ativo: true,
                     cargoId: 'cargo_padrao' // Cargo padrão para novos usuários
                 };
-                
+
                 // Salvar usuário no Firebase
                 usuarios.push(novoUsuario);
                 await salvarNoFirebase('usuarios', novoUsuario);
-                
+
                 // Atualizar status da solicitação para 'aceita'
                 solicitacao.status = 'aceita';
                 await salvarNoFirebase('solicitacoes_cadastro', solicitacao);
-                
+
                 atualizarListaSolicitacoes();
                 atualizarListaUsuarios();
                 mostrarNotificacao(`Solicitação de ${solicitacao.nome} aceita com sucesso!`, 'success');
@@ -981,12 +1140,12 @@ export function aceitarSolicitacao(id) {
 
 export function rejeitarSolicitacao(id) {
     const solicitacao = solicitacoesCadastro.find(s => s.id === id);
-    
+
     if (!solicitacao) {
         mostrarErro('Erro', 'Solicitação não encontrada');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Rejeitar Solicitação',
         `Deseja rejeitar a solicitação de ${solicitacao.nome}?`,
@@ -994,10 +1153,10 @@ export function rejeitarSolicitacao(id) {
             try {
                 // Deletar a solicitação do Firebase para permitir nova solicitação
                 await deletarDoFirebase('solicitacoes_cadastro', id);
-                
+
                 // Remover da lista local
                 solicitacoesCadastro = solicitacoesCadastro.filter(s => s.id !== id);
-                
+
                 atualizarListaSolicitacoes();
                 mostrarNotificacao(`Solicitação de ${solicitacao.nome} rejeitada! A pessoa poderá enviar uma nova solicitação.`, 'success');
             } catch (erro) {
@@ -1033,6 +1192,11 @@ window.moduloConfig = {
     adicionarMedicamentoConfig,
     editarMedicamentoConfig,
     apagarMedicamentoConfig,
+    openModalExameConfig,
+    closeModalExameConfig,
+    adicionarExameConfig,
+    editarExameConfig,
+    apagarExameConfig,
     aceitarSolicitacao,
     rejeitarSolicitacao,
     aplicarPermissoesAbas,

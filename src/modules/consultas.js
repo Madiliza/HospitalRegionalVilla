@@ -6,13 +6,16 @@ import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/di
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { buscarPacientes as buscarPacientesGlobal } from './pacientes.js';
 import { temPermissao } from '../utils/permissoes.js';
+import { paginar, gerarControlesHTML } from '../utils/paginacao.js';
 
 export let consultas = [];
+let paginaAtual = 1;
+const itensPorPagina = 10;
 
 export function init(dadosCarregados) {
     consultas = dadosCarregados.consultas || [];
     configurarEventos();
-    
+
     // Chamar atualizarLista de forma assíncrona para garantir que o DOM está pronto
     Promise.resolve().then(() => {
         setTimeout(() => {
@@ -103,7 +106,7 @@ export async function adicionarConsulta() {
         mostrarErro('Acesso Negado', 'Você não tem permissão para criar consultas');
         return;
     }
-    
+
     const pacienteId = document.getElementById('consultaPacienteId').value;
     const especialidade = document.getElementById('consultaEspecialidade').value;
     const data = document.getElementById('consultaData').value;
@@ -143,6 +146,11 @@ export async function adicionarConsulta() {
     mostrarNotificacao('Consulta agendada com sucesso!', 'success');
 }
 
+export function mudarPagina(novaPagina) {
+    paginaAtual = novaPagina;
+    atualizarLista();
+}
+
 export function atualizarLista() {
     const lista = document.getElementById('consultasList');
 
@@ -155,13 +163,17 @@ export function atualizarLista() {
         return;
     }
 
-    lista.innerHTML = consultas.map(consulta => {
+    // Paginar
+    const resultadoPaginacao = paginar(consultas, paginaAtual, itensPorPagina);
+    const consultasExibidas = resultadoPaginacao.dadosPaginados;
+
+    let html = consultasExibidas.map(consulta => {
         const bgColor = consulta.finalizada ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-600' : 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-500';
         const statusText = consulta.finalizada ? `<p class="text-green-700"><i class="fas fa-check mr-2"></i>Finalizada em: ${consulta.dataFinalizacao}</p>` : '';
         const botaoFinalizacao = consulta.finalizada ? '' : `<button onclick="window.moduloConsultas.abrirModalFinalizacao('${consulta.id}')" class="text-green-600 hover:text-green-800 transition" title="Finalizar Consulta">
                         <i class="fas fa-check-circle text-xl"></i>
                     </button>`;
-        
+
         return `
         <div class="p-6 rounded-lg border-l-4 shadow-md ${bgColor}">
             <div class="flex justify-between items-start">
@@ -183,6 +195,11 @@ export function atualizarLista() {
         </div>
     `;
     }).join('');
+
+    // Adicionar controles de paginação
+    html += gerarControlesHTML(resultadoPaginacao.totalPaginas, resultadoPaginacao.paginaAtual, 'moduloConsultas', 'green');
+
+    lista.innerHTML = html;
 }
 
 export function deletar(id) {
@@ -191,7 +208,7 @@ export function deletar(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para deletar consultas');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Cancelar Consulta',
         'Tem certeza que deseja cancelar esta consulta?',
@@ -267,6 +284,7 @@ window.moduloConsultas = {
     limparSelecaoPaciente,
     deletar,
     atualizarLista,
+    mudarPagina,
     abrirModalFinalizacao,
     fecharModalFinalizacao,
     finalizarConsulta

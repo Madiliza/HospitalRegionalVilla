@@ -6,8 +6,8 @@ import { salvarDados, lerDados, deletarDados } from '../../config/firebase-confi
 
 export async function carregarDadosFirebase() {
     try {
-        
-        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro, valoresAtendimentos, doacoesSangue] = await Promise.all([
+
+        const [pacientes, consultas, exames, medicamentos, cargos, usuarios, medicamentosConfig, solicitacoesCadastro, valoresAtendimentos, doacoesSangue, examesConfig] = await Promise.all([
             lerDados('pacientes'),
             lerDados('consultas'),
             lerDados('exames'),
@@ -17,7 +17,8 @@ export async function carregarDadosFirebase() {
             lerDados('medicamentosConfig'),
             lerDados('solicitacoes_cadastro'),
             lerDados('valoresAtendimentos'),
-            lerDados('doacoesSangue')
+            lerDados('doacoesSangue'),
+            lerDados('examesConfig')
         ]);
 
         const converterParaArray = (dados) => {
@@ -34,6 +35,7 @@ export async function carregarDadosFirebase() {
             cargos: converterParaArray(cargos),
             usuarios: converterParaArray(usuarios),
             medicamentosConfig: converterParaArray(medicamentosConfig),
+            examesConfig: converterParaArray(examesConfig),
             solicitacoesCadastro: converterParaArray(solicitacoesCadastro),
             valoresAtendimentos: valoresAtendimentos?.valoresAtendimentos || valoresAtendimentos || {},
             doacoesSangue: converterParaArray(doacoesSangue)

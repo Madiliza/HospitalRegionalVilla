@@ -6,13 +6,18 @@ import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/di
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { buscarPacientes as buscarPacientesGlobal } from './pacientes.js';
 import { temPermissao } from '../utils/permissoes.js';
+import { paginar, gerarControlesHTML } from '../utils/paginacao.js';
+import { examesConfig } from './configuracoes.js';
 
 export let exames = [];
+let paginaAtual = 1;
+const itensPorPagina = 10;
+let exameEmEdicaoId = null;
 
 export function init(dadosCarregados) {
     exames = dadosCarregados.exames || [];
     configurarEventos();
-    
+
     // Chamar atualizarLista de forma assíncrona para garantir que o DOM está pronto
     Promise.resolve().then(() => {
         setTimeout(() => {
@@ -26,7 +31,7 @@ function configurarEventos() {
     if (formExame) {
         formExame.addEventListener('submit', (e) => {
             e.preventDefault();
-            adicionarExame();
+            salvarExame();
         });
     }
 }
@@ -36,6 +41,7 @@ function configurarEventos() {
 // ============================================
 export function openModal() {
     document.getElementById('modalExame').classList.remove('modal-hidden');
+    renderizarOpcoesExames(); // Renderizar opções sempre ao abrir
     limparFormulario();
 }
 
@@ -44,12 +50,46 @@ export function closeModal() {
 }
 
 function limparFormulario() {
+    exameEmEdicaoId = null;
     document.getElementById('formExame').reset();
     document.getElementById('buscaPacienteExame').value = '';
     document.getElementById('examePacienteId').value = '';
     document.getElementById('dadosPacienteExameDiv').classList.add('hidden');
     document.getElementById('sugestoesPacientesExame').classList.add('hidden');
     document.getElementById('exameResumo').value = '';
+
+    // Limpar checkboxes
+    document.querySelectorAll('input[name="exameTipo"]').forEach(cb => cb.checked = false);
+
+    const btnSubmit = document.querySelector('#formExame button[type="submit"]');
+    if (btnSubmit) {
+        btnSubmit.innerHTML = 'Agendar Exame';
+    }
+}
+
+export function renderizarOpcoesExames() {
+    const container = document.getElementById('listaOpcoesExames');
+    if (!container) return;
+
+    if (examesConfig.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center text-gray-500 py-4">
+                <p>Nenhum tipo de exame configurado.</p>
+                <p class="text-xs">Vá em Configurações > Tipos de Exame para adicionar.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Ordenar alfabeticamente
+    const examesOrdenados = [...examesConfig].sort((a, b) => a.nome.localeCompare(b.nome));
+
+    container.innerHTML = examesOrdenados.map(exame => `
+        <label class="flex items-center space-x-2 cursor-pointer hover:bg-purple-50 p-1 rounded">
+            <input type="checkbox" name="exameTipo" value="${exame.nome}" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
+            <span class="text-gray-700 text-sm">${exame.nome}</span>
+        </label>
+    `).join('');
 }
 
 // Busca de paciente
@@ -98,13 +138,15 @@ export function limparSelecaoPaciente() {
     document.getElementById('sugestoesPacientesExame').classList.add('hidden');
 }
 
-export async function adicionarExame() {
+export async function salvarExame() {
     // Verificar permissão
-    if (!temPermissao('exame', 'criar')) {
-        mostrarErro('Acesso Negado', 'Você não tem permissão para criar exames');
+    const acao = exameEmEdicaoId ? 'editar' : 'criar';
+
+    if (!temPermissao('exame', acao)) {
+        mostrarErro('Acesso Negado', `Você não tem permissão para ${acao} exames`);
         return;
     }
-    
+
     const pacienteId = document.getElementById('examePacienteId').value;
     const tiposSelecionados = Array.from(document.querySelectorAll('input[name="exameTipo"]:checked')).map(cb => cb.value);
     const tipo = tiposSelecionados.join(', ');
@@ -123,28 +165,106 @@ export async function adicionarExame() {
         return;
     }
 
-    const novoExame = {
-        id: `EXAM-${Date.now()}`,
-        pacienteId,
-        tipo,
-        data,
-        hora,
-        resumo,
-        dataCriacao: new Date().toLocaleDateString('pt-BR')
-    };
+    if (exameEmEdicaoId) {
+        // EDIÇÃO
+        const index = exames.findIndex(e => e.id === exameEmEdicaoId);
+        if (index !== -1) {
+            const exameAtualizado = {
+                ...exames[index],
+                pacienteId,
+                tipo,
+                data,
+                hora,
+                resumo
+                // Mantém id e dataCriacao originais
+            };
 
-    exames.push(novoExame);
+            exames[index] = exameAtualizado;
 
-    try {
-        await salvarNoFirebase('exames', novoExame);
-    } catch (erro) {
-        // Erro silencioso
+            try {
+                await salvarNoFirebase('exames', exameAtualizado);
+                mostrarNotificacao('Exame atualizado com sucesso!', 'success');
+            } catch (erro) {
+                console.error(erro);
+                mostrarErro('Erro', 'Falha ao atualizar exame no banco de dados');
+            }
+        }
+    } else {
+        // CRIAÇÃO
+        const novoExame = {
+            id: `EXAM-${Date.now()}`,
+            pacienteId,
+            tipo,
+            data,
+            hora,
+            resumo,
+            dataCriacao: new Date().toLocaleDateString('pt-BR')
+        };
+
+        exames.push(novoExame);
+
+        try {
+            await salvarNoFirebase('exames', novoExame);
+            mostrarNotificacao('Exame agendado com sucesso!', 'success');
+        } catch (erro) {
+            // Erro silencioso ou log
+            console.error(erro);
+        }
     }
 
     closeModal();
     atualizarLista();
+}
 
-    mostrarNotificacao('Exame agendado com sucesso!', 'success');
+export function editar(id) {
+    const exame = exames.find(e => e.id === id);
+    if (!exame) return;
+
+    // Abrir modal e limpar estado anterior
+    document.getElementById('modalExame').classList.remove('modal-hidden');
+    renderizarOpcoesExames(); // Garantir que opções estão renderizadas
+    limparFormulario();
+
+    // Configurar estado de edição
+    exameEmEdicaoId = id;
+
+    // Preencher campos
+    document.getElementById('buscaPacienteExame').value = exame.pacienteId;
+    document.getElementById('examePacienteId').value = exame.pacienteId;
+    document.getElementById('exameData').value = exame.data;
+    document.getElementById('exameHora').value = exame.hora;
+    document.getElementById('exameResumo').value = exame.resumo || '';
+
+    // Marcar checkboxes
+    const tipos = exame.tipo.split(', ');
+    const checkboxes = document.querySelectorAll('input[name="exameTipo"]');
+    checkboxes.forEach(cb => {
+        if (tipos.includes(cb.value)) {
+            cb.checked = true;
+        }
+    });
+
+    // Preencher dados do paciente na UI
+    const paciente = buscarPacientesGlobal('').find(p => p.id === exame.pacienteId);
+    if (paciente) {
+        selecionarPaciente(paciente.id, paciente.nome, paciente.idade);
+    } else {
+        // Caso fallback se paciente não for achado na lista global (improvável mas possível)
+        // Apenas setar o ID nos campos hidden já foi feito acima
+        // Pode-se tentar mostrar algo genérico ou apenas deixar o ID
+        selecionarPaciente(exame.pacienteId, 'Paciente não encontrado', '?');
+    }
+
+    // Atualizar botão
+    const btnSubmit = document.querySelector('#formExame button[type="submit"]');
+    if (btnSubmit) {
+        btnSubmit.innerHTML = 'Salvar Alterações';
+    }
+}
+
+export function mudarPagina(novaPagina) {
+    paginaAtual = novaPagina;
+    atualizarLista();
 }
 
 export function atualizarLista() {
@@ -159,7 +279,11 @@ export function atualizarLista() {
         return;
     }
 
-    lista.innerHTML = exames.map(exame => `
+    // Paginar
+    const resultadoPaginacao = paginar(exames, paginaAtual, itensPorPagina);
+    const examesExibidos = resultadoPaginacao.dadosPaginados;
+
+    let html = examesExibidos.map(exame => `
         <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-lg border-l-4 border-purple-600">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
@@ -169,12 +293,22 @@ export function atualizarLista() {
                     <p class="text-gray-600"><i class="fas fa-clock mr-2"></i>Agendado em: ${exame.dataCriacao}</p>
                     ${exame.resumo ? `<p class="text-gray-700 mt-3"><strong>Resumo:</strong> ${exame.resumo}</p>` : ''}
                 </div>
-                <button onclick="window.moduloExames.deletar('${exame.id}')" class="text-red-600 hover:text-red-800 transition">
-                    <i class="fas fa-trash text-xl"></i>
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="window.moduloExames.editar('${exame.id}')" class="text-blue-600 hover:text-blue-800 transition" title="Editar">
+                        <i class="fas fa-edit text-xl"></i>
+                    </button>
+                    <button onclick="window.moduloExames.deletar('${exame.id}')" class="text-red-600 hover:text-red-800 transition" title="Deletar">
+                        <i class="fas fa-trash text-xl"></i>
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');
+
+    // Adicionar controles de paginação
+    html += gerarControlesHTML(resultadoPaginacao.totalPaginas, resultadoPaginacao.paginaAtual, 'moduloExames', 'purple');
+
+    lista.innerHTML = html;
 }
 
 export function deletar(id) {
@@ -183,7 +317,7 @@ export function deletar(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para deletar exames');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Cancelar Exame',
         'Tem certeza que deseja cancelar este exame?',
@@ -204,5 +338,7 @@ window.moduloExames = {
     selecionarPaciente,
     limparSelecaoPaciente,
     deletar,
-    atualizarLista
+    editar,
+    atualizarLista,
+    mudarPagina
 };

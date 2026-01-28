@@ -37,12 +37,12 @@ let usuarioLogado = null;
 async function carregarComponentes() {
     const componentes = ['pacientes', 'consultas', 'exames', 'farmacia', 'configuracoes', 'calculadora', 'doarsangue'];
     const containerComponentes = document.getElementById('componentes');
-    
+
     // Aguardar que o container exista
     if (!containerComponentes) {
         return;
     }
-    
+
     for (const nome of componentes) {
         try {
             const response = await fetch(`./src/components/${nome}.html`);
@@ -54,7 +54,7 @@ async function carregarComponentes() {
             // Erro silencioso ao carregar componente
         }
     }
-    
+
     // Aguardar várias frames para garantir que o DOM foi atualizado e renderizado
     return new Promise(resolve => {
         // Use requestAnimationFrame para aguardar a renderização
@@ -70,31 +70,31 @@ async function carregarComponentes() {
 verificarAutenticacao(async (user) => {
     // Verificar se está logado localmente (por ID)
     const usuarioLogadoLocal = localStorage.getItem('usuarioLogado');
-    
+
     if (!user && !usuarioLogadoLocal) {
         // Usuário não autenticado, redirecionar para login
         window.location.href = '/login.html';
         return;
     }
-    
+
     // Usuário autenticado
     usuarioLogado = user || { uid: usuarioLogadoLocal };
-    
+
     // Atualizar nome do usuário no navbar
     atualizarInfoUsuario(usuarioLogado);
-    
+
     // Inicializar o sistema
     await inicializarSistema();
 });
 
 async function inicializarSistema() {
-    
+
     // Carregar componentes HTML
     await carregarComponentes();
-    
+
     // Carregar dados
     dadosGlobais = await carregarDadosFirebase();
-    
+
     // Inicializar módulos
     moduloPacientes.init(dadosGlobais);
     moduloConsultas.init(dadosGlobais);
@@ -103,32 +103,32 @@ async function inicializarSistema() {
     moduloConfig.init(dadosGlobais);
     moduloCalculadora.init(dadosGlobais);
     moduloDoacao.init(dadosGlobais);
-    
+
     // Aguardar um pouco mais para garantir que o DOM está completamente pronto
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     // Inicializar sistema de permissões
     const usuarioId = localStorage.getItem('usuarioLogado');
     if (usuarioId) {
         const permissoesOk = inicializarPermissoes(usuarioId, dadosGlobais.usuarios, dadosGlobais.cargos);
-        
+
         if (permissoesOk) {
             // Debug: mostrar permissões no console
             debugPermissoes();
-            
+
             // Aplicar controle de permissões na interface
             aplicarPermissoesPorModulo(dadosGlobais);
-            
+
             // Aplicar permissões específicas do módulo de configurações
             if (moduloConfig.aplicarPermissoesAbas) {
                 moduloConfig.aplicarPermissoesAbas();
             }
         }
     }
-    
+
     // Atualizar dashboard
     atualizarDashboard();
-    
+
     // Marcar app como pronto
     setAppReady(true);
 }
@@ -149,7 +149,7 @@ function aplicarPermissoesPorModulo(dados) {
             }
         }
     }
-    
+
     // ============================================
     // BOTÕES PRINCIPAIS POR MÓDULO
     // ============================================
@@ -157,14 +157,14 @@ function aplicarPermissoesPorModulo(dados) {
     controlarBotao('btnNovaConsulta', 'consulta', 'criar', 'Nova Consulta');
     controlarBotao('btnNovoExame', 'exame', 'criar', 'Novo Exame');
     controlarBotao('btnRegistrarAtendimento', 'farmacia', 'criar', 'Registrar Atendimento');
-    
+
     // ============================================
     // CONFIGURAÇÕES
     // ============================================
     controlarBotao('btnNovoCargo', 'cargo', 'criar', 'Novo Cargo');
     controlarBotao('btnNovoUsuario', 'usuario', 'criar', 'Novo Usuário');
     controlarBotao('btnNovoMedicamento', 'farmacia', 'criar', 'Novo Medicamento');
-    
+
     // ============================================
     // SIDEBAR - Usando IDs para seleção robusta
     // ============================================
@@ -180,10 +180,10 @@ function atualizarInfoUsuario(user) {
     const userBtn = document.getElementById('userBtn');
     if (userBtn) {
         // Tentar obter nome do localStorage ou do usuário
-        const nomeUsuario = localStorage.getItem('usuarioNome') || 
-                           user.displayName || 
-                           localStorage.getItem('usuarioLogado') ||
-                           'Usuário';
+        const nomeUsuario = localStorage.getItem('usuarioNome') ||
+            user.displayName ||
+            localStorage.getItem('usuarioLogado') ||
+            'Usuário';
         userBtn.innerHTML = `<i class="fas fa-user-circle mr-2"></i>${nomeUsuario}<i class="fas fa-chevron-down ml-2 text-sm"></i>`;
     }
 }
@@ -201,7 +201,7 @@ function showSection(sectionId) {
         'calculadora': ['cargo', 'visualizar'],
         'doarSangue': ['doacao', 'visualizar']
     };
-    
+
     // Se é um módulo que requer permissão
     if (permissoesModulos[sectionId]) {
         const [modulo, acao] = permissoesModulos[sectionId];
@@ -210,7 +210,7 @@ function showSection(sectionId) {
             return;
         }
     }
-    
+
     // Esconder todas as sections
     document.querySelectorAll('section').forEach(section => {
         section.classList.add('modal-hidden');
@@ -233,7 +233,7 @@ function showSection(sectionId) {
     // Encontrar e destacar o botão clicado
     const buttons = document.querySelectorAll('aside button');
     buttons.forEach(btn => {
-        if (btn.textContent.toLowerCase().includes(sectionId.toLowerCase()) || 
+        if (btn.textContent.toLowerCase().includes(sectionId.toLowerCase()) ||
             btn.onclick.toString().includes(`'${sectionId}'`)) {
             btn.classList.remove('hover:bg-gray-100', 'text-gray-700');
             btn.classList.add('bg-blue-600', 'text-white');
@@ -257,13 +257,13 @@ function atualizarDashboard() {
 function setupProfileDropdown() {
     const userBtn = document.getElementById('userBtn');
     const dropdown = document.getElementById('profileDropdown');
-    
+
     if (userBtn && dropdown) {
         userBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             dropdown.classList.toggle('show');
         });
-        
+
         // Fechar dropdown ao clicar fora
         document.addEventListener('click', (e) => {
             if (!dropdown.contains(e.target) && !userBtn.contains(e.target)) {
@@ -279,7 +279,7 @@ function setupProfileDropdown() {
 function abrirModalAlterarSenha() {
     const dropdown = document.getElementById('profileDropdown');
     dropdown.classList.remove('show');
-    
+
     const modal = document.getElementById('modalAlterarSenha');
     if (modal) {
         modal.classList.remove('modal-hidden');
@@ -301,27 +301,27 @@ function setupFormAlterarSenha() {
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const senhaAtual = document.getElementById('senhaAtual').value;
             const novaSenha = document.getElementById('novaSenha').value;
             const confirmarSenha = document.getElementById('confirmarSenha').value;
-            
+
             // Validações
             if (novaSenha !== confirmarSenha) {
                 mostrarNotificacao('As senhas não coincidem!', 'error');
                 return;
             }
-            
+
             if (novaSenha.length < 6) {
                 mostrarNotificacao('A nova senha deve ter pelo menos 6 caracteres!', 'error');
                 return;
             }
-            
+
             if (senhaAtual === novaSenha) {
                 mostrarNotificacao('A nova senha deve ser diferente da atual!', 'error');
                 return;
             }
-            
+
             try {
                 await alterarSenha(senhaAtual, novaSenha);
                 mostrarNotificacao('Senha alterada com sucesso!', 'success');
@@ -342,20 +342,20 @@ function setupFormAlterarSenha() {
 async function logout() {
     const dropdown = document.getElementById('profileDropdown');
     dropdown.classList.remove('show');
-    
+
     try {
         // Limpar dados locais
         localStorage.removeItem('usuarioLogado');
         localStorage.removeItem('usuarioEmail');
         localStorage.removeItem('usuarioNome');
-        
+
         // Tentar fazer logout no Firebase se existir
         try {
             await fazerLogout();
         } catch (e) {
             // Ignorar erro se não estiver usando Firebase Auth
         }
-        
+
         mostrarNotificacao('Logout realizado com sucesso!', 'success');
         setTimeout(() => {
             window.location.href = '/login.html';
@@ -366,10 +366,10 @@ async function logout() {
 }
 
 // Toggle visibilidade da senha
-window.togglePasswordVisibility = function(inputId) {
+window.togglePasswordVisibility = function (inputId) {
     const input = document.getElementById(inputId);
     const icon = input.nextElementSibling.querySelector('i');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
         icon.classList.remove('fa-eye');

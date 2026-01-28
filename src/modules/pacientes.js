@@ -5,12 +5,16 @@
 import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/dialogs.js';
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { temPermissao } from '../utils/permissoes.js';
+import { paginar, gerarControlesHTML } from '../utils/paginacao.js';
 export let pacientes = [];
+let paginaAtual = 1;
+const itensPorPagina = 10;
+let termoPesquisaAtual = '';
 
 export function init(dadosCarregados) {
     pacientes = dadosCarregados.pacientes || [];
     configurarEventos();
-    
+
     // Chamar atualizarLista de forma assíncrona para garantir que o DOM está pronto
     Promise.resolve().then(() => {
         setTimeout(() => {
@@ -95,7 +99,7 @@ export async function adicionarPaciente() {
             return;
         }
     }
-    
+
     const id = document.getElementById('pacienteId').value;
     const nome = document.getElementById('pacienteNome').value;
     const idade = document.getElementById('pacienteIdade').value;
@@ -167,19 +171,49 @@ export async function adicionarPaciente() {
     }
 }
 
+export function mudarPagina(novaPagina) {
+    paginaAtual = novaPagina;
+    atualizarLista();
+}
+
 export function atualizarLista() {
     const lista = document.getElementById('pacientesList');
+    const resultadoDiv = document.getElementById('resultadoPesquisa');
 
     if (!lista) {
         return;
     }
 
-    if (pacientes.length === 0) {
-        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum paciente cadastrado</p>';
+    // Filtrar primeiro
+    let pacientesFiltrados = pacientes;
+    if (termoPesquisaAtual) {
+        pacientesFiltrados = pacientes.filter(paciente =>
+            paciente.id.toLowerCase().includes(termoPesquisaAtual) ||
+            paciente.nome.toLowerCase().includes(termoPesquisaAtual)
+        );
+
+        // Atualizar contador de resultados
+        if (resultadoDiv) {
+            resultadoDiv.classList.remove('hidden');
+            document.getElementById('totalResultados').textContent = pacientesFiltrados.length;
+        }
+    } else {
+        if (resultadoDiv) {
+            resultadoDiv.classList.add('hidden');
+        }
+    }
+
+    if (pacientesFiltrados.length === 0) {
+        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum paciente encontrado</p>';
         return;
     }
 
-    lista.innerHTML = pacientes.map(paciente => `
+    // Paginar
+    const resultadoPaginacao = paginar(pacientesFiltrados, paginaAtual, itensPorPagina);
+    const pacientesExibidos = resultadoPaginacao.dadosPaginados;
+
+    // Renderizar lista
+    let html = pacientesExibidos.map(paciente => `
         <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-lg border-l-4 border-red-600">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
@@ -201,65 +235,28 @@ export function atualizarLista() {
             </div>
         </div>
     `).join('');
+
+    // Adicionar controles de paginação
+    html += gerarControlesHTML(resultadoPaginacao.totalPaginas, resultadoPaginacao.paginaAtual, 'moduloPacientes');
+
+    lista.innerHTML = html;
 }
 
 export function pesquisarPacientes() {
-    const termoPesquisa = document.getElementById('pesquisaPaciente').value.trim().toLowerCase();
-    const lista = document.getElementById('pacientesList');
-    const resultadoDiv = document.getElementById('resultadoPesquisa');
+    const input = document.getElementById('pesquisaPaciente');
+    if (!input) return;
 
-    if (!lista) return;
-
-    // Se campo vazio, mostrar todos
-    if (!termoPesquisa) {
-        resultadoDiv.classList.add('hidden');
-        atualizarLista();
-        return;
-    }
-
-    // Filtrar pacientes
-    const pacientesFiltrados = pacientes.filter(paciente =>
-        paciente.id.toLowerCase().includes(termoPesquisa) ||
-        paciente.nome.toLowerCase().includes(termoPesquisa)
-    );
-
-    // Mostrar resultado da pesquisa
-    resultadoDiv.classList.remove('hidden');
-    document.getElementById('totalResultados').textContent = pacientesFiltrados.length;
-
-    if (pacientesFiltrados.length === 0) {
-        lista.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum paciente encontrado com os critérios de busca</p>';
-        return;
-    }
-
-    // Renderizar pacientes filtrados
-    lista.innerHTML = pacientesFiltrados.map(paciente => `
-        <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-lg border-l-4 border-red-600">
-            <div class="flex justify-between items-start">
-                <div class="flex-1">
-                    <h3 class="text-lg font-bold text-gray-800">${paciente.nome}</h3>
-                    <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>Passaporte: ${paciente.id}</p>
-                    <p class="text-gray-600"><i class="fas fa-birthday-cake mr-2"></i>Idade: ${paciente.idade} anos</p>
-                    <p class="text-gray-600"><i class="fas fa-droplet mr-2"></i>Tipo Sanguíneo: <strong>${paciente.tipoSanguineo}</strong></p>
-                    <p class="text-gray-600"><i class="fas fa-calendar mr-2"></i>Cadastro: ${paciente.dataCriacao}</p>
-                    ${paciente.observacao ? `<p class="text-gray-700 mt-2"><i class="fas fa-sticky-note mr-2"></i><strong>Observação:</strong> ${paciente.observacao}</p>` : ''}
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="window.moduloPacientes.openEditModal('${paciente.id}')" class="text-blue-600 hover:text-blue-800 transition" title="Editar">
-                        <i class="fas fa-edit text-xl"></i>
-                    </button>
-                    <button onclick="window.moduloPacientes.deletar('${paciente.id}')" class="text-red-600 hover:text-red-800 transition" title="Deletar">
-                        <i class="fas fa-trash text-xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    termoPesquisaAtual = input.value.trim().toLowerCase();
+    paginaAtual = 1; // Resetar para primeira página na busca
+    atualizarLista();
 }
 
 export function limparPesquisa() {
     document.getElementById('pesquisaPaciente').value = '';
-    document.getElementById('resultadoPesquisa').classList.add('hidden');
+    termoPesquisaAtual = '';
+    paginaAtual = 1;
+    const resultadoDiv = document.getElementById('resultadoPesquisa');
+    if (resultadoDiv) resultadoDiv.classList.add('hidden');
     atualizarLista();
 }
 
@@ -269,7 +266,7 @@ export function deletar(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para deletar pacientes');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Deletar Paciente',
         'Tem certeza que deseja deletar este paciente?',
@@ -281,11 +278,11 @@ export function deletar(id) {
         }
     );
 }
-        
+
 
 export function buscarPacientes(termo) {
-    return pacientes.filter(p => 
-        p.id.toLowerCase().includes(termo.toLowerCase()) || 
+    return pacientes.filter(p =>
+        p.id.toLowerCase().includes(termo.toLowerCase()) ||
         p.nome.toLowerCase().includes(termo.toLowerCase())
     );
 }
@@ -297,5 +294,8 @@ window.moduloPacientes = {
     closeModal,
     deletar,
     buscarPacientes,
-    atualizarLista
+    atualizarLista,
+    mudarPagina,
+    pesquisarPacientes,
+    limparPesquisa
 };

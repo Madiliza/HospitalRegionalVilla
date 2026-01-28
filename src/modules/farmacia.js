@@ -6,16 +6,20 @@ import { mostrarNotificacao, mostrarConfirmacao, mostrarErro } from '../utils/di
 import { salvarNoFirebase, deletarDoFirebase } from '../utils/firebase.js';
 import { buscarPacientes as buscarPacientesGlobal } from './pacientes.js';
 import { temPermissao } from '../utils/permissoes.js';
+import { paginar, gerarControlesHTML } from '../utils/paginacao.js';
 
 export let medicamentos = [];
+let paginaAtual = 1;
+const itensPorPagina = 10;
 export let medicamentosConfig = [];
 let medicamentosSelecionados = {};
+let filtroData = null;
 
 export function init(dadosCarregados) {
     medicamentos = dadosCarregados.medicamentos || [];
     medicamentosConfig = dadosCarregados.medicamentosConfig || [];
     configurarEventos();
-    
+
     // Chamar atualizarLista de forma assíncrona para garantir que o DOM está pronto
     Promise.resolve().then(() => {
         setTimeout(() => {
@@ -99,11 +103,11 @@ export function buscarPacientes() {
     const buscaInput = document.getElementById('buscaPacienteId');
     const sugestoes = document.getElementById('sugestoesPacientes');
     const listaSugestoes = document.getElementById('listaSugestoes');
-    
+
     if (!buscaInput || !sugestoes || !listaSugestoes) {
         return;
     }
-    
+
     const termo = buscaInput.value.toLowerCase().trim();
 
     if (termo.length === 0) {
@@ -162,7 +166,7 @@ function getQuantidadeDispensadaHoje(pacienteId, medicamentoId) {
 function getLimiteMedicamento(medicamentoId) {
     const config = medicamentosConfig.find(m => m.id === medicamentoId);
     if (!config) return 999;
-    
+
     const isParceria = isAtendimentoParceria();
     if (isParceria && config.qtdMaxParceria) {
         return parseInt(config.qtdMaxParceria) || 999;
@@ -180,7 +184,7 @@ function isAtendimentoParceria() {
 function getPrecoMedicamento(medicamentoId) {
     const config = medicamentosConfig.find(m => m.id === medicamentoId);
     if (!config) return 0;
-    
+
     if (isAtendimentoParceria()) {
         return parseFloat(config.precoParceria) || parseFloat(config.preco) || 0;
     }
@@ -191,13 +195,13 @@ function getPrecoMedicamento(medicamentoId) {
 export function toggleParceria() {
     const isParceria = isAtendimentoParceria();
     const badge = document.getElementById('tipoPrecoBadge');
-    
+
     if (isParceria) {
         badge.innerHTML = '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold"><i class="fas fa-handshake mr-1"></i>Preço Parceria</span>';
     } else {
         badge.innerHTML = '<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">Preço Normal</span>';
     }
-    
+
     // Atualizar preços dos medicamentos já selecionados
     Object.keys(medicamentosSelecionados).forEach(id => {
         const config = medicamentosConfig.find(m => m.id === id);
@@ -206,7 +210,7 @@ export function toggleParceria() {
             medicamentosSelecionados[id].precoParceria = parseFloat(config.precoParceria) || 0;
         }
     });
-    
+
     atualizarListaMedicamentosNoModal();
     atualizarListaMedicamentosSelecionados();
     atualizarResume();
@@ -215,11 +219,11 @@ export function toggleParceria() {
 export function atualizarListaMedicamentosNoModal() {
     const lista = document.getElementById('listaMedicamentosDisponiveis');
     const pacienteId = document.getElementById('medicamentoPacienteId');
-    
+
     if (!lista || !pacienteId) {
         return;
     }
-    
+
     const pacienteIdValue = pacienteId.value;
     const isParceria = isAtendimentoParceria();
 
@@ -238,7 +242,7 @@ export function atualizarListaMedicamentosNoModal() {
         const precoNormal = parseFloat(med.preco) || 0;
         const precoParceria = parseFloat(med.precoParceria) || 0;
         const precoAtual = isParceria ? precoParceria : precoNormal;
-        
+
         return `
         <div class="p-4 bg-white rounded-lg border border-gray-200 flex items-center justify-between ${desabilitado ? 'opacity-50' : ''}">
             <div>
@@ -344,13 +348,13 @@ export function atualizarListaMedicamentosSelecionados() {
 
     const pacienteId = pacienteIdElement.value;
     const isParceria = isAtendimentoParceria();
-    
+
     div.innerHTML = Object.entries(medicamentosSelecionados).map(([id, med]) => {
         const limiteMax = med.qtdMax || getLimiteMedicamento(id);
         const jaDispensadoHoje = pacienteId ? getQuantidadeDispensadaHoje(pacienteId, id) : 0;
         const limiteDisponivel = limiteMax - jaDispensadoHoje;
         const precoAtual = isParceria ? (med.precoParceria || med.preco) : (med.precoNormal || med.preco);
-        
+
         return `
         <div class="p-3 bg-gray-50 rounded-lg flex items-center justify-between border border-gray-200">
             <div class="flex-1">
@@ -384,7 +388,7 @@ export function atualizarResume() {
     if (!resumo) {
         return;
     }
-    
+
     if (medicatmentosArray.length === 0) {
         resumo.innerHTML = '<p class="text-gray-600">Nenhum medicamento selecionado</p>';
     } else {
@@ -405,7 +409,7 @@ export async function adicionarMedicamento() {
         mostrarErro('Acesso Negado', 'Você não tem permissão para registrar medicamentos');
         return;
     }
-    
+
     const pacienteId = document.getElementById('medicamentoPacienteId').value;
     const isParceria = isAtendimentoParceria();
 
@@ -428,12 +432,12 @@ export async function adicionarMedicamento() {
         };
     });
     const errosLimite = [];
-    
+
     for (const med of medicamentosArray) {
         const limiteMax = med.qtdMax || getLimiteMedicamento(med.id);
         const jaDispensadoHoje = getQuantidadeDispensadaHoje(pacienteId, med.id);
         const totalAposAtendimento = jaDispensadoHoje + med.quantidade;
-        
+
         if (totalAposAtendimento > limiteMax) {
             errosLimite.push(`${med.nome}: solicitado ${med.quantidade}, já dispensado ${jaDispensadoHoje}, limite ${limiteMax}`);
         }
@@ -468,6 +472,27 @@ export async function adicionarMedicamento() {
     mostrarNotificacao('Atendimento registrado com sucesso!', 'success');
 }
 
+export function mudarPagina(novaPagina) {
+    paginaAtual = novaPagina;
+    atualizarLista();
+}
+
+export function filtrarPorData(data) {
+    filtroData = data;
+    paginaAtual = 1; // Resetar para primeira página ao filtrar
+    atualizarLista();
+}
+
+export function limparFiltroData() {
+    filtroData = null;
+    const inputDate = document.getElementById('filtroDataFarmacia');
+    if (inputDate) {
+        inputDate.value = '';
+    }
+    paginaAtual = 1;
+    atualizarLista();
+}
+
 export function atualizarLista() {
     const lista = document.getElementById('farmaciaList');
 
@@ -480,18 +505,33 @@ export function atualizarLista() {
         return;
     }
 
+    // Filtrar e ordenar
+    let listaFiltrada = [...medicamentos];
+
+    if (filtroData) {
+        // Formatar data do input (yyyy-mm-dd) para dd/mm/yyyy para comparar
+        const [ano, mes, dia] = filtroData.split('-');
+        const dataFormatada = `${dia}/${mes}/${ano}`;
+
+        listaFiltrada = listaFiltrada.filter(m => m.dataAtendimento === dataFormatada);
+    }
+
     // Ordenar por data/hora mais recente primeiro
-    const atendimentosOrdenados = [...medicamentos].sort((a, b) => {
+    const atendimentosOrdenados = listaFiltrada.sort((a, b) => {
         const dataA = new Date(`${a.dataAtendimento} ${a.horaAtendimento}`);
         const dataB = new Date(`${b.dataAtendimento} ${b.horaAtendimento}`);
         return dataB - dataA;
     });
 
-    lista.innerHTML = atendimentosOrdenados.map(atendimento => {
+    // Paginar
+    const resultadoPaginacao = paginar(atendimentosOrdenados, paginaAtual, itensPorPagina);
+    const atendimentosExibidos = resultadoPaginacao.dadosPaginados;
+
+    let html = atendimentosExibidos.map(atendimento => {
         const meds = atendimento.medicamentos || [];
         const totalMedicamentos = meds.reduce((sum, m) => sum + (m.quantidade || 0), 0);
         const isParceria = atendimento.isParceria || false;
-        
+
         return `
             <div class="bg-gradient-to-r ${isParceria ? 'from-green-50 to-green-100 border-green-600' : 'from-orange-50 to-orange-100 border-orange-600'} p-6 rounded-lg border-l-4">
                 <div class="flex justify-between items-start">
@@ -522,6 +562,11 @@ export function atualizarLista() {
             </div>
         `;
     }).join('');
+
+    // Adicionar controles de paginação
+    html += gerarControlesHTML(resultadoPaginacao.totalPaginas, resultadoPaginacao.paginaAtual, 'moduloFarmacia', 'orange');
+
+    lista.innerHTML = html;
 }
 
 export function apagarAtendimento(pacienteId) {
@@ -531,12 +576,12 @@ export function apagarAtendimento(pacienteId) {
         async () => {
             const idsParaDeletar = medicamentos.filter(m => m.pacienteId === pacienteId).map(m => m.id);
             medicamentos = medicamentos.filter(m => m.pacienteId !== pacienteId);
-            
+
             // Deletar cada atendimento individualmente do Firebase
             for (const id of idsParaDeletar) {
                 await deletarDoFirebase('medicamentos', id);
             }
-            
+
             atualizarLista();
             mostrarNotificacao('Atendimento removido com sucesso!', 'success');
         }
@@ -549,7 +594,7 @@ export function deletar(id) {
         mostrarErro('Acesso Negado', 'Você não tem permissão para deletar medicamentos');
         return;
     }
-    
+
     mostrarConfirmacao(
         'Remover Medicamento',
         'Tem certeza que deseja remover este medicamento?',
@@ -575,5 +620,9 @@ window.moduloFarmacia = {
     toggleParceria,
     deletar,
     apagarAtendimento,
-    atualizarLista
+
+    atualizarLista,
+    mudarPagina,
+    filtrarPorData,
+    limparFiltroData
 };
